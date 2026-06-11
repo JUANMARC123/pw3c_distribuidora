@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Models\Seguridad\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -33,6 +34,30 @@ class AuthController extends ApiController
             'user' => $user->load('roles', 'estado'),
             'token' => $token,
         ], 'Inicio de sesión exitoso.');
+    }
+
+    public function register(RegisterRequest $request)
+    {
+        $data = $request->validated();
+        $data['password_hash'] = Hash::make($data['password']);
+        $data['fecha_creacion'] = now();
+        $data['id_estado_usuario'] = 1;
+        unset($data['password'], $data['roles']);
+
+        $user = Usuario::create($data);
+
+        if ($request->filled('roles')) {
+            $user->roles()->attach($request->roles);
+        } else {
+            $user->roles()->attach(4);
+        }
+
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return $this->jsonResponse([
+            'user' => $user->load('roles', 'estado'),
+            'token' => $token,
+        ], 'Usuario registrado exitosamente.', 201);
     }
 
     public function logout(Request $request)

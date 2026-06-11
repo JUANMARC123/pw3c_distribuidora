@@ -17,6 +17,7 @@ use App\Http\Controllers\Despacho\EvidenciaController;
 use App\Http\Controllers\Reportes\ReporteController;
 
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);

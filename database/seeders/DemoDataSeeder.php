@@ -67,6 +67,7 @@ class DemoDataSeeder extends Seeder
             for ($i = 0; $i < 2; $i++) {
                 ControlRuta::factory(1)->create([
                     'id_ruta' => $ruta->id_ruta,
+                    'fecha_ruta' => now()->subDays($i),
                     'id_repartidor' => fake()->numberBetween(1, 5),
                     'id_vehiculo' => fake()->numberBetween(1, 10),
                 ]);
