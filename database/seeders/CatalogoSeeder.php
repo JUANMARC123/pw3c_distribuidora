@@ -21,9 +21,24 @@ use App\Models\Evidencia\TipoIncidencia;
 use App\Models\Evidencia\TipoEvidencia;
 use App\Models\Farmacia\Cargo;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class CatalogoSeeder extends Seeder
 {
+    private array $moduleActions = [
+        'Dashboard'       => ['acceder'],
+        'Reportes'        => ['acceder', 'listar'],
+        'Usuarios'        => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'asignar-roles'],
+        'Roles'           => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'asignar-permisos'],
+        'Farmacias'       => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'gestionar-contactos'],
+        'Pedidos'         => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado'],
+        'Repartidores'    => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado'],
+        'Vehículos'       => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado'],
+        'Rutas'           => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'gestionar-paradas'],
+        'Control Rutas'   => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'registrar-llegada'],
+        'Despachos'       => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado', 'gestionar-incidencias', 'gestionar-evidencias'],
+    ];
+
     public function run()
     {
         EstadoUsuario::insert([
@@ -39,36 +54,127 @@ class CatalogoSeeder extends Seeder
             ['nombre' => 'Repartidor'],
         ]);
 
-        Modulo::insert([
-            ['nombre' => 'Seguridad'],
-            ['nombre' => 'Farmacias'],
-            ['nombre' => 'Pedidos'],
-            ['nombre' => 'Repartidores'],
-            ['nombre' => 'Vehiculos'],
-            ['nombre' => 'Logistica'],
-            ['nombre' => 'Despachos'],
-            ['nombre' => 'Incidencias'],
-            ['nombre' => 'Reportes'],
-        ]);
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        Modulo::truncate();
+        Accion::truncate();
+        DB::table('rol_permiso')->truncate();
+        Permiso::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
-        Accion::insert([
-            ['nombre' => 'Crear'],
-            ['nombre' => 'Leer'],
-            ['nombre' => 'Actualizar'],
-            ['nombre' => 'Eliminar'],
-            ['nombre' => 'Exportar'],
-            ['nombre' => 'Importar'],
-        ]);
+        foreach (array_keys($this->moduleActions) as $moduleName) {
+            Modulo::create(['nombre' => $moduleName]);
+        }
 
-        TablaSistema::insert([
+        $allActions = [];
+        foreach ($this->moduleActions as $actions) {
+            foreach ($actions as $action) {
+                $allActions[$action] = true;
+            }
+        }
+
+        foreach (array_keys($allActions) as $actionName) {
+            Accion::create(['nombre' => $actionName]);
+        }
+
+        $modulos = Modulo::pluck('id_modulo', 'nombre');
+        $acciones = Accion::pluck('id_accion', 'nombre');
+
+        $permisosData = [];
+        foreach ($this->moduleActions as $moduleName => $actions) {
+            $idModulo = $modulos[$moduleName];
+            foreach ($actions as $actionName) {
+                $permisosData[] = [
+                    'id_modulo' => $idModulo,
+                    'id_accion' => $acciones[$actionName],
+                ];
+            }
+        }
+        Permiso::insertOrIgnore($permisosData);
+
+        $allPermisos = Permiso::pluck('id_permiso')->toArray();
+
+        $rolePermissions = [
+            1 => null,
+            2 => [
+                ['Dashboard', 'acceder'],
+                ['Reportes', 'acceder'], ['Reportes', 'listar'],
+                ['Farmacias', 'acceder'], ['Farmacias', 'listar'], ['Farmacias', 'crear'], ['Farmacias', 'editar'], ['Farmacias', 'gestionar-contactos'],
+                ['Pedidos', 'acceder'], ['Pedidos', 'listar'], ['Pedidos', 'crear'], ['Pedidos', 'editar'], ['Pedidos', 'cambiar-estado'],
+                ['Repartidores', 'acceder'], ['Repartidores', 'listar'], ['Repartidores', 'crear'], ['Repartidores', 'editar'], ['Repartidores', 'cambiar-estado'],
+                ['Vehículos', 'acceder'], ['Vehículos', 'listar'], ['Vehículos', 'crear'], ['Vehículos', 'editar'], ['Vehículos', 'cambiar-estado'],
+                ['Rutas', 'acceder'], ['Rutas', 'listar'], ['Rutas', 'crear'], ['Rutas', 'editar'], ['Rutas', 'gestionar-paradas'],
+                ['Control Rutas', 'acceder'], ['Control Rutas', 'listar'], ['Control Rutas', 'crear'], ['Control Rutas', 'editar'], ['Control Rutas', 'registrar-llegada'],
+                ['Despachos', 'acceder'], ['Despachos', 'listar'], ['Despachos', 'crear'], ['Despachos', 'editar'], ['Despachos', 'cambiar-estado'], ['Despachos', 'gestionar-incidencias'], ['Despachos', 'gestionar-evidencias'],
+            ],
+            3 => [
+                ['Dashboard', 'acceder'],
+                ['Reportes', 'acceder'], ['Reportes', 'listar'],
+                ['Farmacias', 'acceder'], ['Farmacias', 'listar'],
+                ['Pedidos', 'acceder'], ['Pedidos', 'listar'], ['Pedidos', 'crear'], ['Pedidos', 'editar'], ['Pedidos', 'cambiar-estado'],
+                ['Repartidores', 'acceder'], ['Repartidores', 'listar'],
+                ['Vehículos', 'acceder'], ['Vehículos', 'listar'],
+                ['Rutas', 'acceder'], ['Rutas', 'listar'],
+                ['Control Rutas', 'acceder'], ['Control Rutas', 'listar'], ['Control Rutas', 'crear'], ['Control Rutas', 'editar'],
+                ['Despachos', 'acceder'], ['Despachos', 'listar'], ['Despachos', 'crear'], ['Despachos', 'editar'], ['Despachos', 'cambiar-estado'],
+            ],
+            4 => [
+                ['Dashboard', 'acceder'],
+                ['Rutas', 'acceder'], ['Rutas', 'listar'],
+                ['Control Rutas', 'acceder'], ['Control Rutas', 'listar'], ['Control Rutas', 'registrar-llegada'],
+                ['Despachos', 'acceder'], ['Despachos', 'listar'],
+            ],
+        ];
+
+        $permisoLookup = [];
+        foreach (Permiso::with('modulo', 'accion')->get() as $permiso) {
+            $key = $permiso->modulo->nombre . '::' . $permiso->accion->nombre;
+            $permisoLookup[$key] = $permiso->id_permiso;
+        }
+
+        foreach ($rolePermissions as $rolId => $permisosRequeridos) {
+            if ($permisosRequeridos === null) {
+                $targetPermisos = $allPermisos;
+            } else {
+                $targetPermisos = [];
+                foreach ($permisosRequeridos as [$modulo, $accion]) {
+                    $key = $modulo . '::' . $accion;
+                    if (isset($permisoLookup[$key])) {
+                        $targetPermisos[] = $permisoLookup[$key];
+                    }
+                }
+            }
+
+            $existingAssignments = DB::table('rol_permiso')
+                ->where('id_rol', $rolId)
+                ->pluck('id_permiso')
+                ->toArray();
+
+            $newAssignments = array_diff($targetPermisos, $existingAssignments);
+
+            if (!empty($newAssignments)) {
+                $rolPermisoData = [];
+                foreach ($newAssignments as $idPermiso) {
+                    $rolPermisoData[] = [
+                        'id_rol' => $rolId,
+                        'id_permiso' => $idPermiso,
+                    ];
+                }
+                DB::table('rol_permiso')->insertOrIgnore($rolPermisoData);
+            }
+        }
+
+        TablaSistema::insertOrIgnore([
+            ['nombre' => 'dashboard'],
+            ['nombre' => 'reportes'],
             ['nombre' => 'usuarios'],
+            ['nombre' => 'roles'],
             ['nombre' => 'farmacias'],
             ['nombre' => 'pedidos'],
             ['nombre' => 'repartidores'],
             ['nombre' => 'vehiculos'],
             ['nombre' => 'rutas'],
+            ['nombre' => 'control_rutas'],
             ['nombre' => 'despachos'],
-            ['nombre' => 'incidencias'],
         ]);
 
         EstadoPedido::insert([
@@ -170,18 +276,5 @@ class CatalogoSeeder extends Seeder
             ['nombre_cargo' => 'Recepcionista'],
             ['nombre_cargo' => 'Almacenero'],
         ]);
-
-        $modulos = Modulo::all();
-        $acciones = Accion::all();
-        $permisosData = [];
-        foreach ($modulos as $modulo) {
-            foreach ($acciones as $accion) {
-                $permisosData[] = [
-                    'id_modulo' => $modulo->id_modulo,
-                    'id_accion' => $accion->id_accion,
-                ];
-            }
-        }
-        Permiso::insert($permisosData);
     }
 }
