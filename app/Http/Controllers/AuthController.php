@@ -30,9 +30,13 @@ class AuthController extends ApiController
 
         $token = $user->createToken('api-token')->plainTextToken;
 
+        $user->load('roles.permisos.modulo', 'roles.permisos.accion', 'estado');
+        $permisos = $this->getPermisos($user);
+
         return $this->jsonResponse([
-            'user' => $user->load('roles', 'estado'),
+            'user' => $user,
             'token' => $token,
+            'permisos' => $permisos,
         ], 'Inicio de sesión exitoso.');
     }
 
@@ -54,9 +58,13 @@ class AuthController extends ApiController
 
         $token = $user->createToken('api-token')->plainTextToken;
 
+        $user->load('roles.permisos.modulo', 'roles.permisos.accion', 'estado');
+        $permisos = $this->getPermisos($user);
+
         return $this->jsonResponse([
-            'user' => $user->load('roles', 'estado'),
+            'user' => $user,
             'token' => $token,
+            'permisos' => $permisos,
         ], 'Usuario registrado exitosamente.', 201);
     }
 
@@ -69,8 +77,37 @@ class AuthController extends ApiController
 
     public function user(Request $request)
     {
-        return $this->jsonResponse(
-            $request->user()->load('roles', 'estado')
-        );
+        $user = $request->user()->load([
+            'roles.permisos.modulo',
+            'roles.permisos.accion',
+            'estado',
+        ]);
+
+        $permisos = $this->getPermisos($user);
+
+        return $this->jsonResponse([
+            'user' => $user,
+            'permisos' => $permisos,
+        ]);
+    }
+
+    private function getPermisos($user): array
+    {
+        $seen = [];
+        $result = [];
+        foreach ($user->roles as $role) {
+            foreach ($role->permisos as $permiso) {
+                $id = $permiso->id_permiso;
+                if (!isset($seen[$id])) {
+                    $seen[$id] = true;
+                    $result[] = [
+                        'id_permiso' => $id,
+                        'modulo' => $permiso->modulo->nombre,
+                        'accion' => $permiso->accion->nombre,
+                    ];
+                }
+            }
+        }
+        return $result;
     }
 }

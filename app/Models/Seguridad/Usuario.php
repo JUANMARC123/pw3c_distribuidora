@@ -72,4 +72,16 @@ class Usuario extends Authenticatable
     {
         return $this->hasMany(Auditoria::class, 'id_usuario');
     }
+
+    public function hasPermission(string $modulo, string $accion): bool
+    {
+        foreach ($this->roles as $role) {
+            foreach ($role->permisos as $permiso) {
+                if ($permiso->modulo->nombre === $modulo && $permiso->accion->nombre === $accion) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

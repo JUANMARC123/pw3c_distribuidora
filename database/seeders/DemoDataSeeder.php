@@ -20,18 +20,40 @@ use App\Models\Despacho\HistorialEstadoDespacho;
 use App\Models\Evidencia\Incidencia;
 use App\Models\Evidencia\EvidenciaEntrega;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DemoDataSeeder extends Seeder
 {
     public function run()
     {
-        $usuarios = Usuario::factory(10)->create();
-        $usuarios->first()->update(['email' => 'admin@distribuidora.com']);
+        $roles = Rol::pluck('id_rol', 'nombre');
 
-        foreach ($usuarios as $index => $usuario) {
-            $rolId = ($index === 0) ? 1 : fake()->numberBetween(2, 4);
-            $usuario->roles()->attach($rolId);
+        $demoUsers = [
+            ['nombre' => 'Admin', 'apellido' => 'Sistema', 'email' => 'admin@distribuidora.com', 'rol' => 'Administrador'],
+            ['nombre' => 'Carlos', 'apellido' => 'Mendoza', 'email' => 'supervisor@distribuidora.com', 'rol' => 'Supervisor'],
+            ['nombre' => 'Lucía', 'apellido' => 'Paredes', 'email' => 'operador@distribuidora.com', 'rol' => 'Operador'],
+            ['nombre' => 'Pedro', 'apellido' => 'Quispe', 'email' => 'repartidor@distribuidora.com', 'rol' => 'Repartidor'],
+        ];
+
+        foreach ($demoUsers as $userData) {
+            $usuario = Usuario::create([
+                'nombre' => $userData['nombre'],
+                'apellido' => $userData['apellido'],
+                'email' => $userData['email'],
+                'password_hash' => Hash::make('123456'),
+                'telefono' => fake()->phoneNumber(),
+                'id_estado_usuario' => 1,
+                'fecha_creacion' => now(),
+            ]);
+            $usuario->roles()->attach($roles[$userData['rol']]);
         }
+
+        $usuarios = Usuario::factory(6)->create();
+        foreach ($usuarios as $usuario) {
+            $usuario->roles()->attach(fake()->numberBetween(2, 4));
+        }
+
+        $usuarios = Usuario::all();
 
         $farmacias = Farmacia::factory(10)->create();
 
