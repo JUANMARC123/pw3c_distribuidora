@@ -21,17 +21,19 @@ class EvidenciaController extends ApiController
     {
         $despacho = Despacho::findOrFail($despachoId);
 
-        $data = $request->validate([
+        $request->validate([
             'id_tipo_evidencia' => 'required|integer|exists:tipos_evidencia,id_tipo_evidencia',
-            'archivo' => 'required|file|mimes:jpg,jpeg,png,gif,pdf|max:2048',
+            'archivo' => 'required|file|mimes:jpg,jpeg,png,pdf,gif|max:5120',
         ]);
 
-        $data['archivo'] = $request->file('archivo')->store('evidencias', 'public');
+        $path = $request->file('archivo')->store('evidencias', 'public');
 
-        $data['id_despacho'] = $despacho->id_despacho;
-        $data['fecha_registro'] = now();
-
-        $evidencia = EvidenciaEntrega::create($data);
+        $evidencia = EvidenciaEntrega::create([
+            'id_despacho'       => $despacho->id_despacho,
+            'id_tipo_evidencia' => $request->id_tipo_evidencia,
+            'archivo'           => $path,
+            'fecha_registro'    => now(),
+        ]);
 
         return $this->jsonResponse(
             $evidencia->load('tipoEvidencia'),
@@ -54,12 +56,8 @@ class EvidenciaController extends ApiController
 
         $data = $request->validate([
             'id_tipo_evidencia' => 'sometimes|integer|exists:tipos_evidencia,id_tipo_evidencia',
-            'archivo' => 'sometimes|file|mimes:jpg,jpeg,png,gif,pdf|max:2048',
+            'archivo' => 'sometimes|string|max:255',
         ]);
-
-        if ($request->hasFile('archivo')) {
-            $data['archivo'] = $request->file('archivo')->store('evidencias', 'public');
-        }
 
         $evidencia->update($data);
 
