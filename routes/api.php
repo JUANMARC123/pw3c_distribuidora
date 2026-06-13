@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('usuarios/{usuario}/roles', [UsuarioController::class, 'roles'])->middleware('permission:Usuarios,asignar-roles');
     Route::post('usuarios/{usuario}/roles', [UsuarioController::class, 'assignRoles'])->middleware('permission:Usuarios,asignar-roles');
     Route::apiResource('usuarios', UsuarioController::class)->middleware('permission:Usuarios');
+    Route::put('/usuarios/{id}/bloquear', [UsuarioController::class, 'bloquear']);
 
     // Módulo: Roles
     Route::get('roles/{rol}/permisos', [RolController::class, 'permisos'])->middleware('permission:Roles,asignar-permisos');

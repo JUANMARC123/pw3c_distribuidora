@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Seguridad;
-
+use Illuminate\Database\QueryException;
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\Seguridad\UsuarioStoreRequest;
 use App\Models\Seguridad\Usuario;
@@ -93,12 +93,39 @@ class UsuarioController extends ApiController
     }
 
     public function destroy($id)
-    {
-        $usuario = Usuario::findOrFail($id);
+{
+    $usuario = Usuario::findOrFail($id);
+
+    try {
         $usuario->delete();
 
         return $this->jsonResponse(null, 'Usuario eliminado exitosamente.');
+    } catch (QueryException $e) {
+        if ($e->getCode() == 23000) {
+            return response()->json([
+                'success' => false,
+                'can_block' => true,
+                'message' => 'No se puede eliminar este usuario porque tiene pedidos registrados.'
+            ], 409);
+        }
+
+        throw $e;
     }
+}
+
+public function bloquear($id)
+{
+    $usuario = Usuario::findOrFail($id);
+
+    $usuario->update([
+        'id_estado_usuario' => 2 // Bloqueado
+    ]);
+
+    return $this->jsonResponse(
+        $usuario->load('estado', 'roles'),
+        'Usuario bloqueado exitosamente.'
+    );
+}
 
     public function roles($id)
     {
