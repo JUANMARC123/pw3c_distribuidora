@@ -8,24 +8,23 @@ use Illuminate\Http\Request;
 
 class FarmaciaController extends ApiController
 {
-    public function index(Request $request)
-    {
-        $query = Farmacia::query();
+   public function index(Request $request)
+{
+    $query = Farmacia::withCount('contactos');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('direccion', 'like', "%{$search}%")
-                  ->orWhere('telefono', 'like', "%{$search}%");
-            });
-        }
-
-        return $this->paginatedResponse(
-            $query->orderBy('nombre')->paginate($request->per_page ?? 15)
-        );
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('nombre', 'like', "%{$search}%")
+              ->orWhere('direccion', 'like', "%{$search}%")
+              ->orWhere('telefono', 'like', "%{$search}%");
+        });
     }
 
+    return $this->paginatedResponse(
+        $query->orderBy('nombre')->paginate($request->per_page ?? 15)
+    );
+}
     public function store(Request $request)
     {
         $data = $request->validate([
