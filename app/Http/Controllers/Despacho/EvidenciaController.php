@@ -23,8 +23,10 @@ class EvidenciaController extends ApiController
 
         $data = $request->validate([
             'id_tipo_evidencia' => 'required|integer|exists:tipos_evidencia,id_tipo_evidencia',
-            'archivo' => 'required|string|max:255',
+            'archivo' => 'required|file|mimes:jpg,jpeg,png,gif,pdf|max:2048',
         ]);
+
+        $data['archivo'] = $request->file('archivo')->store('evidencias', 'public');
 
         $data['id_despacho'] = $despacho->id_despacho;
         $data['fecha_registro'] = now();
@@ -52,8 +54,12 @@ class EvidenciaController extends ApiController
 
         $data = $request->validate([
             'id_tipo_evidencia' => 'sometimes|integer|exists:tipos_evidencia,id_tipo_evidencia',
-            'archivo' => 'sometimes|string|max:255',
+            'archivo' => 'sometimes|file|mimes:jpg,jpeg,png,gif,pdf|max:2048',
         ]);
+
+        if ($request->hasFile('archivo')) {
+            $data['archivo'] = $request->file('archivo')->store('evidencias', 'public');
+        }
 
         $evidencia->update($data);
 
