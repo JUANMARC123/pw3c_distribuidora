@@ -10,7 +10,7 @@ class FarmaciaController extends ApiController
 {
     public function index(Request $request)
     {
-        $query = Farmacia::query();
+        $query = Farmacia::withCount('contactos');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -68,7 +68,17 @@ class FarmaciaController extends ApiController
 
     public function destroy($id)
     {
-        $farmacia = Farmacia::findOrFail($id);
+        $farmacia = Farmacia::withCount(['contactos', 'pedidos'])->findOrFail($id);
+
+        if ($farmacia->pedidos_count > 0) {
+            return $this->errorResponse(
+                "No se puede eliminar la farmacia \"{$farmacia->nombre}\" porque tiene {$farmacia->pedidos_count} pedido(s) registrado(s). Elimine primero los pedidos asociados.",
+                409
+            );
+        }
+
+        // Eliminar contactos primero (por si acaso)
+        $farmacia->contactos()->delete();
         $farmacia->delete();
 
         return $this->jsonResponse(null, 'Farmacia eliminada exitosamente.');
