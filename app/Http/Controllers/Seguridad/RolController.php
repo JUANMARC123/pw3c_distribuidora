@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiController;
 use App\Models\Seguridad\Permiso;
 use App\Models\Seguridad\Rol;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class RolController extends ApiController
 {
@@ -45,12 +46,25 @@ class RolController extends ApiController
     }
 
     public function destroy($id)
-    {
-        $rol = Rol::findOrFail($id);
+{
+    $rol = Rol::findOrFail($id);
+
+    try {
         $rol->delete();
 
         return $this->jsonResponse(null, 'Rol eliminado exitosamente.');
+    } catch (QueryException $e) {
+        if ($e->getCode() == 23000) {
+            return response()->json([
+                'success' => false,
+                'assigned' => true,
+                'message' => 'No se puede eliminar este rol porque está asignado a uno o más usuarios.'
+            ], 409);
+        }
+
+        throw $e;
     }
+}
 
     public function permisos($id)
     {
