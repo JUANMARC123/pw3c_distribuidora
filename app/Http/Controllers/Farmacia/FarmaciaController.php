@@ -8,32 +8,33 @@ use Illuminate\Http\Request;
 
 class FarmaciaController extends ApiController
 {
-   public function index(Request $request)
-{
-    $query = Farmacia::withCount('contactos');
+    public function index(Request $request)
+    {
+        $query = Farmacia::withCount('contactos');
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('nombre', 'like', "%{$search}%")
-              ->orWhere('direccion', 'like', "%{$search}%")
-              ->orWhere('telefono', 'like', "%{$search}%");
-        });
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('direccion', 'like', "%{$search}%")
+                  ->orWhere('telefono', 'like', "%{$search}%");
+            });
+        }
+
+        return $this->paginatedResponse(
+            $query->orderBy('nombre')->paginate($request->per_page ?? 15)
+        );
     }
 
-    return $this->paginatedResponse(
-        $query->orderBy('nombre')->paginate($request->per_page ?? 15)
-    );
-}
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nombre' => 'required|string|max:150',
+            'nombre'    => 'required|string|max:150',
             'direccion' => 'required|string',
-            'telefono' => 'required|string|max:20',
-            'email' => 'nullable|email|max:180|unique:farmacias,email',
-            'latitud' => 'required|numeric|between:-90,90',
-            'longitud' => 'required|numeric|between:-180,180',
+            'telefono'  => 'required|string|max:20',
+            'email'     => 'nullable|email|max:180|unique:farmacias,email',
+            'latitud'   => 'required|numeric|between:-90,90',
+            'longitud'  => 'required|numeric|between:-180,180',
         ]);
 
         $farmacia = Farmacia::create($data);
@@ -52,12 +53,12 @@ class FarmaciaController extends ApiController
         $farmacia = Farmacia::findOrFail($id);
 
         $data = $request->validate([
-            'nombre' => 'sometimes|string|max:150',
+            'nombre'    => 'sometimes|string|max:150',
             'direccion' => 'sometimes|string',
-            'telefono' => 'sometimes|string|max:20',
-            'email' => 'nullable|email|max:180|unique:farmacias,email,' . $id . ',id_farmacia',
-            'latitud' => 'sometimes|numeric|between:-90,90',
-            'longitud' => 'sometimes|numeric|between:-180,180',
+            'telefono'  => 'sometimes|string|max:20',
+            'email'     => 'nullable|email|max:180|unique:farmacias,email,' . $id . ',id_farmacia',
+            'latitud'   => 'sometimes|numeric|between:-90,90',
+            'longitud'  => 'sometimes|numeric|between:-180,180',
         ]);
 
         $farmacia->update($data);
@@ -67,7 +68,16 @@ class FarmaciaController extends ApiController
 
     public function destroy($id)
     {
-        $farmacia = Farmacia::findOrFail($id);
+        $farmacia = Farmacia::withCount('pedidos')->findOrFail($id);
+
+        if ($farmacia->pedidos_count > 0) {
+            return $this->errorResponse(
+                'No se puede eliminar la farmacia "' . $farmacia->nombre . '" porque tiene ' . $farmacia->pedidos_count . ' pedido(s) registrado(s). Elimine primero los pedidos asociados.',
+                409
+            );
+        }
+
+        $farmacia->contactos()->delete();
         $farmacia->delete();
 
         return $this->jsonResponse(null, 'Farmacia eliminada exitosamente.');
