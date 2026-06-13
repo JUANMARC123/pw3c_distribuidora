@@ -8,24 +8,23 @@ use Illuminate\Http\Request;
 
 class FarmaciaController extends ApiController
 {
-    public function index(Request $request)
-    {
-        $query = Farmacia::withCount('contactos');
+   public function index(Request $request)
+{
+    $query = Farmacia::withCount('contactos');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('direccion', 'like', "%{$search}%")
-                  ->orWhere('telefono', 'like', "%{$search}%");
-            });
-        }
-
-        return $this->paginatedResponse(
-            $query->orderBy('nombre')->paginate($request->per_page ?? 15)
-        );
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('nombre', 'like', "%{$search}%")
+              ->orWhere('direccion', 'like', "%{$search}%")
+              ->orWhere('telefono', 'like', "%{$search}%");
+        });
     }
 
+    return $this->paginatedResponse(
+        $query->orderBy('nombre')->paginate($request->per_page ?? 15)
+    );
+}
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -68,17 +67,7 @@ class FarmaciaController extends ApiController
 
     public function destroy($id)
     {
-        $farmacia = Farmacia::withCount(['contactos', 'pedidos'])->findOrFail($id);
-
-        if ($farmacia->pedidos_count > 0) {
-            return $this->errorResponse(
-                "No se puede eliminar la farmacia \"{$farmacia->nombre}\" porque tiene {$farmacia->pedidos_count} pedido(s) registrado(s). Elimine primero los pedidos asociados.",
-                409
-            );
-        }
-
-        // Eliminar contactos primero (por si acaso)
-        $farmacia->contactos()->delete();
+        $farmacia = Farmacia::findOrFail($id);
         $farmacia->delete();
 
         return $this->jsonResponse(null, 'Farmacia eliminada exitosamente.');

@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiController;
 use App\Models\Pedido\Pedido;
 use App\Models\Pedido\HistorialEstadoPedido;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class PedidoController extends ApiController
 {
@@ -90,13 +91,26 @@ class PedidoController extends ApiController
         );
     }
 
-    public function destroy($id)
-    {
-        $pedido = Pedido::findOrFail($id);
+   public function destroy($id)
+{
+    $pedido = Pedido::findOrFail($id);
+
+    try {
         $pedido->delete();
 
         return $this->jsonResponse(null, 'Pedido eliminado exitosamente.');
+    } catch (QueryException $e) {
+        if ($e->getCode() == 23000) {
+            return response()->json([
+                'success' => false,
+                'has_dispatch' => true,
+                'message' => 'No se puede eliminar este pedido porque tiene un despacho registrado.'
+            ], 409);
+        }
+
+        throw $e;
     }
+}
 
     public function cambiarEstado(Request $request, $id)
     {
