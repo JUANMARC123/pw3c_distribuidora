@@ -80,7 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'destroy'])->middleware('permission:Despachos,gestionar-evidencias');
 
     // Módulo: Reportes
-    Route::prefix('reportes')->middleware('permission:Reportes')->group(function () {
+    Route::prefix('reportes')->group(function () {
         Route::get('resumen', [ReporteController::class, 'resumen'])->middleware('permission:Reportes,acceder');
         Route::get('pedidos-por-estado', [ReporteController::class, 'pedidosPorEstado'])->middleware('permission:Reportes,listar');
         Route::get('despachos-por-estado', [ReporteController::class, 'despachosPorEstado'])->middleware('permission:Reportes,listar');

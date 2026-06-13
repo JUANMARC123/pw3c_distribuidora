@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\ApiController;
+use App\Models\Seguridad\Permiso;
 use App\Models\Seguridad\Rol;
 use Illuminate\Http\Request;
 
@@ -53,8 +54,17 @@ class RolController extends ApiController
 
     public function permisos($id)
     {
-        $rol = Rol::with('permisos.modulo', 'permisos.accion')->findOrFail($id);
-        return $this->jsonResponse($rol->permisos);
+        $rol = Rol::with('permisos')->findOrFail($id);
+        $allPermisos = Permiso::with('modulo', 'accion')->get();
+        $rolePermIds = $rol->permisos->pluck('id_permiso');
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'permisos' => $allPermisos,
+                'asignados' => $rolePermIds,
+            ],
+        ]);
     }
 
     public function assignPermisos(Request $request, $id)
