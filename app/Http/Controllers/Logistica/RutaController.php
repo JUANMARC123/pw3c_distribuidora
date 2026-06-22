@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiController;
 use App\Models\Logistica\Ruta;
 use App\Models\Logistica\RutaParada;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class RutaController extends ApiController
 {
@@ -49,13 +50,25 @@ class RutaController extends ApiController
     }
 
     public function destroy($id)
-    {
-        $ruta = Ruta::findOrFail($id);
+{
+    $ruta = Ruta::findOrFail($id);
+
+    try {
         $ruta->delete();
 
         return $this->jsonResponse(null, 'Ruta eliminada exitosamente.');
-    }
+    } catch (QueryException $e) {
+        if ($e->getCode() == 23000) {
+            return response()->json([
+                'success' => false,
+                'has_controls' => true,
+                'message' => 'No se puede eliminar esta ruta porque está asociada a controles de ruta registrados.'
+            ], 409);
+        }
 
+        throw $e;
+    }
+}
     public function paradas($id)
     {
         $ruta = Ruta::findOrFail($id);
