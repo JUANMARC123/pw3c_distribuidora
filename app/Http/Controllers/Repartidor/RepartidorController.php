@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiController;
 use App\Models\Repartidor\Repartidor;
 use App\Models\Repartidor\HistorialEstadoRepartidor;
 use Illuminate\Http\Request;
+use App\Services\AuditService;
 
 class RepartidorController extends ApiController
 {
@@ -41,6 +42,8 @@ class RepartidorController extends ApiController
         ]);
 
         $repartidor = Repartidor::create($data);
+
+        AuditService::log(auth()->id(), 'crear', 'repartidores', $repartidor->id_repartidor);
 
         HistorialEstadoRepartidor::create([
             'id_repartidor' => $repartidor->id_repartidor,
@@ -81,6 +84,8 @@ class RepartidorController extends ApiController
 
         $repartidor->update($data);
 
+        AuditService::log(auth()->id(), 'editar', 'repartidores', $repartidor->id_repartidor);
+
         return $this->jsonResponse(
             $repartidor->load('usuario', 'estado', 'licencia', 'extensionCi'),
             'Repartidor actualizado exitosamente.'
@@ -92,8 +97,16 @@ class RepartidorController extends ApiController
         $repartidor = Repartidor::findOrFail($id);
         $repartidor->delete();
 
+        AuditService::log(auth()->id(), 'eliminar', 'repartidores', $id);
+
         return $this->jsonResponse(null, 'Repartidor eliminado exitosamente.');
     }
+
+    private const TRANSICIONES_REPARTIDOR = [
+        1 => [2],
+        2 => [1, 3],
+        3 => [1],
+    ];
 
     public function cambiarEstado(Request $request, $id)
     {
@@ -102,6 +115,21 @@ class RepartidorController extends ApiController
         ]);
 
         $repartidor = Repartidor::findOrFail($id);
+        $nuevoEstado = (int) $request->id_estado_repartidor;
+        $estadoActual = (int) $repartidor->id_estado_repartidor;
+
+        $transicionesValidas = self::TRANSICIONES_REPARTIDOR[$estadoActual] ?? [];
+        if (!empty($transicionesValidas) && !in_array($nuevoEstado, $transicionesValidas)) {
+            return $this->errorResponse(
+                "Transición de estado no válida. No se puede cambiar de " .
+                "{$repartidor->estado->nombre_estado} al estado solicitado.",
+                422
+            );
+        }
+
+        if ($nuevoEstado === $estadoActual) {
+            return $this->errorResponse('El repartidor ya se encuentra en este estado.', 422);
+        }
 
         $historialActual = HistorialEstadoRepartidor::where('id_repartidor', $id)
             ->whereNull('fecha_fin')
@@ -114,11 +142,13 @@ class RepartidorController extends ApiController
 
         HistorialEstadoRepartidor::create([
             'id_repartidor' => $id,
-            'id_estado_repartidor' => $request->id_estado_repartidor,
+            'id_estado_repartidor' => $nuevoEstado,
             'fecha_inicio' => now(),
         ]);
 
-        $repartidor->update(['id_estado_repartidor' => $request->id_estado_repartidor]);
+        $repartidor->update(['id_estado_repartidor' => $nuevoEstado]);
+
+        AuditService::log(auth()->id(), 'cambiar-estado', 'repartidores', $repartidor->id_repartidor);
 
         return $this->jsonResponse(
             $repartidor->load('estado', 'historiales.estado'),

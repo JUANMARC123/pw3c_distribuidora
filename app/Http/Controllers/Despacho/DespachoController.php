@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Despacho;
 use App\Http\Controllers\ApiController;
 use App\Models\Despacho\Despacho;
 use App\Models\Despacho\HistorialEstadoDespacho;
+use App\Models\Pedido\Pedido;
+use App\Models\Logistica\RutaParada;
+use App\Models\Logistica\ControlRuta;
 use Illuminate\Http\Request;
+use App\Services\AuditService;
 
 class DespachoController extends ApiController
 {
@@ -47,9 +51,28 @@ class DespachoController extends ApiController
             'id_estado_despacho' => 'required|integer|exists:estados_despacho,id_estado_despacho',
         ]);
 
+        // RN-053: La farmacia del pedido debe coincidir con la farmacia de la parada
+        $pedido = Pedido::findOrFail($data['id_pedido']);
+        $parada = RutaParada::findOrFail($data['id_parada']);
+        if ((int)$pedido->id_farmacia !== (int)$parada->id_farmacia) {
+            return $this->errorResponse(
+                'La farmacia del pedido no coincide con la farmacia de la parada seleccionada.', 422
+            );
+        }
+
+        // RN-054: La parada debe pertenecer a la misma ruta del control de ruta
+        $controlRuta = ControlRuta::findOrFail($data['id_control_ruta']);
+        if ((int)$parada->id_ruta !== (int)$controlRuta->id_ruta) {
+            return $this->errorResponse(
+                'La parada seleccionada no pertenece a la ruta del control de ruta.', 422
+            );
+        }
+
         $data['fecha_hora_despacho'] = now();
 
         $despacho = Despacho::create($data);
+
+        AuditService::log(auth()->id(), 'crear', 'despachos', $despacho->id_despacho);
 
         HistorialEstadoDespacho::create([
             'id_despacho' => $despacho->id_despacho,
@@ -93,6 +116,8 @@ class DespachoController extends ApiController
 
         $despacho->update($data);
 
+        AuditService::log(auth()->id(), 'editar', 'despachos', $despacho->id_despacho);
+
         return $this->jsonResponse(
             $despacho->load('pedido.farmacia', 'estado'),
             'Despacho actualizado exitosamente.'
@@ -104,8 +129,17 @@ class DespachoController extends ApiController
         $despacho = Despacho::findOrFail($id);
         $despacho->delete();
 
+        AuditService::log(auth()->id(), 'eliminar', 'despachos', $id);
+
         return $this->jsonResponse(null, 'Despacho eliminado exitosamente.');
     }
+
+    private const TRANSICIONES_DESPACHO = [
+        1 => [2],
+        2 => [3, 4],
+        3 => [],
+        4 => [],
+    ];
 
     public function cambiarEstado(Request $request, $id)
     {
@@ -114,6 +148,28 @@ class DespachoController extends ApiController
         ]);
 
         $despacho = Despacho::findOrFail($id);
+        $nuevoEstado = (int) $request->id_estado_despacho;
+        $estadoActual = (int) $despacho->id_estado_despacho;
+
+        $transicionesValidas = self::TRANSICIONES_DESPACHO[$estadoActual] ?? [];
+        if (!empty($transicionesValidas) && !in_array($nuevoEstado, $transicionesValidas)) {
+            return $this->errorResponse(
+                "Transición de estado no válida. No se puede cambiar de " .
+                "{$despacho->estado->nombre_estado} al estado solicitado.",
+                422
+            );
+        }
+
+        if ($nuevoEstado === $estadoActual) {
+            return $this->errorResponse('El despacho ya se encuentra en este estado.', 422);
+        }
+
+        // RN-055: Despacho "Entregado" (estado 3) requiere al menos una evidencia
+        if ($nuevoEstado === 3 && $despacho->evidencias()->count() === 0) {
+            return $this->errorResponse(
+                'No se puede marcar como Entregado sin registrar al menos una evidencia de entrega.', 422
+            );
+        }
 
         $historialActual = HistorialEstadoDespacho::where('id_despacho', $id)
             ->whereNull('fecha_fin')
@@ -126,11 +182,13 @@ class DespachoController extends ApiController
 
         HistorialEstadoDespacho::create([
             'id_despacho' => $id,
-            'id_estado_despacho' => $request->id_estado_despacho,
+            'id_estado_despacho' => $nuevoEstado,
             'fecha_inicio' => now(),
         ]);
 
-        $despacho->update(['id_estado_despacho' => $request->id_estado_despacho]);
+        $despacho->update(['id_estado_despacho' => $nuevoEstado]);
+
+        AuditService::log(auth()->id(), 'cambiar-estado', 'despachos', $despacho->id_despacho);
 
         return $this->jsonResponse(
             $despacho->load('estado', 'historiales.estado'),

@@ -16,6 +16,14 @@ use App\Http\Controllers\Despacho\DespachoController;
 use App\Http\Controllers\Despacho\IncidenciaController;
 use App\Http\Controllers\Despacho\EvidenciaController;
 use App\Http\Controllers\Reportes\ReporteController;
+use App\Http\Controllers\Medicamento\ProductoController;
+use App\Http\Controllers\Inventario\InventarioController;
+use App\Http\Controllers\Compra\ProveedorController;
+use App\Http\Controllers\Compra\OrdenCompraController;
+use App\Http\Controllers\Devolucion\DevolucionController;
+use App\Http\Controllers\Promocion\PromocionController;
+use App\Http\Controllers\Venta\VentaController;
+use App\Http\Controllers\Inventario\AlmacenController;
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
@@ -28,7 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('usuarios/{usuario}/roles', [UsuarioController::class, 'roles'])->middleware('permission:Usuarios,asignar-roles');
     Route::post('usuarios/{usuario}/roles', [UsuarioController::class, 'assignRoles'])->middleware('permission:Usuarios,asignar-roles');
     Route::apiResource('usuarios', UsuarioController::class)->middleware('permission:Usuarios');
-    Route::put('/usuarios/{id}/bloquear', [UsuarioController::class, 'bloquear']);
+    Route::put('/usuarios/{id}/bloquear', [UsuarioController::class, 'bloquear'])->middleware('permission:Usuarios,bloquear');
 
     // Módulo: Roles
     Route::get('roles/{rol}/permisos', [RolController::class, 'permisos'])->middleware('permission:Roles,asignar-permisos');
@@ -58,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Módulo: Rutas
     Route::get('rutas/{ruta}/paradas', [RutaController::class, 'paradas'])->middleware('permission:Rutas,gestionar-paradas');
     Route::post('rutas/{ruta}/paradas', [RutaController::class, 'storeParada'])->middleware('permission:Rutas,gestionar-paradas');
+    Route::get('rutas/{ruta}/paradas/{parada}', [RutaController::class, 'showParada'])->middleware('permission:Rutas,gestionar-paradas');
     Route::put('rutas/{ruta}/paradas/{parada}', [RutaController::class, 'updateParada'])->middleware('permission:Rutas,gestionar-paradas');
     Route::delete('rutas/{ruta}/paradas/{parada}', [RutaController::class, 'destroyParada'])->middleware('permission:Rutas,gestionar-paradas');
     Route::apiResource('rutas', RutaController::class)->middleware('permission:Rutas');
@@ -79,6 +88,49 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('despachos/{despacho}/evidencias', [EvidenciaController::class, 'store'])->middleware('permission:Despachos,gestionar-evidencias');
     Route::put('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'update'])->middleware('permission:Despachos,gestionar-evidencias');
     Route::delete('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'destroy'])->middleware('permission:Despachos,gestionar-evidencias');
+
+    // Módulo: Ventas
+    Route::get('ventas/{venta}/pagos', [VentaController::class, 'pagos'])->middleware('permission:Ventas,listar');
+    Route::post('ventas/{venta}/pagos', [VentaController::class, 'storePago'])->middleware('permission:Ventas,registrar-pago');
+    Route::delete('ventas/{venta}/pagos/{pago}', [VentaController::class, 'destroyPago'])->middleware('permission:Ventas,registrar-pago');
+    Route::apiResource('ventas', VentaController::class)->middleware('permission:Ventas');
+
+    // Módulo: Compras
+    Route::post('ordenes-compra/{ordenCompra}/cambiar-estado', [OrdenCompraController::class, 'cambiarEstado'])->middleware('permission:Compras,cambiar-estado');
+    Route::apiResource('ordenes-compra', OrdenCompraController::class)->middleware('permission:Compras');
+    Route::get('proveedores/{proveedor}/contactos', [ProveedorController::class, 'contactos'])->middleware('permission:Compras,listar');
+    Route::post('proveedores/{proveedor}/contactos', [ProveedorController::class, 'storeContacto'])->middleware('permission:Compras,gestionar-contactos');
+    Route::put('proveedores/{proveedor}/contactos/{contacto}', [ProveedorController::class, 'updateContacto'])->middleware('permission:Compras,gestionar-contactos');
+    Route::delete('proveedores/{proveedor}/contactos/{contacto}', [ProveedorController::class, 'destroyContacto'])->middleware('permission:Compras,gestionar-contactos');
+    Route::apiResource('proveedores', ProveedorController::class)->middleware('permission:Compras');
+
+    // Módulo: Devoluciones
+    Route::post('devoluciones/{devolucion}/cambiar-estado', [DevolucionController::class, 'cambiarEstado'])->middleware('permission:Devoluciones,cambiar-estado');
+    Route::apiResource('devoluciones', DevolucionController::class)->middleware('permission:Devoluciones');
+
+    // Módulo: Promociones
+    Route::apiResource('promociones', PromocionController::class)->middleware('permission:Promociones');
+
+    // Módulo: Inventario
+    Route::get('inventario/alertas', [InventarioController::class, 'alertas'])->middleware('permission:Inventario,listar');
+    Route::post('inventario/movimientos', [InventarioController::class, 'storeMovimiento'])->middleware('permission:Inventario,registrar-movimiento');
+    Route::put('inventario/{inventario}', [InventarioController::class, 'update'])->middleware('permission:Inventario,editar');
+    Route::get('inventario/{inventario}/movimientos', [InventarioController::class, 'movimientos'])->middleware('permission:Inventario,listar');
+    Route::apiResource('inventario', InventarioController::class)->middleware('permission:Inventario')->only(['index', 'show']);
+
+    // Módulo: Almacenes
+    Route::apiResource('almacenes', AlmacenController::class)->middleware('permission:Almacenes');
+    Route::get('almacenes/{almacen}/ubicaciones', [AlmacenController::class, 'ubicaciones'])->middleware('permission:Almacenes,gestionar-ubicaciones');
+    Route::post('almacenes/{almacen}/ubicaciones', [AlmacenController::class, 'storeUbicacion'])->middleware('permission:Almacenes,gestionar-ubicaciones');
+    Route::put('almacenes/{almacen}/ubicaciones/{ubicacion}', [AlmacenController::class, 'updateUbicacion'])->middleware('permission:Almacenes,gestionar-ubicaciones');
+    Route::delete('almacenes/{almacen}/ubicaciones/{ubicacion}', [AlmacenController::class, 'destroyUbicacion'])->middleware('permission:Almacenes,gestionar-ubicaciones');
+
+    // Módulo: Medicamentos
+    Route::get('productos/{producto}/lotes', [ProductoController::class, 'lotes'])->middleware('permission:Productos,listar');
+    Route::post('productos/{producto}/lotes', [ProductoController::class, 'storeLote'])->middleware('permission:Productos,gestionar-lotes');
+    Route::put('productos/{producto}/lotes/{lote}', [ProductoController::class, 'updateLote'])->middleware('permission:Productos,gestionar-lotes');
+    Route::delete('productos/{producto}/lotes/{lote}', [ProductoController::class, 'destroyLote'])->middleware('permission:Productos,gestionar-lotes');
+    Route::apiResource('productos', ProductoController::class)->middleware('permission:Productos');
 
     // Módulo: Reportes
     Route::prefix('reportes')->group(function () {
@@ -111,6 +163,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('tipos-incidencia', [CatalogoController::class, 'tiposIncidencia']);
         Route::get('tipos-evidencia', [CatalogoController::class, 'tiposEvidencia']);
         Route::get('cargos', [CatalogoController::class, 'cargos']);
+        Route::get('estados-farmacia', [CatalogoController::class, 'estadosFarmacia']);
+        Route::get('categorias', [CatalogoController::class, 'categorias']);
+        Route::get('laboratorios', [CatalogoController::class, 'laboratorios']);
+        Route::get('presentaciones', [CatalogoController::class, 'presentaciones']);
+        Route::get('unidades-medida', [CatalogoController::class, 'unidadesMedida']);
+        Route::get('tipos-movimiento', [CatalogoController::class, 'tiposMovimiento']);
+        Route::get('estados-orden-compra', [CatalogoController::class, 'estadosOrdenCompra']);
+        Route::get('tipos-devolucion', [CatalogoController::class, 'tiposDevolucion']);
+        Route::get('estados-devolucion', [CatalogoController::class, 'estadosDevolucion']);
+        Route::get('tipos-promocion', [CatalogoController::class, 'tiposPromocion']);
+        Route::get('estados-venta', [CatalogoController::class, 'estadosVenta']);
+        Route::get('metodos-pago', [CatalogoController::class, 'metodosPago']);
 
         Route::middleware('permission:Usuarios')->group(function () {
             Route::post('{catalogo}', [CatalogoController::class, 'store']);

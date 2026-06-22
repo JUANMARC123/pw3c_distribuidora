@@ -19,6 +19,14 @@
 10. [Módulo de Reportes](#10-módulo-de-reportes)
 11. [Módulo de Catálogos](#11-módulo-de-catálogos)
 12. [Reglas Transversales](#12-reglas-transversales)
+13. [Módulo de Productos](#13-módulo-de-productos-medicamentos)
+14. [Módulo de Inventario](#14-módulo-de-inventario)
+15. [Módulo de Compras](#15-módulo-de-compras)
+16. [Módulo de Ventas](#16-módulo-de-ventas)
+17. [Módulo de Devoluciones](#17-módulo-de-devoluciones)
+18. [Módulo de Promociones](#18-módulo-de-promociones)
+19. [Módulo de Almacenes](#19-módulo-de-almacenes)
+20. [Módulo de Inventario (Actualización)](#20-módulo-de-inventario-actualización)
 
 ---
 
@@ -159,7 +167,7 @@
 
 ## 3. Módulo de Pedidos
 
-### 3.1 Máquina de estados de pedidos (6 estados)
+### 3.1 Máquina de estados de pedidos (6 estados) [RN-021]
 
 - **Cómo funciona**: Los pedidos pueden estar en uno de 6 estados: Pendiente, Aprobado, En preparacion, Despachado, Entregado, Cancelado. El sistema NO valida transiciones válidas/inválidas — cualquier estado puede cambiarse a cualquier otro mediante el endpoint `cambiarEstado`.
 - **Dónde se aplica**:
@@ -621,6 +629,139 @@
 
 ---
 
+## 13. Módulo de Productos (Medicamentos)
+
+### 13.1 Producto con código único
+- **Cómo funciona**: El `codigo_producto` debe ser único en la tabla `productos`, validado con `unique:productos,codigo_producto`.
+- **Dónde se aplica**: `app/Http/Controllers/Medicamento/ProductoController.php:34` — Store, `:72` — Update.
+
+### 13.2 Precio unitario no negativo
+- **Cómo funciona**: El `precio_unitario` debe ser >= 0, validado a nivel aplicación y con CHECK constraint en BD.
+- **Dónde se aplica**: `app/Http/Controllers/Medicamento/ProductoController.php:35`, Migración CHECK: `2024_06_01_070001_add_check_constraints.php`.
+
+### 13.3 Lotes anidados bajo productos
+- **Cómo funciona**: Los lotes se gestionan como recurso anidado bajo `/productos/{producto}/lotes`. Al eliminar un producto, sus lotes se eliminan en cascada.
+- **Dónde se aplica**: `routes/api.php:103-107`, Migración: FK con `cascade`.
+
+## 14. Módulo de Inventario
+
+### 14.1 Stock actual no negativo
+- **Cómo funciona**: El `stock_actual` en inventario nunca puede ser negativo. Se valida con CHECK constraint en BD.
+- **Dónde se aplica**: Migración CHECK: `2024_06_01_070001_add_check_constraints.php`.
+
+### 14.2 Movimientos de inventario actualizan stock automáticamente
+- **Cómo funciona**: Al registrar un movimiento, el controlador actualiza el `stock_actual` del registro de inventario correspondiente (suma o resta según tipo de movimiento), todo dentro de una transacción.
+- **Dónde se aplica**: `app/Http/Controllers/Inventario/InventarioController.php:112-140`.
+
+### 14.3 Alertas de stock bajo
+- **Cómo funciona**: El endpoint `GET /inventario/alertas` devuelve todos los registros donde `stock_actual <= stock_minimo`, permitiendo al operador identificar productos que necesitan reposición.
+- **Dónde se aplica**: `app/Http/Controllers/Inventario/InventarioController.php:72-89`, `routes/api.php:97`.
+
+## 15. Módulo de Compras
+
+### 15.1 Máquina de estados de órdenes de compra (5 estados)
+- **Cómo funciona**: Las órdenes de compra siguen: Pendiente → Aprobada → Enviada → Recibida / Cancelada. Validación de transiciones implementada.
+- **Dónde se aplica**: `database/seeders/CatalogoSeeder.php`, `app/Http/Controllers/Compra/OrdenCompraController.php:14-20` — TRANSICIONES_ORDEN.
+
+### 15.2 Código de orden único
+- **Cómo funciona**: El `codigo_orden` debe ser único en `ordenes_compra`, validado con `unique:ordenes_compra,codigo_orden`.
+- **Dónde se aplica**: `app/Http/Controllers/Compra/OrdenCompraController.php:55`.
+
+### 15.3 Detalles de compra con subtotal automático
+- **Cómo funciona**: Al crear o actualizar una orden de compra, el subtotal de cada detalle se calcula como `cantidad * precio_unitario` en el backend.
+- **Dónde se aplica**: `app/Http/Controllers/Compra/OrdenCompraController.php:76-86`.
+
+## 16. Módulo de Ventas
+
+### 16.1 Venta vinculada a un pedido existente
+- **Cómo funciona**: Cada venta debe estar asociada a un pedido existente (FK `id_pedido`). Una venta incluye líneas de detalle con lote, cantidad, precio unitario y subtotal automático. Se requiere al menos 1 detalle al crear una venta.
+- **Dónde se aplica**: `app/Http/Controllers/Venta/VentaController.php:51-57` — Validación.
+- **Código RN**: RN-094
+
+### 16.2 Total de venta calculado automáticamente
+- **Cómo funciona**: El total de la venta se calcula sumando los subtotales de todos los detalles (`cantidad * precio_unitario`) en el backend.
+- **Dónde se aplica**: `app/Http/Controllers/Venta/VentaController.php:67-81`.
+
+### 16.3 Pagos asociados a ventas
+- **Cómo funciona**: Las ventas pueden tener múltiples pagos asociados, cada uno con un método de pago, monto y referencia opcional. Se gestionan como recurso anidado bajo `/ventas/{venta}/pagos`.
+- **Dónde se aplica**: `app/Http/Controllers/Venta/VentaController.php:174-212` — Métodos `pagos()`, `storePago()`, `destroyPago()`.
+
+### 16.4 Detalle de pedido con productos [RN-063]
+- **Cómo funciona**: Los pedidos incluyen líneas de detalle con producto, cantidad, precio unitario y subtotal automático. Se requiere al menos 1 producto al crear un pedido.
+- **Dónde se aplica**: `app/Http/Controllers/Pedido/PedidoController.php:47-50` — Validación de `detalles` array.
+
+### 16.5 Subtotal automático en detalles de pedido
+- **Cómo funciona**: El subtotal de cada detalle se calcula como `cantidad * precio_unitario` en el backend antes de guardar.
+- **Dónde se aplica**: `app/Http/Controllers/Pedido/PedidoController.php:60-63`.
+
+## 17. Módulo de Devoluciones
+
+### 17.1 Máquina de estados de devoluciones (4 estados)
+- **Cómo funciona**: Las devoluciones siguen: Pendiente → Aprobada / Rechazada, Aprobada → Completada. Validación de transiciones implementada.
+- **Dónde se aplica**: `app/Http/Controllers/Devolucion/DevolucionController.php:14-19` — TRANSICIONES_DEVOLUCION.
+
+### 17.2 Detalles de devolución con subtotal automático
+- **Cómo funciona**: Al crear o actualizar una devolución, el subtotal de cada detalle se calcula como `cantidad * precio_unitario`.
+- **Dónde se aplica**: `app/Http/Controllers/Devolucion/DevolucionController.php:73-75`.
+
+### 17.3 Historial de cambios de estado en devoluciones
+- **Cómo funciona**: Mismo patrón que pedidos/repartidores: al cambiar estado se cierra el historial activo anterior y se crea uno nuevo.
+- **Dónde se aplica**: `app/Http/Controllers/Devolucion/DevolucionController.php:166-188`.
+
+## 18. Módulo de Promociones
+
+### 18.1 Promociones con descuento porcentual o fijo
+- **Cómo funciona**: Las promociones pueden ser de tipo porcentual (`es_porcentual = true`) o monto fijo. El campo `descuento` almacena el valor correspondiente.
+- **Dónde se aplica**: `app/Http/Controllers/Promocion/PromocionController.php:62-63`.
+
+### 18.2 Productos asignados a promociones
+- **Cómo funciona**: Cada promoción incluye una lista de productos con una `cantidad_minima` requerida. La combinación `(id_promocion, id_producto)` es única.
+- **Dónde se aplica**: Migración: `2024_06_01_060003_create_productos_promocion_table.php:30`.
+
+### 18.3 Fechas de vigencia con validación
+- **Cómo funciona**: `fecha_fin` debe ser posterior o igual a `fecha_inicio`. La promoción se activa/desactiva con el campo `activo`.
+- **Dónde se aplica**: `app/Http/Controllers/Promocion/PromocionController.php:67`.
+
+## 19. Módulo de Almacenes
+
+### 19.1 Almacén único por farmacia y nombre
+- **Cómo funciona**: La combinación `(id_farmacia, nombre)` debe ser única. No pueden existir dos almacenes con el mismo nombre dentro de la misma farmacia.
+- **Dónde se aplica**: `app/Http/Controllers/Inventario/AlmacenController.php:40-44`, Migración: `2024_07_01_000004_create_almacenes_tables.php`.
+
+### 19.2 Ubicaciones anidadas bajo almacenes
+- **Cómo funciona**: Las ubicaciones se gestionan como recurso anidado bajo `/almacenes/{almacen}/ubicaciones`. Cada ubicación tiene pasillo y estante, con unique compuesto `(id_almacen, pasillo, estante)`.
+- **Dónde se aplica**: `app/Http/Controllers/Inventario/AlmacenController.php:117-168`, `routes/api.php`.
+
+### 19.3 Almacenes se eliminan en cascada con la farmacia
+- **Cómo funciona**: Cuando se elimina una farmacia, todos sus almacenes asociados se eliminan automáticamente (FK con `onDelete('cascade')`). Las ubicaciones también se eliminan en cascada al eliminar el almacén.
+- **Dónde se aplica**: Migración: `2024_07_01_000004_create_almacenes_tables.php`.
+
+### 19.4 Ubicación protegida: no se elimina si tiene inventario
+- **Cómo funciona**: Al intentar eliminar una ubicación que tiene registros de inventario asociados, se captura la excepción `23000` y se retorna HTTP 409.
+- **Dónde se aplica**: `app/Http/Controllers/Inventario/AlmacenController.php:175-183`.
+
+## 20. Módulo de Inventario (Actualización)
+
+### 20.1 Actualización de ubicación y precio en inventario
+- **Cómo funciona**: Los registros de inventario pueden actualizarse para asignar una ubicación en almacén (`id_ubicacion`) y fijar un precio de venta (`precio_venta`). Al modificarse estos campos, `fecha_actualizacion` se establece automáticamente a `now()`.
+- **Dónde se aplica**: `app/Http/Controllers/Inventario/InventarioController.php:55-78`.
+
+## Índice de Reglas por Código RN
+
+| Código | Descripción | Ubicación |
+|--------|-------------|-----------|
+| RN-021 | Farmacia inactiva no recibe pedidos | `PedidoController:55` |
+| RN-032 | Repartidor inactivo no recibe rutas | `ControlRutaController:56` |
+| RN-040 | Vehículo fuera de servicio no asignado | `ControlRutaController:62` |
+| RN-053 | Farmacia del pedido debe coincidir con farmacia de la parada | `DespachoController:54` |
+| RN-054 | Parada debe pertenecer a la misma ruta del control_ruta | `DespachoController:63` |
+| RN-055 | Estado "Entregado" requiere evidencia | `DespachoController:167` |
+| RN-063 | Contacto debe pertenecer a la misma farmacia del pedido | `PedidoController:61,126` |
+| RN-079 | No devolver más cantidad de la vendida | `DevolucionController:71` |
+| RN-080 | Devolución en estado "Completada" aumenta stock | `DevolucionController:228` |
+| RN-093 | Recepción de orden de compra genera inventario | `OrdenCompraController:191` |
+| RN-094 | Venta vinculada a pedido existente | `VentaController:51` |
+
 ## Resumen de Máquinas de Estado
 
 | Entidad | Estados Posibles | Validación de Transiciones |
@@ -629,12 +770,15 @@
 | **Repartidor** | Disponible → En ruta → Inactivo | ❌ No validada |
 | **Vehículo** | Operativo → En mantenimiento → Fuera de servicio | ❌ No validada |
 | **Despacho** | Pendiente → En camino → Entregado / Fallido | ❌ No validada |
+| **Orden de Compra** | Pendiente → Aprobada → Enviada → Recibida / Cancelada | ✅ Validada |
+| **Devolución** | Pendiente → Aprobada / Rechazada, Aprobada → Completada | ✅ Validada |
+| **Venta** | Pendiente → Pagada → Completada / Cancelada | ❌ No validada |
 
 ## Resumen de Roles y Permisos Base
 
 | Rol | Alcance |
 |-----|---------|
 | **Administrador** (id=1) | Todos los permisos de todos los módulos |
-| **Supervisor** (id=2) | Dashboard, Reportes, Farmacias (full), Pedidos (full), Repartidores (full), Vehículos (full), Rutas (full), Control Rutas (full), Despachos (full) |
-| **Operador** (id=3) | Dashboard, Reportes (listar), Farmacias (acceder, listar), Pedidos (full excepto eliminar), Repartidores (acceder, listar), Vehículos (acceder, listar), Rutas (acceder, listar), Control Rutas (crear, editar, listar), Despachos (full excepto incidencias/evidencias) |
-| **Repartidor** (id=4) | Dashboard, Rutas (acceder, listar), Control Rutas (acceder, listar, registrar-llegada), Despachos (acceder, listar) |
+| **Supervisor** (id=2) | Dashboard, Reportes, Farmacias (full), Pedidos (full), Ventas (full), Repartidores (full), Vehículos (full), Rutas (full), Control Rutas (full), Despachos (full), Productos (full), Inventario (full excepto eliminar), Compras (full), Devoluciones (full), Promociones (full), Almacenes (full excepto eliminar) |
+| **Operador** (id=3) | Dashboard, Reportes (listar), Farmacias (acceder, listar), Pedidos (full excepto eliminar), Ventas (full excepto eliminar), Repartidores (acceder, listar), Vehículos (acceder, listar), Rutas (acceder, listar), Control Rutas (crear, editar, listar), Despachos (full excepto incidencias/evidencias), Productos (acceder, listar), Inventario (acceder, listar), Compras (acceder, listar), Devoluciones (acceder, listar), Promociones (acceder, listar), Almacenes (acceder, listar) |
+| **Repartidor** (id=4) | Dashboard, Rutas (acceder, listar), Control Rutas (acceder, listar, registrar-llegada), Despachos (acceder, listar), Devoluciones (acceder, listar), Promociones (acceder, listar) |

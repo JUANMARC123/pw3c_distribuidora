@@ -84,6 +84,14 @@ class RutaController extends ApiController
         );
     }
 
+    public function showParada($id, $paradaId)
+    {
+        $ruta = Ruta::findOrFail($id);
+        $parada = RutaParada::where('id_ruta', $ruta->id_ruta)->with('farmacia')->findOrFail($paradaId);
+
+        return $this->jsonResponse($parada);
+    }
+
     public function updateParada(Request $request, $id, $paradaId)
     {
         $ruta = Ruta::findOrFail($id);

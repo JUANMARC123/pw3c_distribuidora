@@ -18,7 +18,19 @@ class Farmacia extends Model
         'email',
         'latitud',
         'longitud',
+        'id_estado_farmacia',
+        'zona',
+        'descripcion',
+        'es_24_horas',
+        'horario_apertura',
+        'horario_cierre',
+        'fecha_verificacion',
     ];
+
+    public function estado()
+    {
+        return $this->belongsTo(EstadoFarmacia::class, 'id_estado_farmacia');
+    }
 
     public function contactos()
     {
