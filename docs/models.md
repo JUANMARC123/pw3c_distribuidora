@@ -1,4 +1,4 @@
-# Documentación de Modelos - Pw3c Distribuidora
+﻿# Documentación de Modelos - Pw3c Distribuidora
 
 > **Framework:** Laravel 9 (Eloquent ORM)
 > **Total de modelos:** 36
@@ -51,9 +51,9 @@
    - [Incidencia](#incidencia)
    - [TipoEvidencia](#tipoevidencia)
    - [TipoIncidencia](#tipoincidencia)
+9. [Leyenda](#9-leyenda)
 
 ---
-
 ## 1. Seguridad
 
 ### Usuario
@@ -61,27 +61,35 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_usuario` | PK | Identificador único |
-| `nombre` | string | Nombre del usuario |
-| `apellido` | string | Apellido del usuario |
-| `email` | string | Correo electrónico (unique) |
-| `password_hash` | string | Contraseña hasheada |
-| `telefono` | string | Teléfono |
-| `id_estado_usuario` | FK | Relación con EstadoUsuario |
+| `nombre` | string(100) | Nombre del usuario |
+| `apellido` | string(100) | Apellido del usuario |
+| `email` | string(180) | Correo electrónico (**unique**) |
+| `password_hash` | string | Contraseña hasheada (hidden) |
+| `telefono` | string(20) | Teléfono |
+| `id_estado_usuario` | FK→`estados_usuario` | Estado del usuario |
 | `fecha_creacion` | datetime | Fecha de creación |
 | `fecha_bloqueo` | datetime | Fecha de bloqueo (nullable) |
 | `ultimo_acceso` | datetime | Último acceso (nullable) |
 
-**Tabla:** `usuarios` | **PK:** `id_usuario` | **Timestamps:** No
+**Tabla:** `usuarios` | **PK:** `id_usuario` | **Timestamps:** No | **Traits:** HasApiTokens, HasFactory, Notifiable
+
+**Hidden:** `password_hash`, `remember_token`
+
+**Casts:** `fecha_creacion:datetime`, `fecha_bloqueo:datetime`, `ultimo_acceso:datetime`
+
+**Métodos destacados:**
+- `getAuthPassword(): string` — Retorna `password_hash` en lugar del campo `password` convencional de Laravel
+- `hasPermission(string $modulo, string $accion): bool` — Itera roles y permisos para verificar acceso
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `EstadoUsuario` | `id_estado_usuario` |
-| belongsToMany | `Rol` | pivot: `usuario_roles` |
-| hasMany | `Pedido` | `id_usuario` |
-| hasOne | `Repartidor` | `id_usuario` |
-| hasMany | `SesionUsuario` | `id_usuario` |
-| hasMany | `Auditoria` | `id_usuario` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `estado()` | `EstadoUsuario` | `id_estado_usuario` |
+| belongsToMany | `roles()` | `Rol` | pivot: `usuario_roles` |
+| hasMany | `pedidos()` | `Pedido` | `id_usuario` |
+| hasOne | `repartidor()` | `Repartidor` | `id_usuario` |
+| hasMany | `sesiones()` | `SesionUsuario` | `id_usuario` |
+| hasMany | `auditorias()` | `Auditoria` | `id_usuario` |
 
 ---
 
@@ -89,15 +97,15 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_estado_usuario` | PK | Identificador único |
-| `nombre_estado` | string | Nombre del estado (ej: Activo, Bloqueado) |
+| `id_estado_usuario` | PK (tinyInteger) | Identificador único |
+| `nombre_estado` | string(50) | Nombre del estado (**unique**) |
 
 **Tabla:** `estados_usuario` | **PK:** `id_estado_usuario` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Usuario` | `id_estado_usuario` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `usuarios()` | `Usuario` | `id_estado_usuario` |
 
 ---
 
@@ -105,16 +113,16 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_rol` | PK | Identificador único |
-| `nombre` | string | Nombre del rol (ej: Admin, Repartidor) |
+| `id_rol` | PK (tinyInteger) | Identificador único |
+| `nombre` | string(50) | Nombre del rol (**unique**) |
 
 **Tabla:** `roles` | **PK:** `id_rol` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsToMany | `Usuario` | pivot: `usuario_roles` |
-| belongsToMany | `Permiso` | pivot: `rol_permiso` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsToMany | `usuarios()` | `Usuario` | pivot: `usuario_roles` |
+| belongsToMany | `permisos()` | `Permiso` | pivot: `rol_permiso` |
 
 ---
 
@@ -123,17 +131,19 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_permiso` | PK | Identificador único |
-| `id_modulo` | FK | Relación con Modulo |
-| `id_accion` | FK | Relación con Accion |
+| `id_modulo` | FK→`modulos` | Módulo asociado |
+| `id_accion` | FK→`acciones` | Acción asociada |
 
 **Tabla:** `permisos` | **PK:** `id_permiso` | **Timestamps:** No
 
+**Unique compuesto:** `(id_modulo, id_accion)`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Modulo` | `id_modulo` |
-| belongsTo | `Accion` | `id_accion` |
-| belongsToMany | `Rol` | pivot: `rol_permiso` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `modulo()` | `Modulo` | `id_modulo` |
+| belongsTo | `accion()` | `Accion` | `id_accion` |
+| belongsToMany | `roles()` | `Rol` | pivot: `rol_permiso` |
 
 ---
 
@@ -141,15 +151,15 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_modulo` | PK | Identificador único |
-| `nombre` | string | Nombre del módulo (ej: Usuarios, Pedidos) |
+| `id_modulo` | PK (tinyInteger) | Identificador único |
+| `nombre` | string(50) | Nombre del módulo (**unique**) |
 
 **Tabla:** `modulos` | **PK:** `id_modulo` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Permiso` | `id_modulo` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `permisos()` | `Permiso` | `id_modulo` |
 
 ---
 
@@ -157,15 +167,15 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_accion` | PK | Identificador único |
-| `nombre` | string | Nombre de la acción (ej: Crear, Leer, Actualizar, Eliminar) |
+| `id_accion` | PK (tinyInteger) | Identificador único |
+| `nombre` | string(50) | Nombre de la acción (**unique**) |
 
 **Tabla:** `acciones` | **PK:** `id_accion` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Permiso` | `id_accion` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `permisos()` | `Permiso` | `id_accion` |
 
 ---
 
@@ -173,15 +183,15 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_tabla` | PK | Identificador único |
-| `nombre` | string | Nombre de la tabla del sistema auditada |
+| `id_tabla` | PK (tinyInteger) | Identificador único |
+| `nombre` | string(100) | Nombre de la tabla del sistema auditada (**unique**) |
 
 **Tabla:** `tablas_sistema` | **PK:** `id_tabla` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Auditoria` | `id_tabla` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `auditorias()` | `Auditoria` | `id_tabla` |
 
 ---
 
@@ -190,20 +200,22 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_auditoria` | PK | Identificador único |
-| `id_usuario` | FK | Relación con Usuario |
-| `id_accion` | FK | Relación con Accion |
-| `id_tabla` | FK | Relación con TablaSistema |
-| `registro_id` | int | ID del registro afectado |
+| `id_usuario` | FK→`usuarios` | Usuario que realizó la acción |
+| `id_accion` | FK→`acciones` | Acción realizada |
+| `id_tabla` | FK→`tablas_sistema` | Tabla afectada |
+| `registro_id` | integer | ID del registro afectado |
 | `fecha_hora` | datetime | Fecha y hora de la auditoría |
 
 **Tabla:** `auditorias` | **PK:** `id_auditoria` | **Timestamps:** No
 
+**Casts:** `fecha_hora:datetime`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Usuario` | `id_usuario` |
-| belongsTo | `Accion` | `id_accion` |
-| belongsTo | `TablaSistema` | `id_tabla` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `usuario()` | `Usuario` | `id_usuario` |
+| belongsTo | `accion()` | `Accion` | `id_accion` |
+| belongsTo | `tabla()` | `TablaSistema` | `id_tabla` |
 
 ---
 
@@ -212,16 +224,18 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_sesion` | PK | Identificador único |
-| `id_usuario` | FK | Relación con Usuario |
+| `id_usuario` | FK→`usuarios` | Usuario de la sesión |
 | `fecha_inicio` | datetime | Inicio de sesión |
 | `fecha_fin` | datetime | Fin de sesión (nullable) |
 
 **Tabla:** `sesiones_usuario` | **PK:** `id_sesion` | **Timestamps:** No
 
+**Casts:** `fecha_inicio:datetime`, `fecha_fin:datetime`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Usuario` | `id_usuario` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `usuario()` | `Usuario` | `id_usuario` |
 
 ---
 
@@ -232,21 +246,21 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_farmacia` | PK | Identificador único |
-| `nombre` | string | Nombre de la farmacia |
-| `direccion` | string | Dirección |
-| `telefono` | string | Teléfono |
-| `email` | string | Correo electrónico |
-| `latitud` | decimal | Latitud de ubicación |
-| `longitud` | decimal | Longitud de ubicación |
+| `nombre` | string(150) | Nombre de la farmacia |
+| `direccion` | text | Dirección |
+| `telefono` | string(20) | Teléfono |
+| `email` | string(180) | Correo electrónico (**unique**, nullable) |
+| `latitud` | decimal(10,7) | Latitud de ubicación (entre -90 y 90) |
+| `longitud` | decimal(10,7) | Longitud de ubicación (entre -180 y 180) |
 
-**Tabla:** `farmacias` | **PK:** `id_farmacia` | **Timestamps:** Sí (por defecto)
+**Tabla:** `farmacias` | **PK:** `id_farmacia` | **Timestamps:** Sí (created_at, updated_at) | **Traits:** HasFactory
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `ContactoFarmacia` | `id_farmacia` |
-| hasMany | `Pedido` | `id_farmacia` |
-| hasMany | `RutaParada` | `id_farmacia` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `contactos()` | `ContactoFarmacia` | `id_farmacia` |
+| hasMany | `pedidos()` | `Pedido` | `id_farmacia` |
+| hasMany | `paradas()` | `RutaParada` | `id_farmacia` |
 
 ---
 
@@ -255,19 +269,19 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_contacto` | PK | Identificador único |
-| `id_farmacia` | FK | Relación con Farmacia |
-| `nombre_contacto` | string | Nombre del contacto |
-| `id_cargo` | FK | Relación con Cargo |
-| `telefono` | string | Teléfono del contacto |
-| `email` | string | Correo electrónico del contacto |
+| `id_farmacia` | FK→`farmacias` | Farmacia asociada |
+| `nombre_contacto` | string(150) | Nombre del contacto |
+| `id_cargo` | FK→`cargos` | Cargo del contacto |
+| `telefono` | string(20) | Teléfono del contacto |
+| `email` | string(180) | Correo electrónico (nullable) |
 
-**Tabla:** `contactos_farmacia` | **PK:** `id_contacto` | **Timestamps:** No
+**Tabla:** `contactos_farmacia` | **PK:** `id_contacto` | **Timestamps:** No | **Traits:** HasFactory
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Farmacia` | `id_farmacia` |
-| belongsTo | `Cargo` | `id_cargo` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `farmacia()` | `Farmacia` | `id_farmacia` |
+| belongsTo | `cargo()` | `Cargo` | `id_cargo` |
 
 ---
 
@@ -275,15 +289,15 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_cargo` | PK | Identificador único |
-| `nombre_cargo` | string | Nombre del cargo (ej: Gerente, Encargado) |
+| `id_cargo` | PK (tinyInteger) | Identificador único |
+| `nombre_cargo` | string(100) | Nombre del cargo (**unique**) |
 
 **Tabla:** `cargos` | **PK:** `id_cargo` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `ContactoFarmacia` | `id_cargo` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `contactos()` | `ContactoFarmacia` | `id_cargo` |
 
 ---
 
@@ -294,23 +308,23 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_repartidor` | PK | Identificador único |
-| `id_usuario` | FK | Relación con Usuario |
-| `ci` | string | Cédula de identidad |
-| `id_extension_ci` | FK | Relación con ExtensionCI |
-| `id_licencia` | FK | Relación con Licencia |
-| `id_estado_repartidor` | FK | Relación con EstadoRepartidor |
+| `id_usuario` | FK→`usuarios` | Usuario asociado (**unique**) |
+| `ci` | string(20) | Cédula de identidad (**unique**) |
+| `id_extension_ci` | FK→`extensiones_ci` | Extensión del CI |
+| `id_licencia` | FK→`licencias` | Categoría de licencia |
+| `id_estado_repartidor` | FK→`estados_repartidor` | Estado del repartidor |
 
-**Tabla:** `repartidores` | **PK:** `id_repartidor` | **Timestamps:** No
+**Tabla:** `repartidores` | **PK:** `id_repartidor` | **Timestamps:** No | **Traits:** HasFactory
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Usuario` | `id_usuario` |
-| belongsTo | `ExtensionCI` | `id_extension_ci` |
-| belongsTo | `Licencia` | `id_licencia` |
-| belongsTo | `EstadoRepartidor` | `id_estado_repartidor` |
-| hasMany | `HistorialEstadoRepartidor` | `id_repartidor` |
-| hasMany | `ControlRuta` | `id_repartidor` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `usuario()` | `Usuario` | `id_usuario` |
+| belongsTo | `extensionCi()` | `ExtensionCI` | `id_extension_ci` |
+| belongsTo | `licencia()` | `Licencia` | `id_licencia` |
+| belongsTo | `estado()` | `EstadoRepartidor` | `id_estado_repartidor` |
+| hasMany | `historiales()` | `HistorialEstadoRepartidor` | `id_repartidor` |
+| hasMany | `controlRutas()` | `ControlRuta` | `id_repartidor` |
 
 ---
 
@@ -318,16 +332,16 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_estado_repartidor` | PK | Identificador único |
-| `nombre_estado` | string | Nombre del estado (ej: Disponible, Ocupado, Inactivo) |
+| `id_estado_repartidor` | PK (tinyInteger) | Identificador único |
+| `nombre_estado` | string(50) | Nombre del estado (**unique**) |
 
 **Tabla:** `estados_repartidor` | **PK:** `id_estado_repartidor` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Repartidor` | `id_estado_repartidor` |
-| hasMany | `HistorialEstadoRepartidor` | `id_estado_repartidor` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `repartidores()` | `Repartidor` | `id_estado_repartidor` |
+| hasMany | `historiales()` | `HistorialEstadoRepartidor` | `id_estado_repartidor` |
 
 ---
 
@@ -336,18 +350,22 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_historial` | PK | Identificador único |
-| `id_repartidor` | FK | Relación con Repartidor |
-| `id_estado_repartidor` | FK | Relación con EstadoRepartidor |
+| `id_repartidor` | FK→`repartidores` | Repartidor asociado |
+| `id_estado_repartidor` | FK→`estados_repartidor` | Estado asignado |
 | `fecha_inicio` | datetime | Fecha de inicio del estado |
 | `fecha_fin` | datetime | Fecha de fin del estado (nullable) |
 
 **Tabla:** `historial_estado_repartidor` | **PK:** `id_historial` | **Timestamps:** No
 
+**Casts:** `fecha_inicio:datetime`, `fecha_fin:datetime`
+
+**Unique compuesto:** `(id_repartidor, fecha_inicio)`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Repartidor` | `id_repartidor` |
-| belongsTo | `EstadoRepartidor` | `id_estado_repartidor` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `repartidor()` | `Repartidor` | `id_repartidor` |
+| belongsTo | `estado()` | `EstadoRepartidor` | `id_estado_repartidor` |
 
 ---
 
@@ -355,15 +373,15 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_licencia` | PK | Identificador único |
-| `categoria` | string | Categoría de licencia (ej: A, B, C) |
+| `id_licencia` | PK (tinyInteger) | Identificador único |
+| `categoria` | string(20) | Categoría de licencia (**unique**) |
 
 **Tabla:** `licencias` | **PK:** `id_licencia` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Repartidor` | `id_licencia` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `repartidores()` | `Repartidor` | `id_licencia` |
 
 ---
 
@@ -371,15 +389,15 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_extension_ci` | PK | Identificador único |
-| `nombre_extension` | string | Nombre de extensión de CI (ej: LP, SC, CB) |
+| `id_extension_ci` | PK (tinyInteger) | Identificador único |
+| `nombre_extension` | string(10) | Extensión del CI (**unique**) |
 
 **Tabla:** `extensiones_ci` | **PK:** `id_extension_ci` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Repartidor` | `id_extension_ci` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `repartidores()` | `Repartidor` | `id_extension_ci` |
 
 ---
 
@@ -390,21 +408,21 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_vehiculo` | PK | Identificador único |
-| `placa` | string | Placa del vehículo |
-| `id_modelo` | FK | Relación con Modelo |
-| `id_capacidad` | FK | Relación con Capacidad |
-| `id_estado_vehiculo` | FK | Relación con EstadoVehiculo |
+| `placa` | string(20) | Placa del vehículo (**unique**) |
+| `id_modelo` | FK→`modelos` | Modelo del vehículo |
+| `id_capacidad` | FK→`capacidades` | Capacidad de carga |
+| `id_estado_vehiculo` | FK→`estados_vehiculo` | Estado del vehículo |
 
-**Tabla:** `vehiculos` | **PK:** `id_vehiculo` | **Timestamps:** No
+**Tabla:** `vehiculos` | **PK:** `id_vehiculo` | **Timestamps:** No | **Traits:** HasFactory
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Modelo` | `id_modelo` |
-| belongsTo | `Capacidad` | `id_capacidad` |
-| belongsTo | `EstadoVehiculo` | `id_estado_vehiculo` |
-| hasMany | `HistorialEstadoVehiculo` | `id_vehiculo` |
-| hasMany | `ControlRuta` | `id_vehiculo` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `modelo()` | `Modelo` | `id_modelo` |
+| belongsTo | `capacidad()` | `Capacidad` | `id_capacidad` |
+| belongsTo | `estado()` | `EstadoVehiculo` | `id_estado_vehiculo` |
+| hasMany | `historiales()` | `HistorialEstadoVehiculo` | `id_vehiculo` |
+| hasMany | `controlRutas()` | `ControlRuta` | `id_vehiculo` |
 
 ---
 
@@ -412,16 +430,16 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_estado_vehiculo` | PK | Identificador único |
-| `nombre_estado` | string | Nombre del estado (ej: Operativo, Mantenimiento) |
+| `id_estado_vehiculo` | PK (tinyInteger) | Identificador único |
+| `nombre_estado` | string(50) | Nombre del estado (**unique**) |
 
 **Tabla:** `estados_vehiculo` | **PK:** `id_estado_vehiculo` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Vehiculo` | `id_estado_vehiculo` |
-| hasMany | `HistorialEstadoVehiculo` | `id_estado_vehiculo` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `vehiculos()` | `Vehiculo` | `id_estado_vehiculo` |
+| hasMany | `historiales()` | `HistorialEstadoVehiculo` | `id_estado_vehiculo` |
 
 ---
 
@@ -430,18 +448,22 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_historial` | PK | Identificador único |
-| `id_vehiculo` | FK | Relación con Vehiculo |
-| `id_estado_vehiculo` | FK | Relación con EstadoVehiculo |
+| `id_vehiculo` | FK→`vehiculos` | Vehículo asociado |
+| `id_estado_vehiculo` | FK→`estados_vehiculo` | Estado asignado |
 | `fecha_inicio` | datetime | Fecha de inicio del estado |
 | `fecha_fin` | datetime | Fecha de fin del estado (nullable) |
 
 **Tabla:** `historial_estado_vehiculo` | **PK:** `id_historial` | **Timestamps:** No
 
+**Casts:** `fecha_inicio:datetime`, `fecha_fin:datetime`
+
+**Unique compuesto:** `(id_vehiculo, fecha_inicio)`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Vehiculo` | `id_vehiculo` |
-| belongsTo | `EstadoVehiculo` | `id_estado_vehiculo` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `vehiculo()` | `Vehiculo` | `id_vehiculo` |
+| belongsTo | `estado()` | `EstadoVehiculo` | `id_estado_vehiculo` |
 
 ---
 
@@ -449,15 +471,15 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_marca` | PK | Identificador único |
-| `nombre_marca` | string | Nombre de la marca (ej: Toyota, Nissan) |
+| `id_marca` | PK (tinyIncrements) | Identificador único |
+| `nombre_marca` | string(50) | Nombre de la marca (**unique**) |
 
 **Tabla:** `marcas` | **PK:** `id_marca` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Modelo` | `id_marca` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `modelos()` | `Modelo` | `id_marca` |
 
 ---
 
@@ -465,17 +487,19 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_modelo` | PK | Identificador único |
-| `id_marca` | FK | Relación con Marca |
-| `nombre_modelo` | string | Nombre del modelo (ej: Hilux, Hiace) |
+| `id_modelo` | PK (smallIncrements) | Identificador único |
+| `id_marca` | FK→`marcas` | Marca asociada |
+| `nombre_modelo` | string(100) | Nombre del modelo |
 
 **Tabla:** `modelos` | **PK:** `id_modelo` | **Timestamps:** No
 
+**Unique compuesto:** `(id_marca, nombre_modelo)`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Marca` | `id_marca` |
-| hasMany | `Vehiculo` | `id_modelo` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `marca()` | `Marca` | `id_marca` |
+| hasMany | `vehiculos()` | `Vehiculo` | `id_modelo` |
 
 ---
 
@@ -483,15 +507,17 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_capacidad` | PK | Identificador único |
-| `capacidad_kg` | decimal(2) | Capacidad en kilogramos |
+| `id_capacidad` | PK (tinyInteger) | Identificador único |
+| `capacidad_kg` | decimal(8,2) | Capacidad en kilogramos (**unique**, >= 0) |
 
 **Tabla:** `capacidades` | **PK:** `id_capacidad` | **Timestamps:** No
 
+**Casts:** `capacidad_kg:decimal:2`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Vehiculo` | `id_capacidad` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `vehiculos()` | `Vehiculo` | `id_capacidad` |
 
 ---
 
@@ -502,22 +528,24 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_pedido` | PK | Identificador único |
-| `id_farmacia` | FK | Relación con Farmacia |
-| `id_usuario` | FK | Relación con Usuario |
-| `id_estado_pedido` | FK | Relación con EstadoPedido |
-| `fecha_pedido` | datetime | Fecha del pedido |
+| `id_farmacia` | FK→`farmacias` | Farmacia destino |
+| `id_usuario` | FK→`usuarios` | Usuario que registró |
+| `id_estado_pedido` | FK→`estados_pedido` | Estado del pedido |
+| `fecha_pedido` | timestamp | Fecha del pedido (default: now) |
 | `observaciones` | text | Observaciones (nullable) |
 
-**Tabla:** `pedidos` | **PK:** `id_pedido` | **Timestamps:** No
+**Tabla:** `pedidos` | **PK:** `id_pedido` | **Timestamps:** No | **Traits:** HasFactory
+
+**Casts:** `fecha_pedido:datetime`
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Farmacia` | `id_farmacia` |
-| belongsTo | `Usuario` | `id_usuario` |
-| belongsTo | `EstadoPedido` | `id_estado_pedido` |
-| hasMany | `HistorialEstadoPedido` | `id_pedido` |
-| hasOne | `Despacho` | `id_pedido` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `farmacia()` | `Farmacia` | `id_farmacia` |
+| belongsTo | `usuario()` | `Usuario` | `id_usuario` |
+| belongsTo | `estado()` | `EstadoPedido` | `id_estado_pedido` |
+| hasMany | `historiales()` | `HistorialEstadoPedido` | `id_pedido` |
+| hasOne | `despacho()` | `Despacho` | `id_pedido` |
 
 ---
 
@@ -525,16 +553,16 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_estado_pedido` | PK | Identificador único |
-| `nombre_estado` | string | Nombre del estado (ej: Pendiente, Aprobado, Despachado) |
+| `id_estado_pedido` | PK (tinyInteger) | Identificador único |
+| `nombre_estado` | string(50) | Nombre del estado (**unique**) |
 
 **Tabla:** `estados_pedido` | **PK:** `id_estado_pedido` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Pedido` | `id_estado_pedido` |
-| hasMany | `HistorialEstadoPedido` | `id_estado_pedido` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `pedidos()` | `Pedido` | `id_estado_pedido` |
+| hasMany | `historiales()` | `HistorialEstadoPedido` | `id_estado_pedido` |
 
 ---
 
@@ -543,18 +571,22 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_historial` | PK | Identificador único |
-| `id_pedido` | FK | Relación con Pedido |
-| `id_estado_pedido` | FK | Relación con EstadoPedido |
+| `id_pedido` | FK→`pedidos` | Pedido asociado |
+| `id_estado_pedido` | FK→`estados_pedido` | Estado asignado |
 | `fecha_inicio` | datetime | Fecha de inicio del estado |
 | `fecha_fin` | datetime | Fecha de fin del estado (nullable) |
 
 **Tabla:** `historial_estado_pedido` | **PK:** `id_historial` | **Timestamps:** No
 
+**Casts:** `fecha_inicio:datetime`, `fecha_fin:datetime`
+
+**Unique compuesto:** `(id_pedido, fecha_inicio)`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Pedido` | `id_pedido` |
-| belongsTo | `EstadoPedido` | `id_estado_pedido` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `pedido()` | `Pedido` | `id_pedido` |
+| belongsTo | `estado()` | `EstadoPedido` | `id_estado_pedido` |
 
 ---
 
@@ -565,24 +597,26 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_despacho` | PK | Identificador único |
-| `id_pedido` | FK | Relación con Pedido |
-| `id_parada` | FK | Relación con RutaParada |
-| `id_control_ruta` | FK | Relación con ControlRuta |
-| `fecha_hora_despacho` | datetime | Fecha y hora del despacho |
-| `id_estado_despacho` | FK | Relación con EstadoDespacho |
+| `id_pedido` | FK→`pedidos` | Pedido asociado (**unique**) |
+| `id_parada` | FK→`ruta_paradas` | Parada de ruta |
+| `id_control_ruta` | FK→`control_rutas` | Control de ruta |
+| `fecha_hora_despacho` | timestamp | Fecha y hora del despacho (default: now) |
+| `id_estado_despacho` | FK→`estados_despacho` | Estado del despacho |
 
-**Tabla:** `despachos` | **PK:** `id_despacho` | **Timestamps:** No
+**Tabla:** `despachos` | **PK:** `id_despacho` | **Timestamps:** No | **Traits:** HasFactory
+
+**Casts:** `fecha_hora_despacho:datetime`
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Pedido` | `id_pedido` |
-| belongsTo | `RutaParada` | `id_parada` |
-| belongsTo | `ControlRuta` | `id_control_ruta` |
-| belongsTo | `EstadoDespacho` | `id_estado_despacho` |
-| hasMany | `HistorialEstadoDespacho` | `id_despacho` |
-| hasMany | `Incidencia` | `id_despacho` |
-| hasMany | `EvidenciaEntrega` | `id_despacho` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `pedido()` | `Pedido` | `id_pedido` |
+| belongsTo | `parada()` | `RutaParada` | `id_parada` |
+| belongsTo | `controlRuta()` | `ControlRuta` | `id_control_ruta` |
+| belongsTo | `estado()` | `EstadoDespacho` | `id_estado_despacho` |
+| hasMany | `historiales()` | `HistorialEstadoDespacho` | `id_despacho` |
+| hasMany | `incidencias()` | `Incidencia` | `id_despacho` |
+| hasMany | `evidencias()` | `EvidenciaEntrega` | `id_despacho` |
 
 ---
 
@@ -590,16 +624,16 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_estado_despacho` | PK | Identificador único |
-| `nombre_estado` | string | Nombre del estado (ej: Pendiente, En ruta, Entregado) |
+| `id_estado_despacho` | PK (tinyInteger) | Identificador único |
+| `nombre_estado` | string(50) | Nombre del estado (**unique**) |
 
 **Tabla:** `estados_despacho` | **PK:** `id_estado_despacho` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Despacho` | `id_estado_despacho` |
-| hasMany | `HistorialEstadoDespacho` | `id_estado_despacho` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `despachos()` | `Despacho` | `id_estado_despacho` |
+| hasMany | `historiales()` | `HistorialEstadoDespacho` | `id_estado_despacho` |
 
 ---
 
@@ -608,18 +642,22 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_historial` | PK | Identificador único |
-| `id_despacho` | FK | Relación con Despacho |
-| `id_estado_despacho` | FK | Relación con EstadoDespacho |
+| `id_despacho` | FK→`despachos` | Despacho asociado |
+| `id_estado_despacho` | FK→`estados_despacho` | Estado asignado |
 | `fecha_inicio` | datetime | Fecha de inicio del estado |
 | `fecha_fin` | datetime | Fecha de fin del estado (nullable) |
 
 **Tabla:** `historial_estado_despacho` | **PK:** `id_historial` | **Timestamps:** No
 
+**Casts:** `fecha_inicio:datetime`, `fecha_fin:datetime`
+
+**Unique compuesto:** `(id_despacho, fecha_inicio)`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Despacho` | `id_despacho` |
-| belongsTo | `EstadoDespacho` | `id_estado_despacho` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `despacho()` | `Despacho` | `id_despacho` |
+| belongsTo | `estado()` | `EstadoDespacho` | `id_estado_despacho` |
 
 ---
 
@@ -629,16 +667,16 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_ruta` | PK | Identificador único |
-| `nombre_ruta` | string | Nombre de la ruta |
+| `id_ruta` | PK (smallIncrements) | Identificador único |
+| `nombre_ruta` | string(100) | Nombre de la ruta (**unique**) |
 
-**Tabla:** `rutas` | **PK:** `id_ruta` | **Timestamps:** No
+**Tabla:** `rutas` | **PK:** `id_ruta` | **Timestamps:** No | **Traits:** HasFactory
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `RutaParada` | `id_ruta` (ordenado por `orden_parada`) |
-| hasMany | `ControlRuta` | `id_ruta` |
+| Tipo | Método | Modelo destino | FK | Nota |
+|------|--------|----------------|-----|------|
+| hasMany | `paradas()` | `RutaParada` | `id_ruta` | Ordenado por `orden_parada ASC` |
+| hasMany | `controles()` | `ControlRuta` | `id_ruta` | |
 
 ---
 
@@ -647,19 +685,23 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_parada` | PK | Identificador único |
-| `id_ruta` | FK | Relación con Ruta |
-| `id_farmacia` | FK | Relación con Farmacia |
-| `orden_parada` | int | Orden de la parada en la ruta |
-| `hora_estimada` | string | Hora estimada de llegada |
+| `id_ruta` | FK→`rutas` | Ruta asociada |
+| `id_farmacia` | FK→`farmacias` | Farmacia de la parada |
+| `orden_parada` | smallInteger | Orden de la parada en la ruta (>= 1) |
+| `hora_estimada` | string (time) | Hora estimada de llegada (H:i:s) |
 
-**Tabla:** `ruta_paradas` | **PK:** `id_parada` | **Timestamps:** No
+**Tabla:** `ruta_paradas` | **PK:** `id_parada` | **Timestamps:** No | **Traits:** HasFactory
+
+**Casts:** `hora_estimada:string`
+
+**Unique compuesto:** `(id_ruta, orden_parada)`
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Ruta` | `id_ruta` |
-| belongsTo | `Farmacia` | `id_farmacia` |
-| hasMany | `Despacho` | `id_parada` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `ruta()` | `Ruta` | `id_ruta` |
+| belongsTo | `farmacia()` | `Farmacia` | `id_farmacia` |
+| hasMany | `despachos()` | `Despacho` | `id_parada` |
 
 ---
 
@@ -668,22 +710,26 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_control_ruta` | PK | Identificador único |
-| `id_ruta` | FK | Relación con Ruta |
+| `id_ruta` | FK→`rutas` | Ruta controlada |
 | `fecha_ruta` | date | Fecha de la ruta |
-| `hora_salida` | string | Hora de salida |
-| `hora_llegada_real` | string | Hora de llegada real (nullable) |
-| `id_repartidor` | FK | Relación con Repartidor |
-| `id_vehiculo` | FK | Relación con Vehiculo |
+| `hora_salida` | string (time) | Hora de salida (H:i:s) |
+| `hora_llegada_real` | string (time) | Hora de llegada real (nullable) |
+| `id_repartidor` | FK→`repartidores` | Repartidor asignado |
+| `id_vehiculo` | FK→`vehiculos` | Vehículo asignado |
 
-**Tabla:** `control_rutas` | **PK:** `id_control_ruta` | **Timestamps:** No
+**Tabla:** `control_rutas` | **PK:** `id_control_ruta` | **Timestamps:** No | **Traits:** HasFactory
+
+**Casts:** `fecha_ruta:date`, `hora_salida:string`, `hora_llegada_real:string`
+
+**Unique compuesto:** `(id_ruta, fecha_ruta)`
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Ruta` | `id_ruta` |
-| belongsTo | `Repartidor` | `id_repartidor` |
-| belongsTo | `Vehiculo` | `id_vehiculo` |
-| hasMany | `Despacho` | `id_control_ruta` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `ruta()` | `Ruta` | `id_ruta` |
+| belongsTo | `repartidor()` | `Repartidor` | `id_repartidor` |
+| belongsTo | `vehiculo()` | `Vehiculo` | `id_vehiculo` |
+| hasMany | `despachos()` | `Despacho` | `id_control_ruta` |
 
 ---
 
@@ -694,18 +740,20 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_evidencia` | PK | Identificador único |
-| `id_despacho` | FK | Relación con Despacho |
-| `id_tipo_evidencia` | FK | Relación con TipoEvidencia |
+| `id_despacho` | FK→`despachos` | Despacho asociado |
+| `id_tipo_evidencia` | FK→`tipos_evidencia` | Tipo de evidencia |
 | `archivo` | string | Ruta del archivo de evidencia |
-| `fecha_registro` | datetime | Fecha de registro de la evidencia |
+| `fecha_registro` | datetime | Fecha de registro |
 
 **Tabla:** `evidencias_entrega` | **PK:** `id_evidencia` | **Timestamps:** No
 
+**Casts:** `fecha_registro:datetime`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Despacho` | `id_despacho` |
-| belongsTo | `TipoEvidencia` | `id_tipo_evidencia` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `despacho()` | `Despacho` | `id_despacho` |
+| belongsTo | `tipoEvidencia()` | `TipoEvidencia` | `id_tipo_evidencia` |
 
 ---
 
@@ -714,18 +762,20 @@
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id_incidencia` | PK | Identificador único |
-| `id_despacho` | FK | Relación con Despacho |
-| `id_tipo_incidencia` | FK | Relación con TipoIncidencia |
+| `id_despacho` | FK→`despachos` | Despacho asociado |
+| `id_tipo_incidencia` | FK→`tipos_incidencia` | Tipo de incidencia |
 | `descripcion` | text | Descripción de la incidencia |
 | `fecha_incidencia` | datetime | Fecha de la incidencia |
 
 **Tabla:** `incidencias` | **PK:** `id_incidencia` | **Timestamps:** No
 
+**Casts:** `fecha_incidencia:datetime`
+
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| belongsTo | `Despacho` | `id_despacho` |
-| belongsTo | `TipoIncidencia` | `id_tipo_incidencia` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| belongsTo | `despacho()` | `Despacho` | `id_despacho` |
+| belongsTo | `tipoIncidencia()` | `TipoIncidencia` | `id_tipo_incidencia` |
 
 ---
 
@@ -733,15 +783,15 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_tipo_evidencia` | PK | Identificador único |
-| `nombre_tipo` | string | Nombre del tipo de evidencia (ej: Foto, PDF, Firma) |
+| `id_tipo_evidencia` | PK (tinyInteger) | Identificador único |
+| `nombre_tipo` | string(100) | Nombre del tipo de evidencia (**unique**) |
 
 **Tabla:** `tipos_evidencia` | **PK:** `id_tipo_evidencia` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `EvidenciaEntrega` | `id_tipo_evidencia` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `evidencias()` | `EvidenciaEntrega` | `id_tipo_evidencia` |
 
 ---
 
@@ -749,15 +799,35 @@
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id_tipo_incidencia` | PK | Identificador único |
-| `nombre_tipo` | string | Nombre del tipo de incidencia (ej: Producto dañado, Retraso) |
+| `id_tipo_incidencia` | PK (tinyInteger) | Identificador único |
+| `nombre_tipo` | string(100) | Nombre del tipo de incidencia (**unique**) |
 
 **Tabla:** `tipos_incidencia` | **PK:** `id_tipo_incidencia` | **Timestamps:** No
 
 **Relaciones:**
-| Tipo | Modelo | FK |
-|------|--------|----|
-| hasMany | `Incidencia` | `id_tipo_incidencia` |
+| Tipo | Método | Modelo destino | FK |
+|------|--------|----------------|----|
+| hasMany | `incidencias()` | `Incidencia` | `id_tipo_incidencia` |
+
+---
+
+## 9. Leyenda
+
+| Símbolo | Significado |
+|---------|-------------|
+| PK | Primary Key (clave primaria) |
+| FK→`tabla` | Foreign Key que referencia a la tabla indicada |
+| (**unique**) | Restricción de unicidad en la BD |
+| (nullable) | Permite valores nulos |
+| **Traits** | Traits de Laravel usados por el modelo |
+| **Hidden** | Atributos ocultos en respuestas JSON |
+| **Casts** | Conversión automática de tipos al acceder al atributo |
+| Timestamps: No | `$timestamps = false` (sin created_at / updated_at) |
+| `hasOne` | Relación 1:1 |
+| `hasMany` | Relación 1:N |
+| `belongsTo` | Relación N:1 (inversa) |
+| `belongsToMany` | Relación N:M |
+| tinyInteger / smallIncrements | Tipo de columna en BD |
 
 ---
 
@@ -765,65 +835,67 @@
 
 ### Seguridad
 ```
-EstadoUsuario (1) ----< (N) Usuario (N) >---- (N) Rol (N) >---- (N) Permiso
-                                 |                                  |        |
-                                 |                                  1        1
-                                 |                              Modulo    Accion
-                                 |
-                  SesionUsuario | Auditoria
+EstadoUsuario (1) --< (N) Usuario (N) >-- (N) Rol (N) >-- (N) Permiso
+                                  |                         |         |
+                                  |                         1         1
+                                  |                     Modulo    Accion
+                                  |
+                   SesionUsuario | Auditoria
 ```
 
 ### Farmacia
 ```
-Cargo (1) ----< (N) ContactoFarmacia (N) >---- (1) Farmacia
+Cargo (1) --< (N) ContactoFarmacia (N) >-- (1) Farmacia
 ```
 
 ### Repartidor
 ```
-ExtensionCI (1) ----< (N) Repartidor (N) >---- (1) EstadoRepartidor
-Licencia (1) ----< (N)        |        (N) >---- (1) Usuario
-                              |
-                  HistorialEstadoRepartidor
+ExtensionCI (1) --< (N) Repartidor (N) >-- (1) EstadoRepartidor
+Licencia (1) --< (N)             |       (N) >-- (1) Usuario
+                                 |
+                     HistorialEstadoRepartidor
 ```
 
 ### Vehículo
 ```
-Marca (1) ----< (N) Modelo (N) >---- (1) Vehiculo (N) >---- (1) EstadoVehiculo
-Capacidad (1) ----< (N)      |                              |
-                              |           HistorialEstadoVehiculo
+Marca (1) --< (N) Modelo (N) >-- (1) Vehiculo (N) >-- (1) EstadoVehiculo
+Capacidad (1) --< (N)           |                       |
+                                |    HistorialEstadoVehiculo
 ```
 
 ### Pedido
 ```
-EstadoPedido (1) ----< (N) Pedido (N) >---- (1) Farmacia
-                              |        (N) >---- (1) Usuario
-                              |
-                  HistorialEstadoPedido
+EstadoPedido (1) --< (N) Pedido (N) >-- (1) Farmacia
+                                |     (N) >-- (1) Usuario
+                                |
+                    HistorialEstadoPedido
 ```
 
 ### Despacho
 ```
-EstadoDespacho (1) ----< (N) Despacho (N) >---- (1) Pedido
-                              |        (N) >---- (1) RutaParada
-                              |        (N) >---- (1) ControlRuta
-                              |
-                  HistorialEstadoDespacho
+EstadoDespacho (1) --< (N) Despacho (N) >-- (1) Pedido
+                                |        (N) >-- (1) RutaParada
+                                |        (N) >-- (1) ControlRuta
+                                |
+                    HistorialEstadoDespacho
+                     Incidencia
+                     EvidenciaEntrega
 ```
 
 ### Logística
 ```
-Ruta (1) ----< (N) RutaParada (N) >---- (1) Farmacia
+Ruta (1) --< (N) RutaParada (N) >-- (1) Farmacia
   |                      |
   |               Despacho
   |
-  +---< ControlRuta (N) >---- (1) Repartidor
-                  |           >---- (1) Vehiculo
+  +--< ControlRuta (N) >-- (1) Repartidor
+                  |         >-- (1) Vehiculo
                   |
             Despacho
 ```
 
 ### Evidencia
 ```
-TipoEvidencia (1) ----< (N) EvidenciaEntrega (N) >---- (1) Despacho
-TipoIncidencia (1) ----< (N) Incidencia (N) >---- (1) Despacho
+TipoEvidencia (1) --< (N) EvidenciaEntrega (N) >-- (1) Despacho
+TipoIncidencia (1) --< (N) Incidencia (N) >-- (1) Despacho
 ```
