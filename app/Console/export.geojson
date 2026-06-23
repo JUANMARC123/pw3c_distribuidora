@@ -1,0 +1,8320 @@
+ {
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-04-26T12:43:29Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/439384430",
+        "amenity": "pharmacy",
+        "building": "yes",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -68.1562431,
+              -16.5149255
+            ],
+            [
+              -68.1562131,
+              -16.5149768
+            ],
+            [
+              -68.1561651,
+              -16.514951
+            ],
+            [
+              -68.1561263,
+              -16.5149302
+            ],
+            [
+              -68.1561563,
+              -16.5148789
+            ],
+            [
+              -68.1562431,
+              -16.5149255
+            ]
+          ]
+        ]
+      },
+      "id": "way/439384430"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/440208674",
+        "amenity": "pharmacy",
+        "building": "yes",
+        "name": "Farmacia Mifarma"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -68.1630269,
+              -16.5321332
+            ],
+            [
+              -68.163097,
+              -16.5320816
+            ],
+            [
+              -68.1631125,
+              -16.5320703
+            ],
+            [
+              -68.1631417,
+              -16.532107
+            ],
+            [
+              -68.1630562,
+              -16.5321698
+            ],
+            [
+              -68.1630269,
+              -16.5321332
+            ]
+          ]
+        ]
+      },
+      "id": "way/440208674"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/441249046",
+        "amenity": "pharmacy",
+        "building": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Cruz Verde",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -68.1603905,
+              -16.5077247
+            ],
+            [
+              -68.160434,
+              -16.5077487
+            ],
+            [
+              -68.1604467,
+              -16.5077579
+            ],
+            [
+              -68.1604237,
+              -16.5077974
+            ],
+            [
+              -68.1603633,
+              -16.5077651
+            ],
+            [
+              -68.1603905,
+              -16.5077247
+            ]
+          ]
+        ]
+      },
+      "id": "way/441249046"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/441305570",
+        "amenity": "pharmacy",
+        "building": "yes",
+        "name:es": "Farmacia farmavida",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -68.1899827,
+              -16.4905254
+            ],
+            [
+              -68.1900061,
+              -16.4906047
+            ],
+            [
+              -68.1899229,
+              -16.4906273
+            ],
+            [
+              -68.1898995,
+              -16.490548
+            ],
+            [
+              -68.1899827,
+              -16.4905254
+            ]
+          ]
+        ]
+      },
+      "id": "way/441305570"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/446430137",
+        "addr:city": "EL ALTO",
+        "addr:housenumber": "348",
+        "addr:street": "juan lechin oquendo",
+        "amenity": "pharmacy",
+        "building": "yes",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -68.2142938,
+              -16.496614
+            ],
+            [
+              -68.2142374,
+              -16.4967571
+            ],
+            [
+              -68.2141825,
+              -16.4967372
+            ],
+            [
+              -68.2142389,
+              -16.4965941
+            ],
+            [
+              -68.2142938,
+              -16.496614
+            ]
+          ]
+        ]
+      },
+      "id": "way/446430137"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/446430138",
+        "amenity": "pharmacy",
+        "building": "yes",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -68.2151701,
+              -16.496498
+            ],
+            [
+              -68.2151488,
+              -16.4965554
+            ],
+            [
+              -68.2150465,
+              -16.4965205
+            ],
+            [
+              -68.2150625,
+              -16.4964771
+            ],
+            [
+              -68.2151007,
+              -16.4964901
+            ],
+            [
+              -68.2151059,
+              -16.4964761
+            ],
+            [
+              -68.2151701,
+              -16.496498
+            ]
+          ]
+        ]
+      },
+      "id": "way/446430138"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/446430146",
+        "amenity": "pharmacy",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -68.2135176,
+              -16.496413
+            ],
+            [
+              -68.2134826,
+              -16.4964903
+            ],
+            [
+              -68.2134351,
+              -16.4964705
+            ],
+            [
+              -68.2134702,
+              -16.4963932
+            ],
+            [
+              -68.2135176,
+              -16.496413
+            ]
+          ]
+        ]
+      },
+      "id": "way/446430146"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1095744118",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Litoral"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1619857,
+          -16.5056224
+        ]
+      },
+      "id": "node/1095744118"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3672698803",
+        "addr:street": "Avenida Cívica",
+        "amenity": "pharmacy",
+        "check_date": "2025-06-09",
+        "healthcare": "pharmacy",
+        "name": "Vital Joy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.156569,
+          -16.5197754
+        ]
+      },
+      "id": "node/3672698803"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3760720074",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "check_date": "2024-12-02",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Ciudad Satélite",
+        "note": "0.9",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1514479,
+          -16.5238852
+        ]
+      },
+      "id": "node/3760720074"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010453521",
+        "amenity": "pharmacy",
+        "name": "Farmal",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2079454,
+          -16.4897042
+        ]
+      },
+      "id": "node/4010453521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010453522",
+        "Source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "name": "Farmacia El Mundo",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2032661,
+          -16.4911249
+        ]
+      },
+      "id": "node/4010453522"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010453523",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1956543,
+          -16.4933877
+        ]
+      },
+      "id": "node/4010453523"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010453726",
+        "amenity": "pharmacy",
+        "name": "Farmacia Angelica"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2308477,
+          -16.4980685
+        ]
+      },
+      "id": "node/4010453726"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010455322",
+        "Source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2014363,
+          -16.4915375
+        ]
+      },
+      "id": "node/4010455322"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010455324",
+        "amenity": "pharmacy",
+        "name:es": "Farmacia Juan Pablo I",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1751761,
+          -16.4996104
+        ]
+      },
+      "id": "node/4010455324"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010455326",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "name": "Farmacia Prosalud",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1710909,
+          -16.501152
+        ]
+      },
+      "id": "node/4010455326"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010455329",
+        "addr:street": "Avenida 6 de Marzo",
+        "amenity": "pharmacy",
+        "fixme": "Needs_a_Name",
+        "healthcare": "pharmacy",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1639522,
+          -16.508268
+        ]
+      },
+      "id": "node/4010455329"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010455819",
+        "Source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016",
+        "amenity": "pharmacy",
+        "hashtags": "#ciudatlab25",
+        "healthcare": "pharmacy",
+        "name": "Paz y Salud con Dios",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1947097,
+          -16.4943062
+        ]
+      },
+      "id": "node/4010455819"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010455832",
+        "amenity": "pharmacy",
+        "name": "Farmacia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1843112,
+          -16.5975772
+        ]
+      },
+      "id": "node/4010455832"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010455834",
+        "amenity": "pharmacy",
+        "check_date": "2025-03-04",
+        "name": "Farmacia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1829029,
+          -16.6192639
+        ]
+      },
+      "id": "node/4010455834"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4010455924",
+        "amenity": "pharmacy",
+        "name": "Farmacia",
+        "name:es": "Farmacia Roca de Ayuda",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1845042,
+          -16.5967315
+        ]
+      },
+      "id": "node/4010455924"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4329412701",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida del Policía",
+        "amenity": "pharmacy",
+        "check_date": "2024-12-02",
+        "healthcare": "pharmacy",
+        "name": "Alto Farma Center",
+        "wheelchair": "limited"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1523848,
+          -16.5260498
+        ]
+      },
+      "id": "node/4329412701"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351350637",
+        "addr:street": "Avenida 6 de Marzo",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name:es": "Virgen de Copacabana II",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1632916,
+          -16.5062338
+        ]
+      },
+      "id": "node/4351350637"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351350641",
+        "addr:street": "Avenida 6 de Marzo",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia 6 De Marzo",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1635037,
+          -16.506937
+        ]
+      },
+      "id": "node/4351350641"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351589494",
+        "addr:street": "Avenida 6 de Marzo",
+        "amenity": "pharmacy",
+        "check_date": "2025-02-27",
+        "healthcare": "pharmacy",
+        "name": "Super Farmacia",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.16419,
+          -16.5089358
+        ]
+      },
+      "id": "node/4351589494"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351589498",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida 6 de Marzo",
+        "amenity": "pharmacy",
+        "check_date": "2025-02-27",
+        "healthcare": "pharmacy",
+        "name": "Super Farmacia",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1646984,
+          -16.510383
+        ]
+      },
+      "id": "node/4351589498"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4354617269",
+        "addr:housenumber": "14",
+        "addr:street": "Avenida 6 de Marzo",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Bolivia - El Alto",
+        "opening_hours": "Mo-Su 07:30-19:30",
+        "operator": "COBOFAR",
+        "phone": "22820833",
+        "source": "Reconocimiento cartográfico por KG 2016.",
+        "website": "https://www.farmaciasbolivia.com.bo/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1637812,
+          -16.5063165
+        ]
+      },
+      "id": "node/4354617269"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4354623685",
+        "addr:street": "Calle 4",
+        "amenity": "pharmacy",
+        "check_date": "2025-02-27",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Sariri",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1644982,
+          -16.5083735
+        ]
+      },
+      "id": "node/4354623685"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4355018321",
+        "addr:street": "Avenida 6 de Marzo",
+        "amenity": "pharmacy",
+        "name": "Farmacia Coral",
+        "opening_hours": "Mo-Sa 09:00-09:30",
+        "source": "Reconocimiento cartográfico por KG 2016.",
+        "wheelchair": "limited"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1849083,
+          -16.5807181
+        ]
+      },
+      "id": "node/4355018321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4355018323",
+        "addr:street": "Avenida 6 de Marzo",
+        "amenity": "pharmacy",
+        "name": "Farmacia Virgen Socabon",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1848092,
+          -16.5815582
+        ]
+      },
+      "id": "node/4355018323"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4356238707",
+        "amenity": "pharmacy",
+        "name": "Farmacias",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2014268,
+          -16.5458164
+        ]
+      },
+      "id": "node/4356238707"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4356249344",
+        "amenity": "pharmacy",
+        "name": "Horeb",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1980951,
+          -16.5422254
+        ]
+      },
+      "id": "node/4356249344"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4356405432",
+        "addr:street": "Avenida Bolivia",
+        "amenity": "pharmacy",
+        "name": "Farmacias Gabriel",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1908037,
+          -16.5342589
+        ]
+      },
+      "id": "node/4356405432"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4356405435",
+        "addr:street": "Avenida Bolivia",
+        "amenity": "pharmacy",
+        "name": "Farmacia Manet",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1917015,
+          -16.5338839
+        ]
+      },
+      "id": "node/4356405435"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4356405440",
+        "addr:street": "Avenida Bolivia",
+        "amenity": "pharmacy",
+        "check_date:opening_hours": "2025-07-25",
+        "name": "Farmacia Claudia",
+        "opening_hours:signed": "no",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1926142,
+          -16.5329253
+        ]
+      },
+      "id": "node/4356405440"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4356463520",
+        "amenity": "pharmacy",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2048806,
+          -16.5504045
+        ]
+      },
+      "id": "node/4356463520"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4356606665",
+        "addr:street": "Avenida Bolivia",
+        "amenity": "pharmacy",
+        "name": "Farmacia Buena Salud",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1912202,
+          -16.5338708
+        ]
+      },
+      "id": "node/4356606665"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4356606668",
+        "addr:street": "Avenida Bolivia",
+        "amenity": "pharmacy",
+        "name": "Farmacia Samy",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1914875,
+          -16.5335743
+        ]
+      },
+      "id": "node/4356606668"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4356689268",
+        "Source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "name:es": "Génesis",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2012206,
+          -16.4910621
+        ]
+      },
+      "id": "node/4356689268"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4357551937",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "name": "Farmacia Corpkam",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1961093,
+          -16.4937379
+        ]
+      },
+      "id": "node/4357551937"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4357602221",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "name": "Farmacia Pirai",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1754623,
+          -16.4995382
+        ]
+      },
+      "id": "node/4357602221"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4357602223",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1746953,
+          -16.4997203
+        ]
+      },
+      "id": "node/4357602223"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4357615522",
+        "Source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1637585,
+          -16.5028709
+        ]
+      },
+      "id": "node/4357615522"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4357693169",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1678209,
+          -16.5021249
+        ]
+      },
+      "id": "node/4357693169"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4357693170",
+        "Source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "name": "Farmacia Puerto Rico",
+        "source": "Reconocimiento cartográfico por KG 2016."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.165301,
+          -16.5028849
+        ]
+      },
+      "id": "node/4357693170"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4360218593",
+        "addr:city": "El Alto",
+        "addr:housenumber": "864",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "branch": "Satélite",
+        "brand": "Farmacorp",
+        "brand:wikidata": "Q81968937",
+        "dispensing": "no",
+        "healthcare": "pharmacy",
+        "name": "Farmacorp",
+        "note": "Sucursal 79",
+        "opening_hours": "24/7",
+        "operator": "Farmacorp",
+        "payment:cash": "yes",
+        "payment:credit_cards": "yes",
+        "payment:debit_cards": "yes",
+        "phone": "+591 69094233",
+        "website": "http://www.farmacorp.com.bo",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1544632,
+          -16.5226718
+        ]
+      },
+      "id": "node/4360218593"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4377859800",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name:es": "Farmacia Gintia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1563433,
+          -16.5192602
+        ]
+      },
+      "id": "node/4377859800"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4377903030",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1661065,
+          -16.5312276
+        ]
+      },
+      "id": "node/4377903030"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4377976325",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1890002,
+          -16.5359891
+        ]
+      },
+      "id": "node/4377976325"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4377980792",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.189685,
+          -16.5354829
+        ]
+      },
+      "id": "node/4377980792"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4377980794",
+        "amenity": "pharmacy",
+        "name": "Farmàcia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1901117,
+          -16.5351735
+        ]
+      },
+      "id": "node/4377980794"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4378105917",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Domingo Savio"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1574177,
+          -16.5204295
+        ]
+      },
+      "id": "node/4378105917"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379285467",
+        "amenity": "pharmacy",
+        "name": "Farmacia Jared I",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1613344,
+          -16.5295215
+        ]
+      },
+      "id": "node/4379285467"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379329403",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1689299,
+          -16.5415091
+        ]
+      },
+      "id": "node/4379329403"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379348972",
+        "amenity": "pharmacy",
+        "name": "Farmacia DJ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1745403,
+          -16.5454869
+        ]
+      },
+      "id": "node/4379348972"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379356272",
+        "amenity": "pharmacy",
+        "name": "Farmacia Kapri"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1747913,
+          -16.5456545
+        ]
+      },
+      "id": "node/4379356272"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379361458",
+        "amenity": "pharmacy",
+        "name": "Farmacia Turqueza"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1820493,
+          -16.5405803
+        ]
+      },
+      "id": "node/4379361458"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379426857",
+        "amenity": "pharmacy",
+        "name": "Farmacias Ahumada"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1856211,
+          -16.5294689
+        ]
+      },
+      "id": "node/4379426857"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379509388",
+        "amenity": "pharmacy",
+        "name": "Plus Farma",
+        "opening_hours": "Mo-Fr 09:00-22:00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1959151,
+          -16.5298076
+        ]
+      },
+      "id": "node/4379509388"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379632541",
+        "amenity": "pharmacy",
+        "name": "Farmacia Jumataki"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1809862,
+          -16.5243815
+        ]
+      },
+      "id": "node/4379632541"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379692580",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1907515,
+          -16.5335107
+        ]
+      },
+      "id": "node/4379692580"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379715438",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1949854,
+          -16.5302443
+        ]
+      },
+      "id": "node/4379715438"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379724236",
+        "amenity": "pharmacy",
+        "name": "Farmacia Luz De Cristo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1988243,
+          -16.5266089
+        ]
+      },
+      "id": "node/4379724236"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379731830",
+        "amenity": "pharmacy",
+        "name": "Farmacia Caranavi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2008367,
+          -16.5247166
+        ]
+      },
+      "id": "node/4379731830"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4379791134",
+        "amenity": "pharmacy",
+        "name": "Farmacia B&V"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2060151,
+          -16.5227601
+        ]
+      },
+      "id": "node/4379791134"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4380934132",
+        "amenity": "pharmacy",
+        "name": "Sana Sana"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2193819,
+          -16.5268783
+        ]
+      },
+      "id": "node/4380934132"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4380961813",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2293053,
+          -16.5281092
+        ]
+      },
+      "id": "node/4380961813"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4380961815",
+        "amenity": "pharmacy",
+        "name": "Farmacia Rousse Van"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2297052,
+          -16.5283106
+        ]
+      },
+      "id": "node/4380961815"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4380983726",
+        "amenity": "pharmacy",
+        "name": "Pharma Rocio"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2292449,
+          -16.5284603
+        ]
+      },
+      "id": "node/4380983726"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4381006136",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2248544,
+          -16.5331079
+        ]
+      },
+      "id": "node/4381006136"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4381154844",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1868444,
+          -16.5191832
+        ]
+      },
+      "id": "node/4381154844"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4381154846",
+        "amenity": "pharmacy",
+        "name:es": "Farmacia Quenisha"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1851256,
+          -16.5183522
+        ]
+      },
+      "id": "node/4381154846"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4381196639",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Araiz"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.215637,
+          -16.5335756
+        ]
+      },
+      "id": "node/4381196639"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4381260243",
+        "amenity": "pharmacy",
+        "name": "Farmacia Cosmos"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2036068,
+          -16.5270905
+        ]
+      },
+      "id": "node/4381260243"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4381285476",
+        "amenity": "pharmacy",
+        "name": "Farmacia Jazer"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2010218,
+          -16.525575
+        ]
+      },
+      "id": "node/4381285476"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4381298232",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1948114,
+          -16.5230592
+        ]
+      },
+      "id": "node/4381298232"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4381354712",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Alin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1666018,
+          -16.5163148
+        ]
+      },
+      "id": "node/4381354712"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4387454509",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia San Antonio"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.160993,
+          -16.5141228
+        ]
+      },
+      "id": "node/4387454509"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4387454515",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Emanuel Bombori"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1607021,
+          -16.5138393
+        ]
+      },
+      "id": "node/4387454515"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4387509352",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Ciudad Satélite",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Inca",
+        "opening_hours:covid19": "Mo-Fr 08:00-12:00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1619186,
+          -16.5182311
+        ]
+      },
+      "id": "node/4387509352"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4387509353",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Ciudad Satélite",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Esperanza de Sanación"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1609342,
+          -16.5189061
+        ]
+      },
+      "id": "node/4387509353"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4387509355",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Jassiel"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.160413,
+          -16.5192829
+        ]
+      },
+      "id": "node/4387509355"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4388287221",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Mercurio"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1558415,
+          -16.515455
+        ]
+      },
+      "id": "node/4388287221"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4388361183",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name:es": "Farmacia San Carlos"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1566312,
+          -16.5141067
+        ]
+      },
+      "id": "node/4388361183"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4388395664",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Dany",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1570001,
+          -16.5134708
+        ]
+      },
+      "id": "node/4388395664"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4388453152",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "image": "https://kartaview.org/details/3732669/50/track-info",
+        "name": "Farmacia Satélite II",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1539826,
+          -16.5228687
+        ]
+      },
+      "id": "node/4388453152"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4389771974",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Panorámica",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Telefarma",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1505915,
+          -16.5177164
+        ]
+      },
+      "id": "node/4389771974"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4389821552",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Antofagasta",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia VIP"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1512107,
+          -16.5173867
+        ]
+      },
+      "id": "node/4389821552"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4389866271",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Antofagasta",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia",
+        "opening_hours:covid19": "Mo-Fr 08:00-12:00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1544978,
+          -16.5159735
+        ]
+      },
+      "id": "node/4389866271"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390108892",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Anita",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.158557,
+          -16.5108253
+        ]
+      },
+      "id": "node/4390108892"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390131275",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Jaris",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1597848,
+          -16.5087411
+        ]
+      },
+      "id": "node/4390131275"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390131280",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Virgen Del Carmen",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1598993,
+          -16.5085077
+        ]
+      },
+      "id": "node/4390131280"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390132199",
+        "amenity": "pharmacy",
+        "brand": "Farmacias Ahumada",
+        "brand:wikidata": "Q5856069",
+        "brand:wikipedia": "es:Farmacias Ahumada",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Ahumada",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1601461,
+          -16.5081101
+        ]
+      },
+      "id": "node/4390132199"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390138712",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1606061,
+          -16.5073636
+        ]
+      },
+      "id": "node/4390138712"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390165074",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name:es": "Farmacia Eva",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1584899,
+          -16.5099249
+        ]
+      },
+      "id": "node/4390165074"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390219654",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1574667,
+          -16.5122784
+        ]
+      },
+      "id": "node/4390219654"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390219669",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Adrian",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1579303,
+          -16.5114612
+        ]
+      },
+      "id": "node/4390219669"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390270987",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Chavez",
+        "name:en": "Farmacia Chávez",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1587629,
+          -16.5093332
+        ]
+      },
+      "id": "node/4390270987"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390271799",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Farida",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1593275,
+          -16.5102695
+        ]
+      },
+      "id": "node/4390271799"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390299538",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Adriana",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1593643,
+          -16.5090358
+        ]
+      },
+      "id": "node/4390299538"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390530736",
+        "amenity": "pharmacy",
+        "name:es": "Farmacia Galvani I",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1750178,
+          -16.4993628
+        ]
+      },
+      "id": "node/4390530736"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390530743",
+        "amenity": "pharmacy",
+        "name": "Farmacia Union",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1745728,
+          -16.4978753
+        ]
+      },
+      "id": "node/4390530743"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390530744",
+        "amenity": "pharmacy",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1743631,
+          -16.4971634
+        ]
+      },
+      "id": "node/4390530744"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390647743",
+        "amenity": "pharmacy",
+        "name": "Farmacias Ahumada",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1870533,
+          -16.4913452
+        ]
+      },
+      "id": "node/4390647743"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390673615",
+        "amenity": "pharmacy",
+        "name": "Red De Farmacias",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1927026,
+          -16.4903814
+        ]
+      },
+      "id": "node/4390673615"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390694338",
+        "amenity": "pharmacy",
+        "name": "FarmaCalidad",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1937,
+          -16.4940263
+        ]
+      },
+      "id": "node/4390694338"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4390749854",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1616519,
+          -16.5039835
+        ]
+      },
+      "id": "node/4390749854"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4391068632",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "name:es": "Mencofar",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1706835,
+          -16.5008332
+        ]
+      },
+      "id": "node/4391068632"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392089813",
+        "amenity": "pharmacy",
+        "name": "Farmacia Israel",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1740209,
+          -16.4971419
+        ]
+      },
+      "id": "node/4392089813"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392146293",
+        "amenity": "pharmacy",
+        "name": "Farmacias Ahumada",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1739094,
+          -16.4953168
+        ]
+      },
+      "id": "node/4392146293"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392146295",
+        "amenity": "pharmacy",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1741854,
+          -16.4965378
+        ]
+      },
+      "id": "node/4392146295"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392190605",
+        "amenity": "pharmacy",
+        "name": "Farmacia Jazbel",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1828998,
+          -16.4927382
+        ]
+      },
+      "id": "node/4392190605"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392277394",
+        "amenity": "pharmacy",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1951123,
+          -16.4936265
+        ]
+      },
+      "id": "node/4392277394"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392392208",
+        "amenity": "pharmacy",
+        "name:es": "Farmacia Torrent",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2066328,
+          -16.4904725
+        ]
+      },
+      "id": "node/4392392208"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392392212",
+        "amenity": "pharmacy",
+        "name:es": "Farmacia San Fancisco",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2072319,
+          -16.4903468
+        ]
+      },
+      "id": "node/4392392212"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392466372",
+        "amenity": "pharmacy",
+        "name": "Farmacia Miriam",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2118922,
+          -16.491581
+        ]
+      },
+      "id": "node/4392466372"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392507499",
+        "amenity": "pharmacy",
+        "name": "Farmacia Suisse",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2285331,
+          -16.4989407
+        ]
+      },
+      "id": "node/4392507499"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392597766",
+        "amenity": "pharmacy",
+        "name": "Super Farmacia Nataly",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2055774,
+          -16.4901928
+        ]
+      },
+      "id": "node/4392597766"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392597773",
+        "amenity": "pharmacy",
+        "name": "Ex tranca Rio seco",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2060929,
+          -16.4900771
+        ]
+      },
+      "id": "node/4392597773"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392597776",
+        "amenity": "pharmacy",
+        "name:es": "Farmacia Niño San Salvador",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.206942,
+          -16.4898998
+        ]
+      },
+      "id": "node/4392597776"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392597787",
+        "amenity": "pharmacy",
+        "name": "Super Red Farmacia",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2076133,
+          -16.4897881
+        ]
+      },
+      "id": "node/4392597787"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392647254",
+        "amenity": "pharmacy",
+        "name": "Farmacia Y Consultorio Medico R&M",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2257939,
+          -16.5011393
+        ]
+      },
+      "id": "node/4392647254"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392647255",
+        "amenity": "pharmacy",
+        "name": "Farmacia Precios Economicos",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.225466,
+          -16.5013482
+        ]
+      },
+      "id": "node/4392647255"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392673974",
+        "amenity": "pharmacy",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2186336,
+          -16.5063936
+        ]
+      },
+      "id": "node/4392673974"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4392785680",
+        "amenity": "pharmacy",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1915145,
+          -16.549197
+        ]
+      },
+      "id": "node/4392785680"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4399029852",
+        "amenity": "pharmacy",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1997411,
+          -16.5415925
+        ]
+      },
+      "id": "node/4399029852"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4399094612",
+        "addr:street": "Avenida Cívica",
+        "amenity": "pharmacy",
+        "name": "Farmacia Maria Laura",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1677921,
+          -16.540138
+        ]
+      },
+      "id": "node/4399094612"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4399167227",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1596296,
+          -16.5305704
+        ]
+      },
+      "id": "node/4399167227"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4399595375",
+        "amenity": "pharmacy",
+        "name": "CAPELLA",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1650189,
+          -16.5362623
+        ]
+      },
+      "id": "node/4399595375"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4399595376",
+        "amenity": "pharmacy",
+        "check_date": "2023-06-30",
+        "source": "Actualizaciones en Bolivia. Reconocimiento cartográfico por KG 2016"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1646803,
+          -16.5357145
+        ]
+      },
+      "id": "node/4399595376"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4400102202",
+        "addr:city": "Ciudad Satélite",
+        "addr:housenumber": "620",
+        "addr:neighbourhood": "Plan 405",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Nicol",
+        "operator": "Ruth Beatriz Gomez Villalta",
+        "phone:mobile": "+591 72567433",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1523658,
+          -16.5235147
+        ]
+      },
+      "id": "node/4400102202"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4400102203",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Betesda",
+        "note": "0.7",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1528169,
+          -16.5233343
+        ]
+      },
+      "id": "node/4400102203"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4449188998",
+        "amenity": "pharmacy",
+        "name": "Rosas Pampa"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1730311,
+          -16.5418337
+        ]
+      },
+      "id": "node/4449188998"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4449189294",
+        "amenity": "pharmacy",
+        "name": "Rosana"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1720304,
+          -16.5417644
+        ]
+      },
+      "id": "node/4449189294"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4449215189",
+        "amenity": "pharmacy",
+        "name": "Gared"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1719537,
+          -16.5420982
+        ]
+      },
+      "id": "node/4449215189"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4449415794",
+        "amenity": "pharmacy",
+        "name": "A. L. J. Farma",
+        "name:es": "Farmacia",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1645786,
+          -16.5365556
+        ]
+      },
+      "id": "node/4449415794"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460392790",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "name": "Revelación",
+        "name:es": "Revelación"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2004167,
+          -16.4912884
+        ]
+      },
+      "id": "node/4460392790"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460402551",
+        "amenity": "pharmacy",
+        "name": "Super Red",
+        "name:es": "Super Red"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1992667,
+          -16.487747
+        ]
+      },
+      "id": "node/4460402551"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460422026",
+        "amenity": "pharmacy",
+        "name": "Misterio de Luz",
+        "name:es": "Misterio de Luz"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1992033,
+          -16.4879618
+        ]
+      },
+      "id": "node/4460422026"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460422196",
+        "amenity": "pharmacy",
+        "name": "Torrent I",
+        "name:es": "Torrent I"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1997328,
+          -16.4892565
+        ]
+      },
+      "id": "node/4460422196"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460422197",
+        "amenity": "pharmacy",
+        "name": "El Dorado",
+        "name:es": "El Dorado"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2010504,
+          -16.4887767
+        ]
+      },
+      "id": "node/4460422197"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460422692",
+        "amenity": "pharmacy",
+        "name": "El poder de la cruz",
+        "name:es": "El poder de la cruz"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2009926,
+          -16.4881345
+        ]
+      },
+      "id": "node/4460422692"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460422695",
+        "addr:street": "Alfredo Pascoe",
+        "amenity": "pharmacy",
+        "name": "Flor de Dios",
+        "name:es": "Flor de Dios"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2011541,
+          -16.4891191
+        ]
+      },
+      "id": "node/4460422695"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460443989",
+        "amenity": "pharmacy",
+        "check_date": "2024-03-05",
+        "name": "Juan Pablo II",
+        "name:es": "Juan Pablo II"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2008924,
+          -16.4885536
+        ]
+      },
+      "id": "node/4460443989"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460445390",
+        "amenity": "pharmacy",
+        "name": "Issol",
+        "name:es": "Issol"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2015359,
+          -16.4903035
+        ]
+      },
+      "id": "node/4460445390"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460445490",
+        "amenity": "pharmacy",
+        "name": "Issol",
+        "name:es": "Issol"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2001893,
+          -16.4914024
+        ]
+      },
+      "id": "node/4460445490"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4469985292",
+        "addr:street": "Calle C Medina",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Casa de Salud",
+        "name:es": "Casa de Salud"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1572963,
+          -16.5111521
+        ]
+      },
+      "id": "node/4469985292"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4470013190",
+        "addr:street": "Calle 8",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia 24 de Agosto"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1603321,
+          -16.5133964
+        ]
+      },
+      "id": "node/4470013190"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4470028191",
+        "addr:street": "Calle 8",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "San Isidro (S.I.)",
+        "name:es": "Cuida tu Salud"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.157458,
+          -16.5119973
+        ]
+      },
+      "id": "node/4470028191"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4470060892",
+        "addr:street": "Avenida 3",
+        "amenity": "pharmacy",
+        "name": "Ana Laura",
+        "name:es": "Ana Laura"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1632707,
+          -16.5246099
+        ]
+      },
+      "id": "node/4470060892"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4485967089",
+        "amenity": "pharmacy",
+        "name": "GIMVIC -MANI MED",
+        "name:es": "GIMVIC -MANI MED"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2199615,
+          -16.5633635
+        ]
+      },
+      "id": "node/4485967089"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4510972691",
+        "addr:city": "El Alto",
+        "addr:street": "Calle 30 B",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Solet",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1559584,
+          -16.5302487
+        ]
+      },
+      "id": "node/4510972691"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4512162292",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Panorámica",
+        "amenity": "pharmacy",
+        "branch": "Estación Teleférico Línea Amarilla",
+        "brand": "Farmacias Bolivia",
+        "brand:wikidata": "Q81970584",
+        "description": "SUCURSAL 82",
+        "dispensing": "no",
+        "drive_through": "no",
+        "healthcare": "pharmacy",
+        "level": "0",
+        "name": "Farmacias Bolivia",
+        "opening_hours": "Mo-Sa 07:30-22:30; Su 09:00-21:00",
+        "operator": "Corporación Boliviana de Farmacias S.A. COBOFAR",
+        "phone": "+591 79182571",
+        "website": "https://www.farmaciasbolivia.com.bo/",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1498927,
+          -16.5185334
+        ]
+      },
+      "id": "node/4512162292"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4514042194",
+        "addr:street": "Avenida Junin",
+        "amenity": "pharmacy",
+        "name:es": "Farmacia Esperanza",
+        "opening_hours": "24/7"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2106109,
+          -16.5218516
+        ]
+      },
+      "id": "node/4514042194"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4514042197",
+        "addr:street": "Avenida Junin",
+        "amenity": "pharmacy",
+        "name": "San Gabriel",
+        "name:es": "San Gabriel"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2102966,
+          -16.5215015
+        ]
+      },
+      "id": "node/4514042197"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4548572048",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida del Policía",
+        "amenity": "pharmacy",
+        "dispensing": "no",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Atención Profesional",
+        "shop_1": "copyshop",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1509716,
+          -16.526887
+        ]
+      },
+      "id": "node/4548572048"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4548572050",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Calle Hno. E. Morales",
+        "amenity": "pharmacy",
+        "check_date": "2026-04-11",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "image": "https://kartaview.org/details/3998405/16/track-info",
+        "name": "Farmacia Monrroy",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.150722,
+          -16.5261488
+        ]
+      },
+      "id": "node/4548572050"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4565326334",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia La Nuestra",
+        "note": "0.8",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1498644,
+          -16.5245171
+        ]
+      },
+      "id": "node/4565326334"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4567124191",
+        "addr:city": "Ciudad Satélite",
+        "addr:housenumber": "500",
+        "addr:street": "Avenida Alfredo Sanjines",
+        "amenity": "pharmacy",
+        "branch": "Gran Plaza",
+        "brand": "Farmacias Bolivia",
+        "brand:wikidata": "Q81970584",
+        "description": "Sucursal 61",
+        "dispensing": "no",
+        "drive_through": "no",
+        "healthcare": "pharmacy",
+        "level": "0",
+        "name": "Farmacias Bolivia",
+        "note": "0.8",
+        "opening_hours": "Mo-Sa 07:30-22:30; Su 09:00-21:00",
+        "operator": "COBOFAR",
+        "phone": "+591 2 2818415",
+        "phone:mobile": "+591 7016895",
+        "website": "https://www.farmaciasbolivia.com.bo/",
+        "wheelchair": "limited"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1484741,
+          -16.527262
+        ]
+      },
+      "id": "node/4567124191"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4589373367",
+        "addr:city": "Ciudad Satélite",
+        "addr:housenumber": "405",
+        "addr:neighbourhood": "Plan 405",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Chávez",
+        "note": "0.9"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.15194,
+          -16.5236888
+        ]
+      },
+      "id": "node/4589373367"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4589930822",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Arturo Ballivian Otero",
+        "amenity": "pharmacy",
+        "check_date": "2024-01-16",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia RASIEL",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1519365,
+          -16.5250189
+        ]
+      },
+      "id": "node/4589930822"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4608593292",
+        "amenity": "pharmacy",
+        "name": "Farma-diet",
+        "name:es": "Farma-diet"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1844424,
+          -16.4968491
+        ]
+      },
+      "id": "node/4608593292"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4711996051",
+        "addr:city": "El Alto",
+        "addr:street": "Punata",
+        "amenity": "pharmacy",
+        "opening_hours": "10:00 - 22:00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.198445,
+          -16.5165907
+        ]
+      },
+      "id": "node/4711996051"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4716416289",
+        "amenity": "pharmacy",
+        "drive_through": "no",
+        "name": "Farmacia Luz y vida"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2116329,
+          -16.5197057
+        ]
+      },
+      "id": "node/4716416289"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4719355426",
+        "addr:street": "Calle Evadidos del Paraguay",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "La Predilecta",
+        "name:es": "La Predilecta"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1678023,
+          -16.5110799
+        ]
+      },
+      "id": "node/4719355426"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4743543021",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Katunta",
+        "name:es": "Katunta",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1581803,
+          -16.5209154
+        ]
+      },
+      "id": "node/4743543021"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4750080724",
+        "amenity": "pharmacy",
+        "name": "Biomédica"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1719205,
+          -16.4886531
+        ]
+      },
+      "id": "node/4750080724"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4756408222",
+        "addr:street": "Calle Cuzco",
+        "amenity": "pharmacy",
+        "name": "Suiza I",
+        "name:es": "Suiza I"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2090115,
+          -16.4910062
+        ]
+      },
+      "id": "node/4756408222"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4771169223",
+        "addr:city": "El Alto",
+        "addr:street": "Calle Franco Valle",
+        "amenity": "pharmacy",
+        "brand": "Farmacias Bolivia",
+        "brand:wikidata": "Q81970584",
+        "drive_through": "no",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Bolivia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1636463,
+          -16.5112585
+        ]
+      },
+      "id": "node/4771169223"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4771449121",
+        "addr:street": "Calle 5",
+        "amenity": "pharmacy",
+        "fixme": "Needs_a_Name",
+        "healthcare": "pharmacy",
+        "name:es": "Farmacia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1642978,
+          -16.5098121
+        ]
+      },
+      "id": "node/4771449121"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4827119926",
+        "addr:street": "Calle 4",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Virgen Morena",
+        "name:es": "Virgen Morena",
+        "opening_hours": "Mo-Sa 08:00-22:00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1623136,
+          -16.5090559
+        ]
+      },
+      "id": "node/4827119926"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4827132122",
+        "addr:street": "Calle Franco Valle",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Eternidad",
+        "name:es": "Farmacias Eternidad"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.162658,
+          -16.5078689
+        ]
+      },
+      "id": "node/4827132122"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4827166521",
+        "addr:street": "Avenida 6 de Marzo",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Virgen de Copacabana III",
+        "name:es": "Virgen de Copacabana III"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1630082,
+          -16.5051888
+        ]
+      },
+      "id": "node/4827166521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5016771529",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Calle 25-B",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Nuestra Señora de Remedios",
+        "opening_hours": "off",
+        "wheelchair": "limited"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1536544,
+          -16.5265603
+        ]
+      },
+      "id": "node/5016771529"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5018575321",
+        "addr:street": "Avenida Luis Espinal",
+        "amenity": "pharmacy",
+        "name": "Walysuma Kolla",
+        "name:es": "Walysuma Kolla"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2078061,
+          -16.4913243
+        ]
+      },
+      "id": "node/5018575321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5058541221",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Calle Nuñez del Prado",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "e Farma"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1510063,
+          -16.5183497
+        ]
+      },
+      "id": "node/5058541221"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5074563328",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2038571,
+          -16.5348736
+        ]
+      },
+      "id": "node/5074563328"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5074605322",
+        "amenity": "pharmacy",
+        "name": "Farmacia Jesus Te Sana"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2030303,
+          -16.534462
+        ]
+      },
+      "id": "node/5074605322"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5095649821",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Panorámica",
+        "amenity": "pharmacy",
+        "brand": "Farmacorp",
+        "brand:wikidata": "Q81968937",
+        "healthcare": "pharmacy",
+        "name": "Farmacorp",
+        "opening_hours": "Mo-Su 07:00-23:00",
+        "operator": "Farmacorp",
+        "phone": "77337738",
+        "website": "http://www.farmacorp.com.bo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1644811,
+          -16.4983586
+        ]
+      },
+      "id": "node/5095649821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5122445321",
+        "amenity": "pharmacy",
+        "name": "Farmacia Ximena"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2018186,
+          -16.5242754
+        ]
+      },
+      "id": "node/5122445321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5126867521",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Integración"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1671573,
+          -16.5022869
+        ]
+      },
+      "id": "node/5126867521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5141629923",
+        "addr:street": "Calle Rene Dorado",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Santa Petrona"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1647922,
+          -16.5003899
+        ]
+      },
+      "id": "node/5141629923"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5203432423",
+        "amenity": "pharmacy",
+        "name": "Farmacia Cristo Rey"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1747592,
+          -16.4987014
+        ]
+      },
+      "id": "node/5203432423"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5203434621",
+        "amenity": "pharmacy",
+        "name": "Farmacia JyM Linares"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2010327,
+          -16.4827227
+        ]
+      },
+      "id": "node/5203434621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5203434622",
+        "amenity": "pharmacy",
+        "name": "Farmacia 26 de julio"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2064652,
+          -16.4899093
+        ]
+      },
+      "id": "node/5203434622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5203434623",
+        "amenity": "pharmacy",
+        "name": "Farmacia Famal",
+        "opening_hours": "Tu 09:49-18:00+"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2073186,
+          -16.489393
+        ]
+      },
+      "id": "node/5203434623"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5203434721",
+        "amenity": "pharmacy",
+        "name": "Farmacia La Habana"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2014269,
+          -16.4816582
+        ]
+      },
+      "id": "node/5203434721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5203434722",
+        "amenity": "pharmacy",
+        "name": "Farmacia Vital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1920095,
+          -16.4894958
+        ]
+      },
+      "id": "node/5203434722"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5203434723",
+        "amenity": "pharmacy",
+        "name": "Farmacia Victoria",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1741645,
+          -16.4948175
+        ]
+      },
+      "id": "node/5203434723"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5203434821",
+        "amenity": "pharmacy",
+        "name": "Farmacia Provida",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1797317,
+          -16.4930066
+        ]
+      },
+      "id": "node/5203434821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5204483027",
+        "amenity": "pharmacy",
+        "name": "Farmacia Alfa y Omega"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2001017,
+          -16.5461433
+        ]
+      },
+      "id": "node/5204483027"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5214633127",
+        "amenity": "pharmacy",
+        "name": "Farmacia Junin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.212029,
+          -16.5236453
+        ]
+      },
+      "id": "node/5214633127"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5214633128",
+        "amenity": "pharmacy",
+        "name": "Farmacia Fermamonte"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1819905,
+          -16.6189564
+        ]
+      },
+      "id": "node/5214633128"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5214747721",
+        "amenity": "pharmacy",
+        "name": "Farmacia Villa Jardin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1884194,
+          -16.5454755
+        ]
+      },
+      "id": "node/5214747721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5215083321",
+        "amenity": "pharmacy",
+        "name": "Farmacia Plin Corp"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2114249,
+          -16.5230361
+        ]
+      },
+      "id": "node/5215083321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5215083322",
+        "amenity": "pharmacy",
+        "name": "Farmacia Fortaleza"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2107404,
+          -16.5224663
+        ]
+      },
+      "id": "node/5215083322"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5215092921",
+        "amenity": "pharmacy",
+        "name": "Farmacia Matias"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2103502,
+          -16.5220002
+        ]
+      },
+      "id": "node/5215092921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216195022",
+        "amenity": "pharmacy",
+        "name": "Farmacia Lourdes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1794878,
+          -16.5368845
+        ]
+      },
+      "id": "node/5216195022"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216348022",
+        "addr:street": "Calle 9",
+        "amenity": "pharmacy",
+        "name": "Farmacia 25 de Julio"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1785198,
+          -16.5375639
+        ]
+      },
+      "id": "node/5216348022"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216359122",
+        "addr:street": "Calle 9",
+        "amenity": "pharmacy",
+        "name": "Farmacia Apostol Santiago"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1792294,
+          -16.5382815
+        ]
+      },
+      "id": "node/5216359122"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216389225",
+        "amenity": "pharmacy",
+        "name": "Farmacia Ariani"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1938938,
+          -16.5573833
+        ]
+      },
+      "id": "node/5216389225"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216394721",
+        "amenity": "pharmacy",
+        "fixme": "needs name",
+        "name": "Farmacia Puerto del Rosario"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1889462,
+          -16.5461495
+        ]
+      },
+      "id": "node/5216394721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216394722",
+        "addr:street": "Avenida Argelia",
+        "amenity": "pharmacy",
+        "name": "Super Farmacia",
+        "name:es": "Super Farmacity"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.195566,
+          -16.5526922
+        ]
+      },
+      "id": "node/5216394722"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216394924",
+        "amenity": "pharmacy",
+        "name": "Farmacia Arcangel San Miguel"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1929965,
+          -16.5569752
+        ]
+      },
+      "id": "node/5216394924"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216423521",
+        "amenity": "pharmacy",
+        "name": "Farmacia Angel Sanatodo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1935903,
+          -16.557644
+        ]
+      },
+      "id": "node/5216423521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216437923",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Safira"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2050713,
+          -16.5358039
+        ]
+      },
+      "id": "node/5216437923"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216437925",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia El Dorado"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.203708,
+          -16.5348798
+        ]
+      },
+      "id": "node/5216437925"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216463522",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Cochabamba",
+        "amenity": "pharmacy",
+        "name": "Farmacia Beysa"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2020173,
+          -16.5336184
+        ]
+      },
+      "id": "node/5216463522"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5216932421",
+        "amenity": "pharmacy",
+        "name": "Farmacia Yandy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2097114,
+          -16.5211983
+        ]
+      },
+      "id": "node/5216932421"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5217009021",
+        "amenity": "pharmacy",
+        "name": "Farmacia Leo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1860322,
+          -16.5818413
+        ]
+      },
+      "id": "node/5217009021"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5217009022",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1858067,
+          -16.58086
+        ]
+      },
+      "id": "node/5217009022"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5217009921",
+        "amenity": "pharmacy",
+        "name": "Farmacia Senkata"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.185738,
+          -16.5815502
+        ]
+      },
+      "id": "node/5217009921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5217048922",
+        "amenity": "pharmacy",
+        "name": "Farmacia Ayelen"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1822112,
+          -16.6183323
+        ]
+      },
+      "id": "node/5217048922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5217048923",
+        "amenity": "pharmacy",
+        "name": "Farmacia Damaris"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1822324,
+          -16.6179815
+        ]
+      },
+      "id": "node/5217048923"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5217162321",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Apostol Santiago Senkata"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.184474,
+          -16.5819058
+        ]
+      },
+      "id": "node/5217162321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5218432221",
+        "amenity": "pharmacy",
+        "name": "Farmacia Liliana Manny"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2001409,
+          -16.5467957
+        ]
+      },
+      "id": "node/5218432221"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5218567921",
+        "amenity": "pharmacy",
+        "name": "Farmacia San Jose I"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1930712,
+          -16.5573754
+        ]
+      },
+      "id": "node/5218567921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5219816522",
+        "amenity": "pharmacy",
+        "name": "Farmacia Camila"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1815987,
+          -16.5243635
+        ]
+      },
+      "id": "node/5219816522"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5220577523",
+        "amenity": "pharmacy",
+        "name": "Farmacia Rymedix"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2074512,
+          -16.518857
+        ]
+      },
+      "id": "node/5220577523"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5222029837",
+        "addr:city": "El Alto",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Vásquez",
+        "opening_hours": "Mo-Su 09:00-20:00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1639297,
+          -16.5171462
+        ]
+      },
+      "id": "node/5222029837"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5222258121",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia El Alto"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1653005,
+          -16.5166919
+        ]
+      },
+      "id": "node/5222258121"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5226703322",
+        "amenity": "pharmacy",
+        "name": "Farmacia Ortiz"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.18584,
+          -16.5853303
+        ]
+      },
+      "id": "node/5226703322"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5226703323",
+        "amenity": "pharmacy",
+        "name": "Farmacia Iaso"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1862325,
+          -16.5856366
+        ]
+      },
+      "id": "node/5226703323"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5227133922",
+        "amenity": "pharmacy",
+        "name": "Farmacia 12 de Agosto"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1966496,
+          -16.5588982
+        ]
+      },
+      "id": "node/5227133922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5227152421",
+        "amenity": "pharmacy",
+        "name": "Farmacia Kenko"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1948131,
+          -16.5595713
+        ]
+      },
+      "id": "node/5227152421"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5227152422",
+        "amenity": "pharmacy",
+        "name": "Farmacia Suma Qamaña"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1954294,
+          -16.5587993
+        ]
+      },
+      "id": "node/5227152422"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5228417421",
+        "amenity": "pharmacy",
+        "name": "Farmacia Montessori"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1810507,
+          -16.6191128
+        ]
+      },
+      "id": "node/5228417421"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5232647322",
+        "amenity": "pharmacy",
+        "name": "Farmacia Salud y Union"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1850103,
+          -16.5190008
+        ]
+      },
+      "id": "node/5232647322"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5232647323",
+        "amenity": "pharmacy",
+        "name": "Farmacia Cesar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1855187,
+          -16.5185404
+        ]
+      },
+      "id": "node/5232647323"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5232647422",
+        "amenity": "pharmacy",
+        "name": "Farmacia VR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1858647,
+          -16.5982845
+        ]
+      },
+      "id": "node/5232647422"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5232647622",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1653625,
+          -16.5110505
+        ]
+      },
+      "id": "node/5232647622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5232647821",
+        "amenity": "pharmacy",
+        "name": "Farmacia Ecofarma"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1848831,
+          -16.5985459
+        ]
+      },
+      "id": "node/5232647821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5246614832",
+        "amenity": "pharmacy",
+        "name": "Farmacia Al paso"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.183484,
+          -16.5424406
+        ]
+      },
+      "id": "node/5246614832"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5246615025",
+        "amenity": "pharmacy",
+        "name": "Farmacia Cristo Rey"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1848798,
+          -16.5288172
+        ]
+      },
+      "id": "node/5246615025"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5251112521",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Inca Huasi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Ruth Reyna"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1860665,
+          -16.5898688
+        ]
+      },
+      "id": "node/5251112521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5254238821",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Goodness"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1596562,
+          -16.5102215
+        ]
+      },
+      "id": "node/5254238821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5254778621",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Hector Yamil"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1967374,
+          -16.5519079
+        ]
+      },
+      "id": "node/5254778621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5256195621",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Emuna"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.166116,
+          -16.5100918
+        ]
+      },
+      "id": "node/5256195621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5266773121",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Niño Pascualito"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1559182,
+          -16.5182556
+        ]
+      },
+      "id": "node/5266773121"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5280768521",
+        "amenity": "pharmacy",
+        "name": "Farmacia San Lorenzo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2320344,
+          -16.5419578
+        ]
+      },
+      "id": "node/5280768521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5292449521",
+        "amenity": "pharmacy",
+        "name": "Farmacia Franco"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1933237,
+          -16.5336543
+        ]
+      },
+      "id": "node/5292449521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5292628422",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Hector"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1963657,
+          -16.5521939
+        ]
+      },
+      "id": "node/5292628422"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5296401221",
+        "amenity": "pharmacy",
+        "name": "Farmacia El Carmen"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1974226,
+          -16.5237338
+        ]
+      },
+      "id": "node/5296401221"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5308323134",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2051974,
+          -16.5039495
+        ]
+      },
+      "id": "node/5308323134"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5325709621",
+        "addr:city": "El Alto",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia J y J"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1632451,
+          -16.5030138
+        ]
+      },
+      "id": "node/5325709621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5339223222",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Alfredo Sanjines",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "level": "0",
+        "name": "Farmacias Hipermaxi",
+        "operator": "Hipermaxi",
+        "website": "https://hipermaxi.com/",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1483689,
+          -16.5269177
+        ]
+      },
+      "id": "node/5339223222"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5349249523",
+        "amenity": "pharmacy",
+        "name": "Farmacia Pharmalive"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2105143,
+          -16.5391907
+        ]
+      },
+      "id": "node/5349249523"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5361246223",
+        "amenity": "pharmacy",
+        "name": "Farmacia Exaltacion"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1789068,
+          -16.5363979
+        ]
+      },
+      "id": "node/5361246223"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5370964022",
+        "amenity": "pharmacy",
+        "name": "Farmacia San Lorenzo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.23201,
+          -16.5419844
+        ]
+      },
+      "id": "node/5370964022"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5414408721",
+        "amenity": "pharmacy",
+        "name": "Jeymy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2109626,
+          -16.5218218
+        ]
+      },
+      "id": "node/5414408721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5432239321",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Leslie Carmen"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1575848,
+          -16.5110588
+        ]
+      },
+      "id": "node/5432239321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5432239322",
+        "amenity": "pharmacy",
+        "name": "Farmacia Adabel"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2316612,
+          -16.5417727
+        ]
+      },
+      "id": "node/5432239322"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5445913925",
+        "amenity": "pharmacy",
+        "name": "Farmacia La Guadalupana"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2155205,
+          -16.5332212
+        ]
+      },
+      "id": "node/5445913925"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5450893321",
+        "addr:street": "Avenida Cívica",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Medí Farma"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1556367,
+          -16.516388
+        ]
+      },
+      "id": "node/5450893321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5480603521",
+        "addr:street": "Calle 6",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1572312,
+          -16.5098932
+        ]
+      },
+      "id": "node/5480603521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5497666521",
+        "amenity": "pharmacy",
+        "name": "Farmacia San Marcos"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1804369,
+          -16.5355831
+        ]
+      },
+      "id": "node/5497666521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5497666522",
+        "amenity": "pharmacy",
+        "name": "Farmacia Betty"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1804735,
+          -16.5335395
+        ]
+      },
+      "id": "node/5497666522"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5497666621",
+        "amenity": "pharmacy",
+        "name": "Farmacia Eva y Fide"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1810794,
+          -16.5348848
+        ]
+      },
+      "id": "node/5497666621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5497666622",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia San Alberto"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1630619,
+          -16.5117206
+        ]
+      },
+      "id": "node/5497666622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5497683921",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Alonzo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1621123,
+          -16.5135796
+        ]
+      },
+      "id": "node/5497683921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5517657922",
+        "addr:housenumber": "31",
+        "addr:street": "Calle Franco Valle",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Bolivia - Franco Valle",
+        "opening_hours": "Mo-Sa 07:30-19:30",
+        "operator": "COBOFAR",
+        "phone": "22826204",
+        "website": "https://www.farmaciasbolivia.com.bo/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1619636,
+          -16.5062045
+        ]
+      },
+      "id": "node/5517657922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5523645721",
+        "amenity": "pharmacy",
+        "name": "Farmacia La Guardia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2133961,
+          -16.5254173
+        ]
+      },
+      "id": "node/5523645721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5529869621",
+        "addr:street": "RN1: Desaguadero-El Alto",
+        "amenity": "pharmacy",
+        "name": "Farmacorp - Río Seco",
+        "opening_hours": "Mo-Su 07:00-23:00",
+        "operator": "Farmacorp",
+        "phone": "77337758",
+        "website": "https://www.farmacorp.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2099094,
+          -16.4901611
+        ]
+      },
+      "id": "node/5529869621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5562279521",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Virgen Morena 2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2173759,
+          -16.5261292
+        ]
+      },
+      "id": "node/5562279521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5581426421",
+        "amenity": "pharmacy",
+        "name": "Farmacia Maranatha"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2202361,
+          -16.5663015
+        ]
+      },
+      "id": "node/5581426421"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5581426521",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Eddita"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2208438,
+          -16.5669137
+        ]
+      },
+      "id": "node/5581426521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5640391521",
+        "amenity": "pharmacy",
+        "name": "Sanidad Divina"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2301662,
+          -16.5406893
+        ]
+      },
+      "id": "node/5640391521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5640391821",
+        "amenity": "pharmacy",
+        "name": "Jota"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2226622,
+          -16.5371609
+        ]
+      },
+      "id": "node/5640391821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5657215121",
+        "amenity": "pharmacy",
+        "name": "Medical"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1903416,
+          -16.6239197
+        ]
+      },
+      "id": "node/5657215121"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5661948416",
+        "addr:street": "Calle 108 , Calle 110",
+        "amenity": "pharmacy",
+        "check_date:opening_hours": "2023-03-10",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia \"JAELY\"",
+        "opening_hours": "Mo-Fr 09:00-21:00",
+        "operator": "Mari Ch."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1793715,
+          -16.5233247
+        ]
+      },
+      "id": "node/5661948416"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5661952459",
+        "addr:city": "La Paz - El Alto",
+        "addr:street": "Avenida Ladislao Cabrera",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia \"JUPITER\"",
+        "opening_hours": "Mo-Su 09:00-23:00",
+        "operator": "Mari Ch."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1807391,
+          -16.5241109
+        ]
+      },
+      "id": "node/5661952459"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5667663127",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia La Merced"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1621093,
+          -16.5112193
+        ]
+      },
+      "id": "node/5667663127"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5667663222",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Hoy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2203709,
+          -16.5656662
+        ]
+      },
+      "id": "node/5667663222"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5732412821",
+        "addr:street": "Calle 7",
+        "amenity": "pharmacy",
+        "name": "Ecomedic"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1994282,
+          -16.4887806
+        ]
+      },
+      "id": "node/5732412821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5851702286",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Cívica",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "YOBYFAR",
+        "opening_hours:covid19": "Mo-Fr 08:00-12:00",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1547062,
+          -16.5154553
+        ]
+      },
+      "id": "node/5851702286"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5964807289",
+        "addr:street": "Calle Santiago de Quilloma",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.215648,
+          -16.527795
+        ]
+      },
+      "id": "node/5964807289"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6007567488",
+        "addr:street": "Avenida Julio Cesar Valdez",
+        "amenity": "pharmacy",
+        "name": "Alquimista"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2180046,
+          -16.5349014
+        ]
+      },
+      "id": "node/6007567488"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042601886",
+        "amenity": "pharmacy",
+        "name": "Cuidamos tu salud"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1927213,
+          -16.5580919
+        ]
+      },
+      "id": "node/6042601886"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042601887",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farma Car"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.164751,
+          -16.5141644
+        ]
+      },
+      "id": "node/6042601887"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042601888",
+        "amenity": "pharmacy",
+        "name": "Farmacia Rosales"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1991722,
+          -16.5279765
+        ]
+      },
+      "id": "node/6042601888"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042603886",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Cívica",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ojeda",
+        "opening_hours:covid19": "Mo-Fr 08:00-12:00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1574378,
+          -16.5218752
+        ]
+      },
+      "id": "node/6042603886"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042603887",
+        "amenity": "pharmacy",
+        "name": "Farmacia Melanie"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.177857,
+          -16.5369933
+        ]
+      },
+      "id": "node/6042603887"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042603888",
+        "amenity": "pharmacy",
+        "name": "Farmacia Kantati"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1944481,
+          -16.5308615
+        ]
+      },
+      "id": "node/6042603888"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042603889",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Hoy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2202281,
+          -16.5657798
+        ]
+      },
+      "id": "node/6042603889"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042603891",
+        "amenity": "pharmacy",
+        "name": "Farmacia Luz Eterna II"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1979535,
+          -16.5275309
+        ]
+      },
+      "id": "node/6042603891"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042603892",
+        "amenity": "pharmacy",
+        "name": "El Economico"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1852848,
+          -16.5382248
+        ]
+      },
+      "id": "node/6042603892"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042603893",
+        "amenity": "pharmacy",
+        "name": "David"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1892921,
+          -16.4840943
+        ]
+      },
+      "id": "node/6042603893"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042610585",
+        "amenity": "pharmacy",
+        "name": "Scarlet"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1871448,
+          -16.5444132
+        ]
+      },
+      "id": "node/6042610585"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042610586",
+        "amenity": "pharmacy",
+        "name": "Roca de Ayuda"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2327922,
+          -16.541833
+        ]
+      },
+      "id": "node/6042610586"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042610785",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "CBA de la salud"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2048287,
+          -16.5502776
+        ]
+      },
+      "id": "node/6042610785"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042610786",
+        "amenity": "pharmacy",
+        "name": "Rho+"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.194845,
+          -16.5516659
+        ]
+      },
+      "id": "node/6042610786"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6042610787",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1885379,
+          -16.6261553
+        ]
+      },
+      "id": "node/6042610787"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6047117085",
+        "amenity": "pharmacy",
+        "name": "Palli"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1933675,
+          -16.5318329
+        ]
+      },
+      "id": "node/6047117085"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6057994885",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Cochabamba",
+        "amenity": "pharmacy",
+        "name": "Farmacia San Elias"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2009023,
+          -16.5328562
+        ]
+      },
+      "id": "node/6057994885"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6058657185",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1583965,
+          -16.5089057
+        ]
+      },
+      "id": "node/6058657185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6076737925",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Renacer"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1603841,
+          -16.5112901
+        ]
+      },
+      "id": "node/6076737925"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6115895085",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Aylin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2050482,
+          -16.5361671
+        ]
+      },
+      "id": "node/6115895085"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6132569087",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "SABEL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1900198,
+          -16.5343868
+        ]
+      },
+      "id": "node/6132569087"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6133600785",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Navarro"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1634868,
+          -16.5101739
+        ]
+      },
+      "id": "node/6133600785"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6145237687",
+        "amenity": "pharmacy",
+        "name": "Paula TM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1946196,
+          -16.5636287
+        ]
+      },
+      "id": "node/6145237687"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6145237688",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Inca Huasi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Aventura"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1875992,
+          -16.5893045
+        ]
+      },
+      "id": "node/6145237688"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6214580985",
+        "amenity": "pharmacy",
+        "name": "R&B"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1883149,
+          -16.5360632
+        ]
+      },
+      "id": "node/6214580985"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6247358485",
+        "amenity": "pharmacy",
+        "name": "Farmacia Esther"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1988271,
+          -16.5556148
+        ]
+      },
+      "id": "node/6247358485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6261899989",
+        "amenity": "pharmacy",
+        "name": "Katunta",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1599087,
+          -16.5262715
+        ]
+      },
+      "id": "node/6261899989"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6293217885",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.186018,
+          -16.5874328
+        ]
+      },
+      "id": "node/6293217885"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6293218285",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmcia Gallardia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1989748,
+          -16.5559246
+        ]
+      },
+      "id": "node/6293218285"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6309003794",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Jhandy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2011513,
+          -16.5403955
+        ]
+      },
+      "id": "node/6309003794"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6309025487",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Santa Maria"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2038434,
+          -16.5380205
+        ]
+      },
+      "id": "node/6309025487"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6309063589",
+        "amenity": "pharmacy",
+        "name": "Admirable"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2057137,
+          -16.5362549
+        ]
+      },
+      "id": "node/6309063589"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6309063787",
+        "amenity": "pharmacy",
+        "name": "Luamar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2061405,
+          -16.5364443
+        ]
+      },
+      "id": "node/6309063787"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6309116388",
+        "amenity": "pharmacy",
+        "name": "Del Sud"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.220165,
+          -16.5461516
+        ]
+      },
+      "id": "node/6309116388"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6309120186",
+        "amenity": "pharmacy",
+        "name": "Más Salud"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2169605,
+          -16.5439075
+        ]
+      },
+      "id": "node/6309120186"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6309120187",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2190196,
+          -16.5452539
+        ]
+      },
+      "id": "node/6309120187"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6309120188",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Propharma"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2213041,
+          -16.5468324
+        ]
+      },
+      "id": "node/6309120188"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6309120189",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2226621,
+          -16.5478745
+        ]
+      },
+      "id": "node/6309120189"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6309120190",
+        "amenity": "pharmacy",
+        "name": "Adonai"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2230198,
+          -16.5480908
+        ]
+      },
+      "id": "node/6309120190"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6313240885",
+        "addr:street": "Calle 7",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Leslie Carmen"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1569323,
+          -16.5107701
+        ]
+      },
+      "id": "node/6313240885"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6319187385",
+        "addr:housenumber": "8045",
+        "addr:street": "Avenida Caquingora",
+        "amenity": "pharmacy",
+        "name": "Rameba"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2286607,
+          -16.5349649
+        ]
+      },
+      "id": "node/6319187385"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6337914986",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Heidy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1911666,
+          -16.5480226
+        ]
+      },
+      "id": "node/6337914986"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6352526502",
+        "amenity": "pharmacy",
+        "name": "Amifar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1727593,
+          -16.5166104
+        ]
+      },
+      "id": "node/6352526502"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6380969385",
+        "addr:street": "Calle África",
+        "amenity": "pharmacy",
+        "name": "Farmacia Virginia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2005941,
+          -16.5463021
+        ]
+      },
+      "id": "node/6380969385"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6382326285",
+        "amenity": "pharmacy",
+        "name": "La Guadalupana I"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1981557,
+          -16.5229625
+        ]
+      },
+      "id": "node/6382326285"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6397241891",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Keren"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1628724,
+          -16.5139403
+        ]
+      },
+      "id": "node/6397241891"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6407649592",
+        "amenity": "pharmacy",
+        "name": "Cielito Lindo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1815494,
+          -16.6190549
+        ]
+      },
+      "id": "node/6407649592"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6450287985",
+        "amenity": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1860271,
+          -16.538695
+        ]
+      },
+      "id": "node/6450287985"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6476571486",
+        "amenity": "pharmacy",
+        "name": "Ivonne"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2256724,
+          -16.52645
+        ]
+      },
+      "id": "node/6476571486"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6514194094",
+        "addr:street": "Avenida 6 de Marzo",
+        "amenity": "pharmacy",
+        "name": "Farmacias Bolivia",
+        "phone": "61231195"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1697321,
+          -16.5225164
+        ]
+      },
+      "id": "node/6514194094"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6514194485",
+        "amenity": "pharmacy",
+        "check_date": "2025-11-14",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Bolivia",
+        "phone": "61231419",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1537524,
+          -16.5123679
+        ]
+      },
+      "id": "node/6514194485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6525502285",
+        "amenity": "pharmacy",
+        "name": "Farmacia Mi Salud"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2028069,
+          -16.5649783
+        ]
+      },
+      "id": "node/6525502285"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6525502286",
+        "amenity": "pharmacy",
+        "name": "Farmacia Superfarmacity I"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2024327,
+          -16.5650072
+        ]
+      },
+      "id": "node/6525502286"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6525505285",
+        "amenity": "pharmacy",
+        "name": "Farmacia Daira"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2031238,
+          -16.5652377
+        ]
+      },
+      "id": "node/6525505285"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6546002285",
+        "amenity": "pharmacy",
+        "name": "La Yapita Medicinal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1957257,
+          -16.5587499
+        ]
+      },
+      "id": "node/6546002285"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6547790485",
+        "amenity": "pharmacy",
+        "name": "Luna"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2114331,
+          -16.5234876
+        ]
+      },
+      "id": "node/6547790485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6553835985",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia La Milagrosa"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1892829,
+          -16.5965848
+        ]
+      },
+      "id": "node/6553835985"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6592043188",
+        "amenity": "pharmacy",
+        "name": "GRECIA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1690084,
+          -16.5233566
+        ]
+      },
+      "id": "node/6592043188"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6604121140",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "dispensing": "no",
+        "healthcare": "pharmacy",
+        "name": "Farmacia MOIRA",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1517601,
+          -16.5237601
+        ]
+      },
+      "id": "node/6604121140"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6610191285",
+        "amenity": "pharmacy",
+        "name": "El Gran Maestro"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1578413,
+          -16.5154516
+        ]
+      },
+      "id": "node/6610191285"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6625001487",
+        "amenity": "pharmacy",
+        "name": "SAN BENEDICTO"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1644427,
+          -16.5075151
+        ]
+      },
+      "id": "node/6625001487"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6638763886",
+        "addr:city": "El Alto",
+        "addr:street": "Calle 8",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Rene Sana Sana",
+        "opening_hours:covid19": "Mo-Fr 08:00-12:00",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.15309,
+          -16.5193846
+        ]
+      },
+      "id": "node/6638763886"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6654153537",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Arturo Ballivian Otero",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "image": "https://kartaview.org/details/3703241/12/track-info",
+        "name": "Dr. Ahorro",
+        "note": "0.8",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1516978,
+          -16.5244643
+        ]
+      },
+      "id": "node/6654153537"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6708471790",
+        "amenity": "pharmacy",
+        "name": "ANAHI"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1832752,
+          -16.5986767
+        ]
+      },
+      "id": "node/6708471790"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6708481786",
+        "amenity": "pharmacy",
+        "name": "Farmafuentes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2308031,
+          -16.5413916
+        ]
+      },
+      "id": "node/6708481786"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6708824186",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Sabel"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2004915,
+          -16.5457899
+        ]
+      },
+      "id": "node/6708824186"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6767473185",
+        "amenity": "pharmacy",
+        "name": "Pharmaretro"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1792623,
+          -16.5324791
+        ]
+      },
+      "id": "node/6767473185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6831431485",
+        "addr:city": "El Alto",
+        "addr:postcode": "LPZ",
+        "addr:street": "Avenida Litoral",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "name": "Farmacia Galenus"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1915016,
+          -16.5492048
+        ]
+      },
+      "id": "node/6831431485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6918471486",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida del Policía",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "image": "https://kartaview.org/details/3745941/8/track-info"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1545855,
+          -16.5251854
+        ]
+      },
+      "id": "node/6918471486"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6952552985",
+        "amenity": "pharmacy",
+        "name": "Alvarado",
+        "opening_hours": "PH,Mo-Su 08:00+"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.199228,
+          -16.5495041
+        ]
+      },
+      "id": "node/6952552985"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6952552986",
+        "amenity": "pharmacy",
+        "name": "Miriam"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1980413,
+          -16.5567409
+        ]
+      },
+      "id": "node/6952552986"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6952553085",
+        "amenity": "pharmacy",
+        "name": "Topacio"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1977489,
+          -16.562003
+        ]
+      },
+      "id": "node/6952553085"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6952553086",
+        "amenity": "pharmacy",
+        "name": "Metrofarma"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1748886,
+          -16.5171325
+        ]
+      },
+      "id": "node/6952553086"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7089682285",
+        "addr:city": "El Alto",
+        "addr:street": "Calle Francisco Carvajal",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Alma Inmortal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.159619,
+          -16.512616
+        ]
+      },
+      "id": "node/7089682285"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7204338885",
+        "addr:street": "Calle Franco Valle",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Rodania"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1630461,
+          -16.5096053
+        ]
+      },
+      "id": "node/7204338885"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7266841085",
+        "amenity": "pharmacy",
+        "name": "Delfi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.195019,
+          -16.5531042
+        ]
+      },
+      "id": "node/7266841085"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7385924985",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Diego de Portugal",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia VIP",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1528307,
+          -16.5221899
+        ]
+      },
+      "id": "node/7385924985"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7385924986",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Diego de Portugal",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Paniagua",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1530224,
+          -16.5226356
+        ]
+      },
+      "id": "node/7385924986"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7395098662",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Ciudad Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Max Farmacias",
+        "note": "0.7"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1564626,
+          -16.5218743
+        ]
+      },
+      "id": "node/7395098662"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7412871685",
+        "addr:street": "Calle 11",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1647468,
+          -16.5170182
+        ]
+      },
+      "id": "node/7412871685"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7412871785",
+        "addr:street": "Avenida Ciudad Satélite",
+        "amenity": "pharmacy",
+        "name": "Farmacias Bolivia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.161395,
+          -16.5183645
+        ]
+      },
+      "id": "node/7412871785"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7415044292",
+        "addr:street": "Avenida Antofagasta",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia RAZEL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1561698,
+          -16.5149177
+        ]
+      },
+      "id": "node/7415044292"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7415080487",
+        "addr:street": "Avenida Cívica",
+        "amenity": "pharmacy",
+        "name": "Farmacias",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1570749,
+          -16.5210038
+        ]
+      },
+      "id": "node/7415080487"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7415081387",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Ciudad Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Eco Salud",
+        "opening_hours:covid19": "Mo-Fr 08:00-12:00",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.157148,
+          -16.521608
+        ]
+      },
+      "id": "node/7415081387"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7415082185",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Antofagasta",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Espíritu Santo",
+        "opening_hours:covid19": "Mo-Fr 08:00-12:00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1540293,
+          -16.5162332
+        ]
+      },
+      "id": "node/7415082185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7415082188",
+        "addr:street": "Avenida Ciudad Satélite",
+        "amenity": "pharmacy",
+        "name": "Farmacia Junco"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1609655,
+          -16.5186972
+        ]
+      },
+      "id": "node/7415082188"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7434539786",
+        "addr:street": "Avenida Litoral",
+        "amenity": "pharmacy",
+        "name": "Farmacia Loza"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2090014,
+          -16.5327327
+        ]
+      },
+      "id": "node/7434539786"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7490386296",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Calle 30 B",
+        "amenity": "pharmacy",
+        "dispensing": "no",
+        "drive_through": "no",
+        "healthcare": "pharmacy",
+        "name": "VIAS FARMACIA",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.155451,
+          -16.5304512
+        ]
+      },
+      "id": "node/7490386296"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7508691391",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Diego de Portugal",
+        "amenity": "pharmacy",
+        "dispensing": "no",
+        "drive_through": "no",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Jarba",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1513023,
+          -16.5180108
+        ]
+      },
+      "id": "node/7508691391"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7512260275",
+        "addr:street": "Avenida La Paz",
+        "amenity": "pharmacy",
+        "check_date:opening_hours": "2023-06-30",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Paulita",
+        "opening_hours": "Mo-Sa 09:00-18:00",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1554192,
+          -16.5334742
+        ]
+      },
+      "id": "node/7512260275"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7518420985",
+        "amenity": "pharmacy",
+        "name": "SASUKE"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1868426,
+          -16.4909949
+        ]
+      },
+      "id": "node/7518420985"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7518448185",
+        "amenity": "pharmacy",
+        "name": "Shecid"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1819163,
+          -16.4808657
+        ]
+      },
+      "id": "node/7518448185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7518520885",
+        "amenity": "pharmacy",
+        "name": "El Alquimista"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.207052,
+          -16.4874532
+        ]
+      },
+      "id": "node/7518520885"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7538257485",
+        "amenity": "pharmacy",
+        "name": "Farmacia Rossy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1858318,
+          -16.4767598
+        ]
+      },
+      "id": "node/7538257485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7538280185",
+        "amenity": "pharmacy",
+        "name": "Oskar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1821492,
+          -16.4873275
+        ]
+      },
+      "id": "node/7538280185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7593676047",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Antofagasta",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacias",
+        "opening_hours:covid19": "Mo-Fr 08:00-12:00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1546641,
+          -16.5156145
+        ]
+      },
+      "id": "node/7593676047"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7593676051",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Cívica",
+        "amenity": "pharmacy",
+        "diet:halal": "no",
+        "diet:kosher": "no",
+        "dispensing": "no",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Rosa de Jérico",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1547257,
+          -16.5155005
+        ]
+      },
+      "id": "node/7593676051"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7597250898",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Calle Diego de Portugal",
+        "amenity": "pharmacy",
+        "dispensing": "no",
+        "healthcare": "pharmacy",
+        "name": "Farmacia",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1567033,
+          -16.5300846
+        ]
+      },
+      "id": "node/7597250898"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7638889981",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Ciudad Satélite",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia",
+        "opening_hours:covid19": "Mo-Fr 08:00-12:00",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1571233,
+          -16.5216152
+        ]
+      },
+      "id": "node/7638889981"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7668131214",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Ciudad Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia 10 de Febrero",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1558613,
+          -16.5218868
+        ]
+      },
+      "id": "node/7668131214"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7672015908",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Panorámica",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia",
+        "opening_hours": "Mo-Sa 09:00-20:00",
+        "opening_hours:covid19": "Mo-Fr 08:00-12:00",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1509492,
+          -16.5173762
+        ]
+      },
+      "id": "node/7672015908"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7680746493",
+        "amenity": "pharmacy",
+        "name": "JERUSALEN"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1824871,
+          -16.6140277
+        ]
+      },
+      "id": "node/7680746493"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7681038087",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Bahia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2056326,
+          -16.5500604
+        ]
+      },
+      "id": "node/7681038087"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7685452085",
+        "addr:street": "Avenida Juan Pablo II",
+        "amenity": "pharmacy",
+        "brand": "Farmacias Bolivia",
+        "brand:wikidata": "Q81970584",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Bolivia",
+        "opening_hours": "Mo-Fr 07:30-17:00",
+        "phone": "79681584"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2039719,
+          -16.4909647
+        ]
+      },
+      "id": "node/7685452085"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7700147485",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Guadalupana"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2117548,
+          -16.5494706
+        ]
+      },
+      "id": "node/7700147485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7850691685",
+        "amenity": "pharmacy",
+        "name": "San Bartolome"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2501767,
+          -16.4805614
+        ]
+      },
+      "id": "node/7850691685"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7869942370",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida del Policía",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Medical Farma",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1496209,
+          -16.5271603
+        ]
+      },
+      "id": "node/7869942370"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7897429485",
+        "amenity": "pharmacy",
+        "name": "Farmilcar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2077078,
+          -16.5372962
+        ]
+      },
+      "id": "node/7897429485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7913825785",
+        "amenity": "pharmacy",
+        "name": "Aylin Denilson"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1817386,
+          -16.6080665
+        ]
+      },
+      "id": "node/7913825785"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7917978485",
+        "amenity": "pharmacy",
+        "name": "Santi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1780699,
+          -16.5337778
+        ]
+      },
+      "id": "node/7917978485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7931376285",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Nathaly"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1939879,
+          -16.5476818
+        ]
+      },
+      "id": "node/7931376285"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8000171185",
+        "amenity": "pharmacy",
+        "name": "Lizeth"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1945573,
+          -16.5616639
+        ]
+      },
+      "id": "node/8000171185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8033205685",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farma Bioetico"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2593758,
+          -16.4789231
+        ]
+      },
+      "id": "node/8033205685"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8033205686",
+        "amenity": "pharmacy",
+        "name": "ECONOFAR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2225311,
+          -16.5254022
+        ]
+      },
+      "id": "node/8033205686"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8059190687",
+        "amenity": "pharmacy",
+        "name": "Sissy Rousse"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2261303,
+          -16.4859272
+        ]
+      },
+      "id": "node/8059190687"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8059192387",
+        "amenity": "pharmacy",
+        "name": "Virgen María Goretti"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2257224,
+          -16.4859834
+        ]
+      },
+      "id": "node/8059192387"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8062913185",
+        "amenity": "pharmacy",
+        "name": "Camila Anahi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2268518,
+          -16.485785
+        ]
+      },
+      "id": "node/8062913185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8085844617",
+        "amenity": "pharmacy",
+        "name": "Farmaprotec"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2223734,
+          -16.5259126
+        ]
+      },
+      "id": "node/8085844617"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8104337178",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Calle 25-A",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Arianne",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1552668,
+          -16.525779
+        ]
+      },
+      "id": "node/8104337178"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8171396626",
+        "amenity": "pharmacy",
+        "name": "Peregrino"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2181374,
+          -16.5264247
+        ]
+      },
+      "id": "node/8171396626"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8184422517",
+        "amenity": "pharmacy",
+        "name": "FIRENZE"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1791199,
+          -16.5341218
+        ]
+      },
+      "id": "node/8184422517"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8184620217",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Fuente de Vida"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.220789,
+          -16.5668302
+        ]
+      },
+      "id": "node/8184620217"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8188784217",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Rosalinda"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1601991,
+          -16.5124933
+        ]
+      },
+      "id": "node/8188784217"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8191580217",
+        "amenity": "pharmacy",
+        "name": "Afamyfar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1861995,
+          -16.5433457
+        ]
+      },
+      "id": "node/8191580217"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8255262217",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Esther"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1994829,
+          -16.5573027
+        ]
+      },
+      "id": "node/8255262217"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8372652317",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Yoselin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1843679,
+          -16.6085885
+        ]
+      },
+      "id": "node/8372652317"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8418834917",
+        "amenity": "pharmacy",
+        "name": "SOE"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1864137,
+          -16.5856651
+        ]
+      },
+      "id": "node/8418834917"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8483891317",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Arca de Noe"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2078619,
+          -16.5434276
+        ]
+      },
+      "id": "node/8483891317"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8489506617",
+        "amenity": "pharmacy",
+        "name": "Tata Santiago"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1824655,
+          -16.6073618
+        ]
+      },
+      "id": "node/8489506617"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8508160722",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Milagros de San Bartolomé"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2076513,
+          -16.5442644
+        ]
+      },
+      "id": "node/8508160722"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8508160723",
+        "amenity": "pharmacy",
+        "drive_through": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Elena"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2072139,
+          -16.5440014
+        ]
+      },
+      "id": "node/8508160723"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8508308318",
+        "amenity": "pharmacy",
+        "name": "HOREB"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1984092,
+          -16.5503967
+        ]
+      },
+      "id": "node/8508308318"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8511851118",
+        "amenity": "pharmacy",
+        "name": "E&A"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.197133,
+          -16.564625
+        ]
+      },
+      "id": "node/8511851118"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8538810817",
+        "amenity": "pharmacy",
+        "name": "GUADALUPE"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1520821,
+          -16.5171834
+        ]
+      },
+      "id": "node/8538810817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8538901817",
+        "amenity": "pharmacy",
+        "name": "Patrick"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1764208,
+          -16.490762
+        ]
+      },
+      "id": "node/8538901817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8551874817",
+        "amenity": "pharmacy",
+        "name": "SAN PABLO"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1649639,
+          -16.5353568
+        ]
+      },
+      "id": "node/8551874817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8645400317",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Hoy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2077069,
+          -16.5555978
+        ]
+      },
+      "id": "node/8645400317"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8710157317",
+        "amenity": "pharmacy",
+        "name": "Unidosis"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1645925,
+          -16.5107683
+        ]
+      },
+      "id": "node/8710157317"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8743466617",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Inca Huasi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Constelación"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1895502,
+          -16.5888802
+        ]
+      },
+      "id": "node/8743466617"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8746499917",
+        "amenity": "pharmacy",
+        "name": "Cielito Lindo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1858481,
+          -16.5995262
+        ]
+      },
+      "id": "node/8746499917"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8750629829",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Calle Diego de Portugal",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia CEMEDIQ",
+        "opening_hours": "off",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1541136,
+          -16.524114
+        ]
+      },
+      "id": "node/8750629829"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8825835917",
+        "amenity": "pharmacy",
+        "name": "TRINIDAD"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2326185,
+          -16.5558876
+        ]
+      },
+      "id": "node/8825835917"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8833624517",
+        "amenity": "pharmacy",
+        "name": "Virgen del Rosario"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1818461,
+          -16.6332518
+        ]
+      },
+      "id": "node/8833624517"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8902599837",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Tokio",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Para el bienestar, salud y vida"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1939091,
+          -16.5951611
+        ]
+      },
+      "id": "node/8902599837"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8904752217",
+        "amenity": "pharmacy",
+        "name": "Genesis"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2073527,
+          -16.5342248
+        ]
+      },
+      "id": "node/8904752217"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8905781589",
+        "addr:city": "El Alto",
+        "addr:street": "Calle Esteban Balboa",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Final Los Andes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1883138,
+          -16.4960196
+        ]
+      },
+      "id": "node/8905781589"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9095385617",
+        "addr:city": "La Paz",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia CEIS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1717243,
+          -16.5365105
+        ]
+      },
+      "id": "node/9095385617"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9108659718",
+        "amenity": "pharmacy",
+        "name": "Héctor Yamil"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1817523,
+          -16.6342731
+        ]
+      },
+      "id": "node/9108659718"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9165038960",
+        "addr:city": "Ciudad Satélite",
+        "addr:housenumber": "789",
+        "addr:street": "Avenida del Policía",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacias MAC",
+        "outdoor_seating": "no",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1545899,
+          -16.525162
+        ]
+      },
+      "id": "node/9165038960"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9208579118",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Trinidad"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.232613,
+          -16.5559599
+        ]
+      },
+      "id": "node/9208579118"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9344092317",
+        "amenity": "pharmacy",
+        "name": "Elysium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2139854,
+          -16.5415871
+        ]
+      },
+      "id": "node/9344092317"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9346419396",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Panamericana",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1747018,
+          -16.5459333
+        ]
+      },
+      "id": "node/9346419396"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9346419401",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Cívica",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "FARMACIA",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1599555,
+          -16.5277051
+        ]
+      },
+      "id": "node/9346419401"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9366418841",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Diego de Portugal",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1525591,
+          -16.5215561
+        ]
+      },
+      "id": "node/9366418841"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9510702080",
+        "addr:city": "El Alto",
+        "addr:street": "Calle 6",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia KATTY",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1663588,
+          -16.5387621
+        ]
+      },
+      "id": "node/9510702080"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9768393294",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Alfredo Sanjines",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Salvador"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1501253,
+          -16.5306217
+        ]
+      },
+      "id": "node/9768393294"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9960605123",
+        "amenity": "pharmacy",
+        "dispensing": "no",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2154177,
+          -16.4950697
+        ]
+      },
+      "id": "node/9960605123"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9962709584",
+        "addr:city": "El Alto",
+        "addr:neighbourhood": "Cristal 1",
+        "addr:street": "Av. Wendy Calvert",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "drive_through": "no",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Cristal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2019092,
+          -16.5944957
+        ]
+      },
+      "id": "node/9962709584"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9962709603",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2028889,
+          -16.5954672
+        ]
+      },
+      "id": "node/9962709603"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9962709611",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2015905,
+          -16.5947491
+        ]
+      },
+      "id": "node/9962709611"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9962737648",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2028441,
+          -16.595056
+        ]
+      },
+      "id": "node/9962737648"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9962869734",
+        "addr:street": "Avenida Romero",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Medicamentos Populares"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2059493,
+          -16.5429041
+        ]
+      },
+      "id": "node/9962869734"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9962869760",
+        "addr:street": "Calle Eucaliptus",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Vital Vip"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.206422,
+          -16.5429647
+        ]
+      },
+      "id": "node/9962869760"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9964119787",
+        "addr:city": "EL ALTO",
+        "addr:housenumber": "1234",
+        "addr:street": "CALLE ARACA",
+        "amenity": "pharmacy",
+        "brand": "Farmacorp",
+        "brand:wikidata": "Q81968937",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacorp"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.259612,
+          -16.4925247
+        ]
+      },
+      "id": "node/9964119787"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10017032244",
+        "addr:city": "Ciudad Satélite",
+        "addr:housenumber": "612",
+        "addr:neighbourhood": "Plan 105",
+        "addr:street": "Avenida Satélite",
+        "amenity": "pharmacy",
+        "dispensing": "no",
+        "email": "online.farmaciachavez.com.bo",
+        "facebook": "@farmaciaschavezsa",
+        "healthcare": "pharmacy",
+        "name": "Farmacias Chávez",
+        "operator": "Farmacias Chávez S.A.",
+        "phone": "+591 69017785",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1554479,
+          -16.5220433
+        ]
+      },
+      "id": "node/10017032244"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10104506808",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Cívica",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Farmacia San Antonio"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1588206,
+          -16.5237568
+        ]
+      },
+      "id": "node/10104506808"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10128352817",
+        "amenity": "pharmacy",
+        "name": "Naturfar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2341791,
+          -16.523747
+        ]
+      },
+      "id": "node/10128352817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10186687717",
+        "amenity": "pharmacy",
+        "name": "Soy tu farmacia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1934498,
+          -16.4740321
+        ]
+      },
+      "id": "node/10186687717"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10249677909",
+        "amenity": "pharmacy",
+        "name": "Diana Farmax"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.162749,
+          -16.5317039
+        ]
+      },
+      "id": "node/10249677909"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10263417709",
+        "amenity": "pharmacy",
+        "name": "Kali-Farm"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1945734,
+          -16.5463411
+        ]
+      },
+      "id": "node/10263417709"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10276758709",
+        "amenity": "pharmacy",
+        "name": "Gran Chaco"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2165852,
+          -16.514895
+        ]
+      },
+      "id": "node/10276758709"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10282180765",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Calle Diego de Portugal",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1536865,
+          -16.5231284
+        ]
+      },
+      "id": "node/10282180765"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10719871405",
+        "amenity": "pharmacy",
+        "name": "Kollita Farma II"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2335565,
+          -16.5238046
+        ]
+      },
+      "id": "node/10719871405"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10783292405",
+        "amenity": "pharmacy",
+        "name": "Holandes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1752859,
+          -16.4841929
+        ]
+      },
+      "id": "node/10783292405"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10783292605",
+        "amenity": "pharmacy",
+        "name": "Frida"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1777159,
+          -16.4830491
+        ]
+      },
+      "id": "node/10783292605"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10917627109",
+        "amenity": "pharmacy",
+        "name": "Farmacia Los Andes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1877924,
+          -16.4941777
+        ]
+      },
+      "id": "node/10917627109"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10917627110",
+        "amenity": "pharmacy",
+        "name": "Farmacia Arturo Valle"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1882218,
+          -16.494095
+        ]
+      },
+      "id": "node/10917627110"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11063481350",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida Ciudad Satélite",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Mi Cielo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1567394,
+          -16.5215462
+        ]
+      },
+      "id": "node/11063481350"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11482918646",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "La Amistad"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1824177,
+          -16.6182287
+        ]
+      },
+      "id": "node/11482918646"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11649183236",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Avenida del Policía",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1570718,
+          -16.5244374
+        ]
+      },
+      "id": "node/11649183236"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12063283936",
+        "addr:city": "El Alto",
+        "addr:street": "Avenida Ladislao Cabrera",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia El Rosario"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1767693,
+          -16.520613
+        ]
+      },
+      "id": "node/12063283936"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12164550570",
+        "addr:city": "Ciudad Satélite",
+        "addr:street": "Calle Mallco Mayta",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Farmacia FIRENZE"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1502885,
+          -16.5217143
+        ]
+      },
+      "id": "node/12164550570"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12624007239",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1643785,
+          -16.5094317
+        ]
+      },
+      "id": "node/12624007239"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13023737355",
+        "amenity": "pharmacy",
+        "check_date": "2025-07-25",
+        "description": "#mapeocholets",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Juan Y Teo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2008105,
+          -16.5246986
+        ]
+      },
+      "id": "node/13023737355"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13023737359",
+        "amenity": "pharmacy",
+        "check_date": "2025-07-25",
+        "description": "#mapeocholets",
+        "healthcare": "pharmacy",
+        "name": "Farmacia Estrella"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.2011511,
+          -16.5256609
+        ]
+      },
+      "id": "node/13023737359"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13023737371",
+        "amenity": "pharmacy",
+        "check_date": "2025-07-25",
+        "description": "#mapeocholets",
+        "healthcare": "pharmacy",
+        "name": "Farmacia La Barata"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -68.1984383,
+          -16.5270246
+        ]
+      },
+      "id": "node/13023737371"
+    }
+  ]
+}

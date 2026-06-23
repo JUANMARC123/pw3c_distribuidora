@@ -30,8 +30,15 @@ class FarmaciaController extends ApiController
             $query->where('zona', 'like', "%{$request->zona}%");
         }
 
+        $perPage = $request->per_page;
+        if ($perPage == -1) {
+            return $this->jsonResponse(
+                $query->orderBy('nombre')->get()
+            );
+        }
+
         return $this->paginatedResponse(
-            $query->orderBy('nombre')->paginate($request->per_page ?? 15)
+            $query->orderBy('nombre')->paginate($perPage ?? 15)
         );
     }
 

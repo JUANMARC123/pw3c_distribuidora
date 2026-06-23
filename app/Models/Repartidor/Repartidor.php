@@ -18,6 +18,7 @@ class Repartidor extends Model
         'id_extension_ci',
         'id_licencia',
         'id_estado_repartidor',
+        'firebase_uid',
     ];
 
     public function usuario()

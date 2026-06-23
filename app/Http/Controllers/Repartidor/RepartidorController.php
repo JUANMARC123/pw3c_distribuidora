@@ -39,6 +39,7 @@ class RepartidorController extends ApiController
             'id_extension_ci' => 'required|integer|exists:extensiones_ci,id_extension_ci',
             'id_licencia' => 'required|integer|exists:licencias,id_licencia',
             'id_estado_repartidor' => 'required|integer|exists:estados_repartidor,id_estado_repartidor',
+            'firebase_uid' => 'nullable|string|max:255|unique:repartidores,firebase_uid',
         ]);
 
         $repartidor = Repartidor::create($data);
@@ -80,6 +81,7 @@ class RepartidorController extends ApiController
             'ci' => 'sometimes|string|max:20|unique:repartidores,ci,' . $id . ',id_repartidor',
             'id_extension_ci' => 'sometimes|integer|exists:extensiones_ci,id_extension_ci',
             'id_licencia' => 'sometimes|integer|exists:licencias,id_licencia',
+            'firebase_uid' => 'nullable|string|max:255|unique:repartidores,firebase_uid,' . $id . ',id_repartidor',
         ]);
 
         $repartidor->update($data);
