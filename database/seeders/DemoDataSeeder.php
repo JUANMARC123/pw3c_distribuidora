@@ -85,27 +85,13 @@ class DemoDataSeeder extends Seeder
             }
         }
 
-        $repartidores = Repartidor::pluck('id_repartidor')->toArray();
-        $vehiculos = Vehiculo::pluck('id_vehiculo')->toArray();
-        $usedRep = [];
-        $usedVeh = [];
-
         foreach ($rutas as $ruta) {
-            foreach ([0, 1] as $dayOffset) {
-                $fecha = now()->subDays($dayOffset)->format('Y-m-d');
-
-                $repId = collect($repartidores)->first(fn($id) => !isset($usedRep[$id.'_'.$fecha]));
-                $vehId = collect($vehiculos)->first(fn($id) => !isset($usedVeh[$id.'_'.$fecha]));
-                if (!$repId || !$vehId) continue;
-
-                $usedRep[$repId.'_'.$fecha] = true;
-                $usedVeh[$vehId.'_'.$fecha] = true;
-
-                ControlRuta::factory()->create([
+            for ($i = 0; $i < 2; $i++) {
+                ControlRuta::factory(1)->create([
                     'id_ruta' => $ruta->id_ruta,
-                    'fecha_ruta' => $fecha,
-                    'id_repartidor' => $repId,
-                    'id_vehiculo' => $vehId,
+                    'fecha_ruta' => now()->subDays($i),
+                    'id_repartidor' => fake()->numberBetween(1, 5),
+                    'id_vehiculo' => fake()->numberBetween(1, 10),
                 ]);
             }
         }

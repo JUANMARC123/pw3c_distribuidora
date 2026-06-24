@@ -19,18 +19,6 @@ use App\Models\Despacho\EstadoDespacho;
 use App\Models\Evidencia\TipoIncidencia;
 use App\Models\Evidencia\TipoEvidencia;
 use App\Models\Farmacia\Cargo;
-use App\Models\Farmacia\EstadoFarmacia;
-use App\Models\Medicamento\Categoria;
-use App\Models\Medicamento\Laboratorio;
-use App\Models\Medicamento\Presentacion;
-use App\Models\Medicamento\UnidadMedida;
-use App\Models\Inventario\TipoMovimiento;
-use App\Models\Compra\EstadoOrdenCompra;
-use App\Models\Devolucion\TipoDevolucion;
-use App\Models\Devolucion\EstadoDevolucion;
-use App\Models\Promocion\TipoPromocion;
-use App\Models\Venta\EstadoVenta;
-use App\Models\Venta\MetodoPago;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -53,19 +41,7 @@ class CatalogoController extends ApiController
         'capacidades'     => ['model' => Capacidad::class, 'field' => 'capacidad_kg', 'table' => 'capacidades', 'id' => 'id_capacidad', 'numeric' => true],
         'tipos-incidencia' => ['model' => TipoIncidencia::class, 'field' => 'nombre_tipo', 'table' => 'tipos_incidencia', 'id' => 'id_tipo_incidencia', 'max' => 100],
         'tipos-evidencia' => ['model' => TipoEvidencia::class, 'field' => 'nombre_tipo', 'table' => 'tipos_evidencia', 'id' => 'id_tipo_evidencia', 'max' => 100],
-        'cargos'             => ['model' => Cargo::class, 'field' => 'nombre_cargo', 'table' => 'cargos', 'id' => 'id_cargo', 'max' => 100],
-        'estados-farmacia'   => ['model' => EstadoFarmacia::class, 'field' => 'nombre_estado', 'table' => 'estados_farmacia', 'id' => 'id_estado_farmacia', 'max' => 50],
-        'categorias'         => ['model' => Categoria::class, 'field' => 'nombre_categoria', 'table' => 'categorias', 'id' => 'id_categoria', 'max' => 100],
-        'laboratorios'       => ['model' => Laboratorio::class, 'field' => 'nombre_laboratorio', 'table' => 'laboratorios', 'id' => 'id_laboratorio', 'max' => 150],
-        'presentaciones'     => ['model' => Presentacion::class, 'field' => 'nombre_presentacion', 'table' => 'presentaciones', 'id' => 'id_presentacion', 'max' => 100],
-        'unidades-medida'    => ['model' => UnidadMedida::class, 'field' => 'nombre_unidad', 'table' => 'unidades_medida', 'id' => 'id_unidad_medida', 'max' => 50],
-        'tipos-movimiento'   => ['model' => TipoMovimiento::class, 'field' => 'nombre_tipo', 'table' => 'tipos_movimiento', 'id' => 'id_tipo_movimiento', 'max' => 50],
-        'estados-orden-compra' => ['model' => EstadoOrdenCompra::class, 'field' => 'nombre_estado', 'table' => 'estados_orden_compra', 'id' => 'id_estado_orden_compra', 'max' => 50],
-        'tipos-devolucion'    => ['model' => TipoDevolucion::class, 'field' => 'nombre_tipo', 'table' => 'tipos_devolucion', 'id' => 'id_tipo_devolucion', 'max' => 100],
-        'estados-devolucion'  => ['model' => EstadoDevolucion::class, 'field' => 'nombre_estado', 'table' => 'estados_devolucion', 'id' => 'id_estado_devolucion', 'max' => 50],
-        'tipos-promocion'     => ['model' => TipoPromocion::class, 'field' => 'nombre_tipo', 'table' => 'tipos_promocion', 'id' => 'id_tipo_promocion', 'max' => 100],
-        'estados-venta'       => ['model' => EstadoVenta::class, 'field' => 'nombre_estado', 'table' => 'estados_venta', 'id' => 'id_estado_venta', 'max' => 50],
-        'metodos-pago'        => ['model' => MetodoPago::class, 'field' => 'nombre_metodo', 'table' => 'metodos_pago', 'id' => 'id_metodo_pago', 'max' => 50],
+        'cargos'          => ['model' => Cargo::class, 'field' => 'nombre_cargo', 'table' => 'cargos', 'id' => 'id_cargo', 'max' => 100],
     ];
 
     public function store(Request $request, $catalogo)
@@ -233,65 +209,5 @@ class CatalogoController extends ApiController
     public function cargos()
     {
         return $this->jsonResponse(Cargo::all());
-    }
-
-    public function estadosFarmacia()
-    {
-        return $this->jsonResponse(EstadoFarmacia::all());
-    }
-
-    public function categorias()
-    {
-        return $this->jsonResponse(Categoria::all());
-    }
-
-    public function laboratorios()
-    {
-        return $this->jsonResponse(Laboratorio::all());
-    }
-
-    public function presentaciones()
-    {
-        return $this->jsonResponse(Presentacion::all());
-    }
-
-    public function unidadesMedida()
-    {
-        return $this->jsonResponse(UnidadMedida::all());
-    }
-
-    public function tiposMovimiento()
-    {
-        return $this->jsonResponse(TipoMovimiento::all());
-    }
-
-    public function estadosOrdenCompra()
-    {
-        return $this->jsonResponse(EstadoOrdenCompra::all());
-    }
-
-    public function tiposDevolucion()
-    {
-        return $this->jsonResponse(TipoDevolucion::all());
-    }
-
-    public function estadosDevolucion()
-    {
-        return $this->jsonResponse(EstadoDevolucion::all());
-    }
-
-    public function tiposPromocion()
-    {
-        return $this->jsonResponse(TipoPromocion::all());
-    }
-
-    public function estadosVenta()
-    {
-        return $this->jsonResponse(EstadoVenta::all());
-    }
-
-    public function metodosPago()
-    {
-        return $this->jsonResponse(MetodoPago::all());
     }
 }

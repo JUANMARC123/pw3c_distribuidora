@@ -6,7 +6,6 @@ use App\Http\Controllers\ApiController;
 use App\Models\Vehiculo\Vehiculo;
 use App\Models\Vehiculo\HistorialEstadoVehiculo;
 use Illuminate\Http\Request;
-use App\Services\AuditService;
 
 class VehiculoController extends ApiController
 {
@@ -41,8 +40,6 @@ class VehiculoController extends ApiController
         ]);
 
         $vehiculo = Vehiculo::create($data);
-
-        AuditService::log(auth()->id(), 'crear', 'vehiculos', $vehiculo->id_vehiculo);
 
         HistorialEstadoVehiculo::create([
             'id_vehiculo' => $vehiculo->id_vehiculo,
@@ -82,8 +79,6 @@ class VehiculoController extends ApiController
 
         $vehiculo->update($data);
 
-        AuditService::log(auth()->id(), 'editar', 'vehiculos', $vehiculo->id_vehiculo);
-
         return $this->jsonResponse(
             $vehiculo->load('modelo.marca', 'capacidad', 'estado'),
             'Vehículo actualizado exitosamente.'
@@ -95,16 +90,8 @@ class VehiculoController extends ApiController
         $vehiculo = Vehiculo::findOrFail($id);
         $vehiculo->delete();
 
-        AuditService::log(auth()->id(), 'eliminar', 'vehiculos', $id);
-
         return $this->jsonResponse(null, 'Vehículo eliminado exitosamente.');
     }
-
-    private const TRANSICIONES_VEHICULO = [
-        1 => [2],
-        2 => [1, 3],
-        3 => [1],
-    ];
 
     public function cambiarEstado(Request $request, $id)
     {
@@ -113,21 +100,6 @@ class VehiculoController extends ApiController
         ]);
 
         $vehiculo = Vehiculo::findOrFail($id);
-        $nuevoEstado = (int) $request->id_estado_vehiculo;
-        $estadoActual = (int) $vehiculo->id_estado_vehiculo;
-
-        $transicionesValidas = self::TRANSICIONES_VEHICULO[$estadoActual] ?? [];
-        if (!empty($transicionesValidas) && !in_array($nuevoEstado, $transicionesValidas)) {
-            return $this->errorResponse(
-                "Transición de estado no válida. No se puede cambiar de " .
-                "{$vehiculo->estado->nombre_estado} al estado solicitado.",
-                422
-            );
-        }
-
-        if ($nuevoEstado === $estadoActual) {
-            return $this->errorResponse('El vehículo ya se encuentra en este estado.', 422);
-        }
 
         $historialActual = HistorialEstadoVehiculo::where('id_vehiculo', $id)
             ->whereNull('fecha_fin')
@@ -140,13 +112,11 @@ class VehiculoController extends ApiController
 
         HistorialEstadoVehiculo::create([
             'id_vehiculo' => $id,
-            'id_estado_vehiculo' => $nuevoEstado,
+            'id_estado_vehiculo' => $request->id_estado_vehiculo,
             'fecha_inicio' => now(),
         ]);
 
-        $vehiculo->update(['id_estado_vehiculo' => $nuevoEstado]);
-
-        AuditService::log(auth()->id(), 'cambiar-estado', 'vehiculos', $vehiculo->id_vehiculo);
+        $vehiculo->update(['id_estado_vehiculo' => $request->id_estado_vehiculo]);
 
         return $this->jsonResponse(
             $vehiculo->load('estado', 'historiales.estado'),

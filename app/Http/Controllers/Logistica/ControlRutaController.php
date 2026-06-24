@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Logistica;
 
 use App\Http\Controllers\ApiController;
 use App\Models\Logistica\ControlRuta;
-use App\Models\Repartidor\Repartidor;
-use App\Models\Vehiculo\Vehiculo;
 use Illuminate\Http\Request;
 
 class ControlRutaController extends ApiController
@@ -53,18 +51,6 @@ class ControlRutaController extends ApiController
             'id_vehiculo' => 'required|integer|exists:vehiculos,id_vehiculo',
         ]);
 
-        // RN-032: Repartidor inactivo no recibe rutas
-        $repartidor = Repartidor::findOrFail($data['id_repartidor']);
-        if ($repartidor->id_estado_repartidor === 3) {
-            return $this->errorResponse('El repartidor seleccionado está inactivo y no puede ser asignado a una ruta.', 422);
-        }
-
-        // RN-040: Vehículo fuera de servicio no asignado a ruta
-        $vehiculo = Vehiculo::findOrFail($data['id_vehiculo']);
-        if ($vehiculo->id_estado_vehiculo === 3) {
-            return $this->errorResponse('El vehículo seleccionado está fuera de servicio y no puede ser asignado a una ruta.', 422);
-        }
-
         $exists = ControlRuta::where('id_ruta', $data['id_ruta'])
             ->where('fecha_ruta', $data['fecha_ruta'])
             ->exists();
@@ -103,30 +89,6 @@ class ControlRutaController extends ApiController
             'id_repartidor' => 'sometimes|integer|exists:repartidores,id_repartidor',
             'id_vehiculo' => 'sometimes|integer|exists:vehiculos,id_vehiculo',
         ]);
-
-        $fechaRuta = $control->fecha_ruta;
-
-        if (isset($data['id_repartidor'])) {
-            $exists = ControlRuta::where('id_repartidor', $data['id_repartidor'])
-                ->where('fecha_ruta', $fechaRuta)
-                ->where('id_control_ruta', '!=', $id)
-                ->exists();
-
-            if ($exists) {
-                return $this->errorResponse('El repartidor seleccionado ya tiene una ruta asignada en esta fecha.', 422);
-            }
-        }
-
-        if (isset($data['id_vehiculo'])) {
-            $exists = ControlRuta::where('id_vehiculo', $data['id_vehiculo'])
-                ->where('fecha_ruta', $fechaRuta)
-                ->where('id_control_ruta', '!=', $id)
-                ->exists();
-
-            if ($exists) {
-                return $this->errorResponse('El vehículo seleccionado ya tiene una ruta asignada en esta fecha.', 422);
-            }
-        }
 
         $control->update($data);
 

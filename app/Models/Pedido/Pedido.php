@@ -14,7 +14,6 @@ class Pedido extends Model
 
     protected $fillable = [
         'id_farmacia',
-        'id_contacto',
         'id_usuario',
         'id_estado_pedido',
         'fecha_pedido',
@@ -28,11 +27,6 @@ class Pedido extends Model
     public function farmacia()
     {
         return $this->belongsTo(\App\Models\Farmacia\Farmacia::class, 'id_farmacia');
-    }
-
-    public function contacto()
-    {
-        return $this->belongsTo(\App\Models\Farmacia\ContactoFarmacia::class, 'id_contacto');
     }
 
     public function usuario()
@@ -53,10 +47,5 @@ class Pedido extends Model
     public function despacho()
     {
         return $this->hasOne(\App\Models\Despacho\Despacho::class, 'id_pedido');
-    }
-
-    public function detalles()
-    {
-        return $this->hasMany(DetallePedido::class, 'id_pedido');
     }
 }

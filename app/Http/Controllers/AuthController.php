@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\Seguridad\Usuario;
-use App\Models\Seguridad\SesionUsuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -28,11 +27,6 @@ class AuthController extends ApiController
 
         $user->ultimo_acceso = now();
         $user->save();
-
-        SesionUsuario::create([
-            'id_usuario' => $user->id_usuario,
-            'fecha_inicio' => now(),
-        ]);
 
         $token = $user->createToken('api-token')->plainTextToken;
 
@@ -76,15 +70,7 @@ class AuthController extends ApiController
 
     public function logout(Request $request)
     {
-        $user = $request->user();
-
-        SesionUsuario::where('id_usuario', $user->id_usuario)
-            ->whereNull('fecha_fin')
-            ->latest('fecha_inicio')
-            ->first()
-            ?->update(['fecha_fin' => now()]);
-
-        $user->currentAccessToken()->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return $this->jsonResponse(null, 'Sesión cerrada exitosamente.');
     }
