@@ -15,6 +15,10 @@ use App\Http\Controllers\Logistica\ControlRutaController;
 use App\Http\Controllers\Despacho\DespachoController;
 use App\Http\Controllers\Despacho\IncidenciaController;
 use App\Http\Controllers\Despacho\EvidenciaController;
+use App\Http\Controllers\Producto\ProductoController;
+use App\Http\Controllers\Pedido\DetallePedidoController;
+use App\Http\Controllers\Logistica\CentroLogisticoController;
+use App\Http\Controllers\Caja\CajaController;
 use App\Http\Controllers\Reportes\ReporteController;
 
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -43,9 +47,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('farmacias/{farmacia}/contactos/{contacto}', [ContactoFarmaciaController::class, 'update'])->middleware('permission:Farmacias,gestionar-contactos');
     Route::delete('farmacias/{farmacia}/contactos/{contacto}', [ContactoFarmaciaController::class, 'destroy'])->middleware('permission:Farmacias,gestionar-contactos');
 
+    // Módulo: Productos
+    Route::apiResource('productos', ProductoController::class)->middleware('permission:Productos');
+
     // Módulo: Pedidos
     Route::post('pedidos/{pedido}/cambiar-estado', [PedidoController::class, 'cambiarEstado'])->middleware('permission:Pedidos,cambiar-estado');
     Route::apiResource('pedidos', PedidoController::class)->middleware('permission:Pedidos');
+    Route::get('pedidos/{pedido}/detalles', [DetallePedidoController::class, 'index'])->middleware('permission:Pedidos,listar');
+    Route::post('pedidos/{pedido}/detalles', [DetallePedidoController::class, 'store'])->middleware('permission:Pedidos,crear');
+    Route::put('pedidos/{pedido}/detalles/{detalle}', [DetallePedidoController::class, 'update'])->middleware('permission:Pedidos,editar');
+    Route::delete('pedidos/{pedido}/detalles/{detalle}', [DetallePedidoController::class, 'destroy'])->middleware('permission:Pedidos,eliminar');
+    Route::put('pedidos/{pedido}/detalles/{detalle}/entrega', [DetallePedidoController::class, 'actualizarEntrega'])->middleware('permission:Pedidos,cambiar-estado');
 
     // Módulo: Repartidores
     Route::post('repartidores/{repartidor}/cambiar-estado', [RepartidorController::class, 'cambiarEstado'])->middleware('permission:Repartidores,cambiar-estado');
@@ -80,6 +92,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'update'])->middleware('permission:Despachos,gestionar-evidencias');
     Route::delete('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'destroy'])->middleware('permission:Despachos,gestionar-evidencias');
 
+    // Módulo: Centro Logístico
+    Route::prefix('logistica')->group(function () {
+        Route::get('pedidos-pendientes', [CentroLogisticoController::class, 'pedidosPendientes']);
+        Route::get('repartidores-disponibles', [CentroLogisticoController::class, 'repartidoresDisponibles']);
+        Route::post('planificacion/borrador', [CentroLogisticoController::class, 'guardarBorrador']);
+        Route::post('planificacion/confirmar', [CentroLogisticoController::class, 'confirmarRuta']);
+        Route::get('rutas-activas', [CentroLogisticoController::class, 'rutasActivas']);
+        Route::get('rutas-activas/{id}', [CentroLogisticoController::class, 'detalleRutaActiva']);
+    });
+
     // Módulo: Reportes
     Route::prefix('reportes')->group(function () {
         Route::get('resumen', [ReporteController::class, 'resumen'])->middleware('permission:Reportes,acceder');
@@ -89,6 +111,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('repartidores-por-estado', [ReporteController::class, 'repartidoresPorEstado'])->middleware('permission:Reportes,listar');
         Route::get('vehiculos-por-estado', [ReporteController::class, 'vehiculosPorEstado'])->middleware('permission:Reportes,listar');
         Route::get('incidencias-por-tipo', [ReporteController::class, 'incidenciasPorTipo'])->middleware('permission:Reportes,listar');
+    });
+
+    // Módulo: Caja Diaria
+    Route::prefix('caja')->group(function () {
+        Route::post('abrir', [CajaController::class, 'abrirCaja']);
+        Route::post('ingreso', [CajaController::class, 'registrarIngreso']);
+        Route::post('gasto', [CajaController::class, 'registrarGasto']);
+        Route::put('cerrar/{id}', [CajaController::class, 'cerrarCaja']);
+        Route::get('dia', [CajaController::class, 'cajaDelDia']);
+        Route::get('resumen', [CajaController::class, 'resumenDiario']);
     });
 
     // Catálogos (lectura: cualquier autenticado; escritura: requiere permisos del módulo Usuarios vía auto-detección)

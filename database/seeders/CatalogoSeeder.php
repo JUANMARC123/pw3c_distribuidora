@@ -20,6 +20,7 @@ use App\Models\Despacho\EstadoDespacho;
 use App\Models\Evidencia\TipoIncidencia;
 use App\Models\Evidencia\TipoEvidencia;
 use App\Models\Farmacia\Cargo;
+use App\Models\Producto\EstadoDetalle;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -31,7 +32,10 @@ class CatalogoSeeder extends Seeder
         'Usuarios'        => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'asignar-roles'],
         'Roles'           => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'asignar-permisos'],
         'Farmacias'       => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'gestionar-contactos'],
+        'Productos'       => ['acceder', 'listar', 'crear', 'editar', 'eliminar'],
         'Pedidos'         => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado'],
+        'Logística'       => ['acceder', 'planificar', 'tracking'],
+        'Caja Diaria'     => ['acceder', 'listar', 'crear', 'cerrar'],
         'Repartidores'    => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado'],
         'Vehículos'       => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado'],
         'Rutas'           => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'gestionar-paradas'],
@@ -99,7 +103,10 @@ class CatalogoSeeder extends Seeder
                 ['Dashboard', 'acceder'],
                 ['Reportes', 'acceder'], ['Reportes', 'listar'],
                 ['Farmacias', 'acceder'], ['Farmacias', 'listar'], ['Farmacias', 'crear'], ['Farmacias', 'editar'], ['Farmacias', 'gestionar-contactos'],
+                ['Productos', 'acceder'], ['Productos', 'listar'], ['Productos', 'crear'], ['Productos', 'editar'],
                 ['Pedidos', 'acceder'], ['Pedidos', 'listar'], ['Pedidos', 'crear'], ['Pedidos', 'editar'], ['Pedidos', 'cambiar-estado'],
+                ['Logística', 'acceder'], ['Logística', 'planificar'], ['Logística', 'tracking'],
+                ['Caja Diaria', 'acceder'], ['Caja Diaria', 'listar'], ['Caja Diaria', 'crear'], ['Caja Diaria', 'cerrar'],
                 ['Repartidores', 'acceder'], ['Repartidores', 'listar'], ['Repartidores', 'crear'], ['Repartidores', 'editar'], ['Repartidores', 'cambiar-estado'],
                 ['Vehículos', 'acceder'], ['Vehículos', 'listar'], ['Vehículos', 'crear'], ['Vehículos', 'editar'], ['Vehículos', 'cambiar-estado'],
                 ['Rutas', 'acceder'], ['Rutas', 'listar'], ['Rutas', 'crear'], ['Rutas', 'editar'], ['Rutas', 'gestionar-paradas'],
@@ -110,7 +117,10 @@ class CatalogoSeeder extends Seeder
                 ['Dashboard', 'acceder'],
                 ['Reportes', 'acceder'], ['Reportes', 'listar'],
                 ['Farmacias', 'acceder'], ['Farmacias', 'listar'],
+                ['Productos', 'acceder'], ['Productos', 'listar'], ['Productos', 'crear'],
                 ['Pedidos', 'acceder'], ['Pedidos', 'listar'], ['Pedidos', 'crear'], ['Pedidos', 'editar'], ['Pedidos', 'cambiar-estado'],
+                ['Logística', 'acceder'], ['Logística', 'planificar'], ['Logística', 'tracking'],
+                ['Caja Diaria', 'acceder'], ['Caja Diaria', 'listar'],
                 ['Repartidores', 'acceder'], ['Repartidores', 'listar'],
                 ['Vehículos', 'acceder'], ['Vehículos', 'listar'],
                 ['Rutas', 'acceder'], ['Rutas', 'listar'],
@@ -170,6 +180,10 @@ class CatalogoSeeder extends Seeder
             ['nombre' => 'roles'],
             ['nombre' => 'farmacias'],
             ['nombre' => 'pedidos'],
+            ['nombre' => 'productos'],
+            ['nombre' => 'logistica'],
+            ['nombre' => 'caja_repartidor'],
+            ['nombre' => 'gastos_operativos'],
             ['nombre' => 'repartidores'],
             ['nombre' => 'vehiculos'],
             ['nombre' => 'rutas'],
@@ -203,6 +217,29 @@ class CatalogoSeeder extends Seeder
             ['nombre_estado' => 'En camino'],
             ['nombre_estado' => 'Entregado'],
             ['nombre_estado' => 'Fallido'],
+        ]);
+
+        DB::table('estados_ruta')->insertOrIgnore([
+            ['nombre_estado' => 'Borrador'],
+            ['nombre_estado' => 'Planificada'],
+            ['nombre_estado' => 'En curso'],
+            ['nombre_estado' => 'Finalizada'],
+            ['nombre_estado' => 'Cancelada'],
+        ]);
+
+        DB::table('estados_caja')->insertOrIgnore([
+            ['nombre_estado' => 'Abierta'],
+            ['nombre_estado' => 'Cerrada'],
+            ['nombre_estado' => 'Revisada'],
+        ]);
+
+        EstadoDetalle::insertOrIgnore([
+            ['nombre_estado' => 'Pendiente'],
+            ['nombre_estado' => 'Preparado'],
+            ['nombre_estado' => 'Enviado'],
+            ['nombre_estado' => 'Entregado'],
+            ['nombre_estado' => 'Faltante'],
+            ['nombre_estado' => 'Cancelado'],
         ]);
 
         Licencia::insert([

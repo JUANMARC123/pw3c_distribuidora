@@ -19,6 +19,7 @@ class ControlRuta extends Model
         'hora_llegada_real',
         'id_repartidor',
         'id_vehiculo',
+        'id_estado_ruta',
     ];
 
     protected $casts = [
@@ -45,5 +46,15 @@ class ControlRuta extends Model
     public function despachos()
     {
         return $this->hasMany(\App\Models\Despacho\Despacho::class, 'id_control_ruta');
+    }
+
+    public function estado()
+    {
+        return $this->belongsTo(EstadoRuta::class, 'id_estado_ruta');
+    }
+
+    public function planificaciones()
+    {
+        return $this->hasMany(PlanificacionRuta::class, 'id_control_ruta');
     }
 }

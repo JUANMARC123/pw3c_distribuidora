@@ -118,16 +118,16 @@
 
 - **Cómo funciona**: Los campos `latitud` y `longitud` se validan con `between:-90,90` y `between:-180,180` respectivamente. En la base de datos son `decimal(10,7)`, permitiendo 7 decimales de precisión.
 - **Dónde se aplica**:
-  - `app/Http/Controllers/Farmacia/FarmaciaController.php:35-36` — Validación en store
-  - `app/Http/Controllers/Farmacia/FarmaciaController.php:59-60` — Validación en update
+  - `app/Http/Controllers/Farmacia/FarmaciaController.php:43-44` — Validación en store
+  - `app/Http/Controllers/Farmacia/FarmaciaController.php:67-68` — Validación en update
   - Migración: `database/migrations/2024_01_02_000002_create_farmacias_table.php`
 
 ### 2.2 Email único (nullable)
 
 - **Cómo funciona**: El email de la farmacia es opcional (nullable), pero si se proporciona, debe tener formato email válido y ser único en la tabla `farmacias`. La validación con `unique:farmacias,email` garantiza que no haya duplicados.
 - **Dónde se aplica**:
-  - `app/Http/Controllers/Farmacia/FarmaciaController.php:34` — Store
-  - `app/Http/Controllers/Farmacia/FarmaciaController.php:58` — Update (ignora el registro actual)
+  - `app/Http/Controllers/Farmacia/FarmaciaController.php:42` — Store
+  - `app/Http/Controllers/Farmacia/FarmaciaController.php:66` — Update (ignora el registro actual)
 
 ### 2.3 Contactos se eliminan en cascada con la farmacia
 
@@ -154,6 +154,13 @@
 - **Cómo funciona**: El endpoint `GET /farmacias` permite buscar por `search` que aplica LIKE sobre `nombre`, `direccion` y `telefono` simultáneamente.
 - **Dónde se aplica**:
   - `app/Http/Controllers/Farmacia/FarmaciaController.php:15-22` — Búsqueda con `orWhere`
+
+### 2.7 Todas las farmacias con `per_page=-1`
+
+- **Cómo funciona**: El endpoint `GET /farmacias` acepta el parámetro `per_page=-1` para devolver **todas** las farmacias sin paginación, usado por el mapa interactivo del frontend (Leaflet + circleMarkers). Cuando se omite o tiene otro valor, funciona con paginación normal (15 por defecto).
+- **Dónde se aplica**:
+  - `app/Http/Controllers/Farmacia/FarmaciaController.php:24-30` — Bloque `if ($request->get('per_page') == -1)`
+  - `frontenda_distribuidora/js/modules/farmacias.js` — Constante `FARMACIAS_ALL = '/farmacias?per_page=-1'`
 
 ---
 
@@ -545,9 +552,9 @@
 
 ### 12.2 Paginación por defecto: 15 registros
 
-- **Cómo funciona**: Todos los endpoints de listado usan `$request->per_page ?? 15` como tamaño de página predeterminado.
+- **Cómo funciona**: Todos los endpoints de listado usan `$request->per_page ?? 15` como tamaño de página predeterminado. Excepción: Farmacias acepta `per_page=-1` para devolver todas sin paginar (regla 2.7).
 - **Dónde se aplica**:
-  - Múltiples controladores: `UsuarioController:31`, `FarmaciaController:25`, `PedidoController:34`, `RepartidorController:29`, `VehiculoController:29`, `RutaController:17`, `ControlRutaController:40`, `DespachoController:37`
+  - Múltiples controladores: `UsuarioController:31`, `FarmaciaController:33`, `PedidoController:34`, `RepartidorController:29`, `VehiculoController:29`, `RutaController:17`, `ControlRutaController:40`, `DespachoController:37`
 
 ### 12.3 Patrón de historial de estados (4 entidades)
 
@@ -594,10 +601,11 @@
 
 ### 12.9 Sin inventario ni productos en pedidos
 
-- **Cómo funciona**: La entidad `Pedido` no tiene líneas de detalle, productos, cantidades ni precios. Es un registro simple que asocia una farmacia con un usuario y un estado, con observaciones opcionales en texto libre.
+- **Cómo funciona**: La entidad `Pedido` no tiene líneas de detalle, productos, cantidades ni precios. Es un registro simple que asocia una farmacia con un usuario y un estado, con observaciones opcionales en texto libre. El frontend ya no incluye la sección de productos en el formulario de pedidos — se eliminó junto con los módulos huérfanos del backend (Productos, Inventario, etc.).
 - **Dónde se aplica**:
   - Migración: `database/migrations/2024_01_03_000001_create_pedidos_table.php` — Sin tabla de detalle de pedido
   - Controlador: `PedidoController` — Sin lógica de productos
+  - `frontenda_distribuidora/js/modules/pedidos.js` — Sección de detalle/productos eliminada del formulario (commit de limpieza)
 
 ### 12.10 Protección de token inválido en frontend
 
@@ -608,9 +616,9 @@
 
 ### 12.11 Sidebar dinámico según permisos
 
-- **Cómo funciona**: El menú lateral del frontend se filtra según los permisos del usuario. Cada ítem tiene un `moduleKey` y solo se muestra si el usuario tiene el permiso `{moduleKey},acceder`. Si el usuario no tiene ningún permiso, se recargan desde el servidor.
+- **Cómo funciona**: El menú lateral del frontend se filtra según los permisos del usuario. Cada ítem tiene un `moduleKey` y solo se muestra si el usuario tiene el permiso `{moduleKey},acceder`. Si el usuario no tiene ningún permiso, se recargan desde el servidor. La sección "Inventario" (Productos, Inventario, Almacenes, Compras, Devoluciones, Promociones) fue eliminada del sidebar junto con los módulos huérfanos del backend.
 - **Dónde se aplica**:
-  - `frontenda_distribuidora/js/layout.js:55-59` — Filtro `hasPermission(item.moduleKey, 'acceder')`
+  - `frontenda_distribuidora/js/layout.js:56-60` — Filtro `hasPermission(item.moduleKey, 'acceder')`
   - `frontenda_distribuidora/js/layout.js:32-34` — Recarga de permisos si está vacío
 
 ### 12.12 Dashboard verifica permiso de acceso

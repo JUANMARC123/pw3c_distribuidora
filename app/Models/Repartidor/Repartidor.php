@@ -49,4 +49,16 @@ class Repartidor extends Model
     {
         return $this->hasMany(\App\Models\Logistica\ControlRuta::class, 'id_repartidor');
     }
+
+    public function vehiculoActual()
+    {
+        return $this->hasOneThrough(
+            \App\Models\Vehiculo\Vehiculo::class,
+            \App\Models\Logistica\ControlRuta::class,
+            'id_repartidor',
+            'id_vehiculo',
+            'id_repartidor',
+            'id_vehiculo'
+        )->latest('fecha_ruta');
+    }
 }

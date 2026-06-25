@@ -12,7 +12,8 @@ class PedidoController extends ApiController
 {
     public function index(Request $request)
     {
-        $query = Pedido::with('farmacia', 'usuario', 'estado');
+        $query = Pedido::with('farmacia', 'usuario', 'estado')
+            ->withCount('detalles');
 
         if ($request->filled('id_estado_pedido')) {
             $query->where('id_estado_pedido', $request->id_estado_pedido);
@@ -69,6 +70,8 @@ class PedidoController extends ApiController
             'estado',
             'historiales.estado',
             'despacho',
+            'detalles.producto',
+            'detalles.estado',
         ])->findOrFail($id);
 
         return $this->jsonResponse($pedido);

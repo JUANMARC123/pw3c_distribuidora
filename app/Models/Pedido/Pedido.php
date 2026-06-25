@@ -18,6 +18,9 @@ class Pedido extends Model
         'id_estado_pedido',
         'fecha_pedido',
         'observaciones',
+        'subtotal',
+        'descuento',
+        'total',
     ];
 
     protected $casts = [
@@ -47,5 +50,10 @@ class Pedido extends Model
     public function despacho()
     {
         return $this->hasOne(\App\Models\Despacho\Despacho::class, 'id_pedido');
+    }
+
+    public function detalles()
+    {
+        return $this->hasMany(DetallePedido::class, 'id_pedido');
     }
 }

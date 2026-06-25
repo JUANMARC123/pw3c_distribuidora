@@ -21,6 +21,14 @@ class FarmaciaController extends ApiController
         });
     }
 
+    if ($request->get('per_page') == -1) {
+        return response()->json([
+            'success' => true,
+            'message' => '',
+            'data' => $query->orderBy('nombre')->get()
+        ]);
+    }
+
     return $this->paginatedResponse(
         $query->orderBy('nombre')->paginate($request->per_page ?? 15)
     );
