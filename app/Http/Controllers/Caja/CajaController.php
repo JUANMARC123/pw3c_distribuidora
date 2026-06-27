@@ -16,7 +16,7 @@ class CajaController extends ApiController
     {
         $request->validate([
             'id_repartidor' => 'required|integer|exists:repartidores,id_repartidor',
-            'id_control_ruta' => 'required|integer|exists:control_rutas,id_control_ruta',
+            'id_control_ruta' => 'nullable|integer|exists:control_rutas,id_control_ruta',
             'monto_inicial' => 'required|numeric|min:0',
         ]);
 
@@ -48,6 +48,7 @@ class CajaController extends ApiController
             'id_caja' => 'required|integer|exists:caja_repartidor,id_caja',
             'monto' => 'required|numeric|min:0.01',
             'concepto' => 'nullable|string|max:255',
+            'descripcion' => 'nullable|string|max:255',
         ]);
 
         $caja = CajaRepartidor::findOrFail($request->id_caja);

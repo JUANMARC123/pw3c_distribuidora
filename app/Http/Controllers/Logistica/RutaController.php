@@ -13,8 +13,8 @@ class RutaController extends ApiController
     {
         $query = Ruta::withCount('paradas');
 
-        return $this->paginatedResponse(
-            $query->orderBy('nombre_ruta')->paginate($request->per_page ?? 15)
+        return $this->safePaginate(
+            $query->orderBy('nombre_ruta'), $request
         );
     }
 

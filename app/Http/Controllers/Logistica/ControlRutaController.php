@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Logistica;
 
 use App\Http\Controllers\ApiController;
 use App\Models\Logistica\ControlRuta;
+use App\Models\Logistica\HistorialEstadoRuta;
 use Illuminate\Http\Request;
 
 class ControlRutaController extends ApiController
@@ -36,8 +37,8 @@ class ControlRutaController extends ApiController
             $query->where('fecha_ruta', '<=', $request->fecha_hasta);
         }
 
-        return $this->paginatedResponse(
-            $query->orderBy('fecha_ruta', 'desc')->orderBy('hora_salida', 'desc')->paginate($request->per_page ?? 15)
+        return $this->safePaginate(
+            $query->orderBy('fecha_ruta', 'desc')->orderBy('hora_salida', 'desc'), $request
         );
     }
 
@@ -49,7 +50,10 @@ class ControlRutaController extends ApiController
             'hora_salida' => 'required|date_format:H:i:s',
             'id_repartidor' => 'required|integer|exists:repartidores,id_repartidor',
             'id_vehiculo' => 'required|integer|exists:vehiculos,id_vehiculo',
+            'id_estado_ruta' => 'sometimes|integer|exists:estados_ruta,id_estado_ruta',
         ]);
+
+        $data['id_estado_ruta'] = $data['id_estado_ruta'] ?? 1;
 
         $exists = ControlRuta::where('id_ruta', $data['id_ruta'])
             ->where('fecha_ruta', $data['fecha_ruta'])
@@ -60,6 +64,12 @@ class ControlRutaController extends ApiController
         }
 
         $control = ControlRuta::create($data);
+
+        HistorialEstadoRuta::create([
+            'id_control_ruta' => $control->id_control_ruta,
+            'id_estado_ruta' => $data['id_estado_ruta'],
+            'fecha_inicio' => now(),
+        ]);
 
         return $this->jsonResponse(
             $control->load('ruta', 'repartidor.usuario', 'vehiculo'),
@@ -88,7 +98,12 @@ class ControlRutaController extends ApiController
             'hora_salida' => 'sometimes|date_format:H:i:s',
             'id_repartidor' => 'sometimes|integer|exists:repartidores,id_repartidor',
             'id_vehiculo' => 'sometimes|integer|exists:vehiculos,id_vehiculo',
+            'id_estado_ruta' => 'sometimes|integer|exists:estados_ruta,id_estado_ruta',
         ]);
+
+        if (isset($data['id_estado_ruta']) && (int) $data['id_estado_ruta'] !== (int) $control->id_estado_ruta) {
+            $this->registrarHistorialEstado($control->id_control_ruta, (int) $data['id_estado_ruta']);
+        }
 
         $control->update($data);
 
@@ -109,15 +124,38 @@ class ControlRutaController extends ApiController
     public function registrarLlegada(Request $request, $id)
     {
         $request->validate([
-            'hora_llegada_real' => 'required|date_format:H:i:s',
+            'hora_llegada_real' => 'nullable|date_format:H:i:s',
         ]);
 
         $control = ControlRuta::findOrFail($id);
-        $control->update(['hora_llegada_real' => $request->hora_llegada_real]);
+        $control->update([
+            'hora_llegada_real' => $request->hora_llegada_real ?? now()->format('H:i:s'),
+            'id_estado_ruta' => 4,
+        ]);
+
+        $this->registrarHistorialEstado($control->id_control_ruta, 4);
 
         return $this->jsonResponse(
             $control->load('ruta', 'repartidor.usuario', 'vehiculo'),
             'Hora de llegada registrada exitosamente.'
         );
+    }
+
+    private function registrarHistorialEstado(int $idControlRuta, int $idEstadoRuta): void
+    {
+        $historialActual = HistorialEstadoRuta::where('id_control_ruta', $idControlRuta)
+            ->whereNull('fecha_fin')
+            ->latest('fecha_inicio')
+            ->first();
+
+        if ($historialActual) {
+            $historialActual->update(['fecha_fin' => now()]);
+        }
+
+        HistorialEstadoRuta::create([
+            'id_control_ruta' => $idControlRuta,
+            'id_estado_ruta' => $idEstadoRuta,
+            'fecha_inicio' => now(),
+        ]);
     }
 }

@@ -21,16 +21,8 @@ class FarmaciaController extends ApiController
         });
     }
 
-    if ($request->get('per_page') == -1) {
-        return response()->json([
-            'success' => true,
-            'message' => '',
-            'data' => $query->orderBy('nombre')->get()
-        ]);
-    }
-
-    return $this->paginatedResponse(
-        $query->orderBy('nombre')->paginate($request->per_page ?? 15)
+    return $this->safePaginate(
+        $query->orderBy('nombre'), $request
     );
 }
     public function store(Request $request)
@@ -40,8 +32,8 @@ class FarmaciaController extends ApiController
             'direccion' => 'required|string',
             'telefono' => 'required|string|max:20',
             'email' => 'nullable|email|max:180|unique:farmacias,email',
-            'latitud' => 'required|numeric|between:-90,90',
-            'longitud' => 'required|numeric|between:-180,180',
+            'latitud' => 'nullable|numeric|between:-90,90',
+            'longitud' => 'nullable|numeric|between:-180,180',
         ]);
 
         $farmacia = Farmacia::create($data);
@@ -64,8 +56,8 @@ class FarmaciaController extends ApiController
             'direccion' => 'sometimes|string',
             'telefono' => 'sometimes|string|max:20',
             'email' => 'nullable|email|max:180|unique:farmacias,email,' . $id . ',id_farmacia',
-            'latitud' => 'sometimes|numeric|between:-90,90',
-            'longitud' => 'sometimes|numeric|between:-180,180',
+            'latitud' => 'sometimes|nullable|numeric|between:-90,90',
+            'longitud' => 'sometimes|nullable|numeric|between:-180,180',
         ]);
 
         $farmacia->update($data);

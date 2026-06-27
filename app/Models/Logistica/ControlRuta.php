@@ -48,6 +48,11 @@ class ControlRuta extends Model
         return $this->hasMany(\App\Models\Despacho\Despacho::class, 'id_control_ruta');
     }
 
+    public function paradasEjecucion()
+    {
+        return $this->hasMany(ControlRutaParada::class, 'id_control_ruta')->orderBy('orden_parada');
+    }
+
     public function estado()
     {
         return $this->belongsTo(EstadoRuta::class, 'id_estado_ruta');

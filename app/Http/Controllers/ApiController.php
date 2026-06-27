@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
@@ -41,5 +43,18 @@ class ApiController extends Controller
                 'total' => $paginator->total(),
             ],
         ]);
+    }
+
+    protected function safePaginate(Builder $query, Request $request, int $defaultPerPage = 15): JsonResponse
+    {
+        $perPage = $request->per_page ?? $defaultPerPage;
+
+        if ($perPage == -1 || $perPage === '-1') {
+            return $this->jsonResponse($query->get());
+        }
+
+        return $this->paginatedResponse(
+            $query->paginate((int) $perPage)
+        );
     }
 }

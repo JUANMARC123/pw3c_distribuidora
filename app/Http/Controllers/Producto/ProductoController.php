@@ -21,12 +21,8 @@ class ProductoController extends ApiController
             $query->where('estado', $request->estado);
         }
 
-        if ($request->per_page === '-1') {
-            return $this->jsonResponse($query->orderBy('nombre')->get());
-        }
-
-        return $this->paginatedResponse(
-            $query->orderBy('nombre')->paginate($request->per_page ?? 15)
+        return $this->safePaginate(
+            $query->orderBy('nombre'), $request
         );
     }
 

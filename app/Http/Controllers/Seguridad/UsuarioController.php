@@ -27,8 +27,8 @@ class UsuarioController extends ApiController
             $query->where('id_estado_usuario', $request->id_estado_usuario);
         }
 
-        return $this->paginatedResponse(
-            $query->orderBy('id_usuario', 'desc')->paginate($request->per_page ?? 15)
+        return $this->safePaginate(
+            $query->orderBy('id_usuario', 'desc'), $request
         );
     }
 

@@ -21,6 +21,7 @@ class Pedido extends Model
         'subtotal',
         'descuento',
         'total',
+        'archivo_pedido',
     ];
 
     protected $casts = [

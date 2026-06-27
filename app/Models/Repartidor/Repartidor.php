@@ -18,6 +18,7 @@ class Repartidor extends Model
         'id_extension_ci',
         'id_licencia',
         'id_estado_repartidor',
+        'firebase_uid',
     ];
 
     public function usuario()
@@ -50,7 +51,34 @@ class Repartidor extends Model
         return $this->hasMany(\App\Models\Logistica\ControlRuta::class, 'id_repartidor');
     }
 
+    public function asignacionesVehiculo()
+    {
+        return $this->hasMany(\App\Models\Logistica\AsignacionVehiculoRepartidor::class, 'id_repartidor');
+    }
+
+    public function asignacionVehiculoActiva()
+    {
+        return $this->hasOne(\App\Models\Logistica\AsignacionVehiculoRepartidor::class, 'id_repartidor')
+            ->where('activo', true)
+            ->whereNull('fecha_fin')
+            ->latestOfMany('fecha_inicio');
+    }
+
     public function vehiculoActual()
+    {
+        return $this->hasOneThrough(
+            \App\Models\Vehiculo\Vehiculo::class,
+            \App\Models\Logistica\AsignacionVehiculoRepartidor::class,
+            'id_repartidor',
+            'id_vehiculo',
+            'id_repartidor',
+            'id_vehiculo'
+        )
+            ->where('asignaciones_vehiculo_repartidor.activo', true)
+            ->whereNull('asignaciones_vehiculo_repartidor.fecha_fin');
+    }
+
+    public function ultimoVehiculoUsado()
     {
         return $this->hasOneThrough(
             \App\Models\Vehiculo\Vehiculo::class,

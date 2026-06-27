@@ -43,4 +43,17 @@ class Vehiculo extends Model
     {
         return $this->hasMany(\App\Models\Logistica\ControlRuta::class, 'id_vehiculo');
     }
+
+    public function asignacionesRepartidor()
+    {
+        return $this->hasMany(\App\Models\Logistica\AsignacionVehiculoRepartidor::class, 'id_vehiculo');
+    }
+
+    public function asignacionActiva()
+    {
+        return $this->hasOne(\App\Models\Logistica\AsignacionVehiculoRepartidor::class, 'id_vehiculo')
+            ->where('activo', true)
+            ->whereNull('fecha_fin')
+            ->latestOfMany('fecha_inicio');
+    }
 }

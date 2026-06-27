@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Pedido;
 use App\Http\Controllers\ApiController;
 use App\Models\Pedido\Pedido;
 use App\Models\Pedido\HistorialEstadoPedido;
+use App\Services\Pedido\PedidoPdfExtractor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\QueryException;
 
 class PedidoController extends ApiController
@@ -31,8 +33,8 @@ class PedidoController extends ApiController
             $query->where('fecha_pedido', '<=', $request->fecha_hasta . ' 23:59:59');
         }
 
-        return $this->paginatedResponse(
-            $query->orderBy('fecha_pedido', 'desc')->paginate($request->per_page ?? 15)
+        return $this->safePaginate(
+            $query->orderBy('fecha_pedido', 'desc'), $request
         );
     }
 
@@ -43,6 +45,9 @@ class PedidoController extends ApiController
             'id_usuario' => 'required|integer|exists:usuarios,id_usuario',
             'id_estado_pedido' => 'required|integer|exists:estados_pedido,id_estado_pedido',
             'observaciones' => 'nullable|string',
+            'subtotal' => 'sometimes|numeric|min:0',
+            'descuento' => 'sometimes|numeric|min:0',
+            'total' => 'sometimes|numeric|min:0',
         ]);
 
         $data['fecha_pedido'] = now();
@@ -83,8 +88,29 @@ class PedidoController extends ApiController
 
         $data = $request->validate([
             'id_farmacia' => 'sometimes|integer|exists:farmacias,id_farmacia',
+            'id_estado_pedido' => 'sometimes|integer|exists:estados_pedido,id_estado_pedido',
             'observaciones' => 'nullable|string',
+            'subtotal' => 'sometimes|numeric|min:0',
+            'descuento' => 'sometimes|numeric|min:0',
+            'total' => 'sometimes|numeric|min:0',
         ]);
+
+        if (isset($data['id_estado_pedido']) && (int) $data['id_estado_pedido'] !== (int) $pedido->id_estado_pedido) {
+            $historialActual = HistorialEstadoPedido::where('id_pedido', $id)
+                ->whereNull('fecha_fin')
+                ->latest('fecha_inicio')
+                ->first();
+
+            if ($historialActual) {
+                $historialActual->update(['fecha_fin' => now()]);
+            }
+
+            HistorialEstadoPedido::create([
+                'id_pedido' => $id,
+                'id_estado_pedido' => $data['id_estado_pedido'],
+                'fecha_inicio' => now(),
+            ]);
+        }
 
         $pedido->update($data);
 
@@ -113,7 +139,61 @@ class PedidoController extends ApiController
 
         throw $e;
     }
-}
+    }
+
+    public function extraerPdf(Request $request, PedidoPdfExtractor $extractor)
+    {
+        $request->validate([
+            'archivo' => 'required|file|mimes:pdf|max:10240',
+        ]);
+
+        try {
+            $productos = $extractor->extraer($request->file('archivo')->getRealPath());
+        } catch (\Throwable $e) {
+            return $this->errorResponse('No se pudo procesar el PDF: ' . $e->getMessage(), 422);
+        }
+
+        return $this->jsonResponse([
+            'productos' => $productos,
+        ], count($productos) ? 'Productos detectados.' : 'No se detectaron productos en el PDF.');
+    }
+
+    public function subirArchivo(Request $request, $id)
+    {
+        $pedido = Pedido::findOrFail($id);
+
+        $request->validate([
+            'archivo' => 'required|file|mimes:pdf|max:10240',
+        ]);
+
+        if ($request->hasFile('archivo')) {
+            if ($pedido->archivo_pedido && Storage::disk('public')->exists($pedido->archivo_pedido)) {
+                Storage::disk('public')->delete($pedido->archivo_pedido);
+            }
+
+            $path = $request->file('archivo')->store('pedidos/' . $id, 'public');
+            $pedido->update(['archivo_pedido' => $path]);
+
+            return $this->jsonResponse([
+                'archivo_pedido' => $path,
+                'url' => Storage::disk('public')->url($path),
+            ], 'Archivo subido exitosamente.');
+        }
+
+        return response()->json(['success' => false, 'message' => 'No se recibió ningún archivo.'], 400);
+    }
+
+    public function descargarArchivo($id)
+    {
+        $pedido = Pedido::findOrFail($id);
+
+        if (!$pedido->archivo_pedido || !Storage::disk('public')->exists($pedido->archivo_pedido)) {
+            return response()->json(['success' => false, 'message' => 'El pedido no tiene archivo adjunto.'], 404);
+        }
+
+        $path = Storage::disk('public')->path($pedido->archivo_pedido);
+        return response()->file($path, ['Content-Type' => 'application/pdf']);
+    }
 
     public function cambiarEstado(Request $request, $id)
     {

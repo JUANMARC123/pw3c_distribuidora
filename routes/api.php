@@ -9,6 +9,7 @@ use App\Http\Controllers\Farmacia\FarmaciaController;
 use App\Http\Controllers\Farmacia\ContactoFarmaciaController;
 use App\Http\Controllers\Pedido\PedidoController;
 use App\Http\Controllers\Repartidor\RepartidorController;
+use App\Http\Controllers\Repartidor\RepartidorVehiculoController;
 use App\Http\Controllers\Vehiculo\VehiculoController;
 use App\Http\Controllers\Logistica\RutaController;
 use App\Http\Controllers\Logistica\ControlRutaController;
@@ -51,7 +52,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('productos', ProductoController::class)->middleware('permission:Productos');
 
     // Módulo: Pedidos
+    Route::post('pedidos/extraer-pdf', [PedidoController::class, 'extraerPdf'])->middleware('permission:Pedidos,crear');
     Route::post('pedidos/{pedido}/cambiar-estado', [PedidoController::class, 'cambiarEstado'])->middleware('permission:Pedidos,cambiar-estado');
+    Route::post('pedidos/{pedido}/subir-archivo', [PedidoController::class, 'subirArchivo'])->middleware('permission:Pedidos,editar');
+    Route::get('pedidos/{pedido}/descargar-archivo', [PedidoController::class, 'descargarArchivo'])->middleware('permission:Pedidos,listar');
     Route::apiResource('pedidos', PedidoController::class)->middleware('permission:Pedidos');
     Route::get('pedidos/{pedido}/detalles', [DetallePedidoController::class, 'index'])->middleware('permission:Pedidos,listar');
     Route::post('pedidos/{pedido}/detalles', [DetallePedidoController::class, 'store'])->middleware('permission:Pedidos,crear');
@@ -61,6 +65,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Módulo: Repartidores
     Route::post('repartidores/{repartidor}/cambiar-estado', [RepartidorController::class, 'cambiarEstado'])->middleware('permission:Repartidores,cambiar-estado');
+    Route::get('repartidores/{repartidor}/asignacion-vehiculo', [RepartidorVehiculoController::class, 'show'])->middleware('permission:Repartidores,listar');
+    Route::post('repartidores/{repartidor}/asignacion-vehiculo', [RepartidorVehiculoController::class, 'store'])->middleware('permission:Repartidores,editar');
+    Route::delete('repartidores/{repartidor}/asignacion-vehiculo', [RepartidorVehiculoController::class, 'destroy'])->middleware('permission:Repartidores,editar');
     Route::apiResource('repartidores', RepartidorController::class)->middleware('permission:Repartidores');
 
     // Módulo: Vehículos
