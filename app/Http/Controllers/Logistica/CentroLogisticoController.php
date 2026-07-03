@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers\Logistica;
 
+use App\Events\RutaIniciada;
+use App\Events\EntregaCompletada;
+use App\Events\EntregaFallida;
+use App\Events\DevolucionProducto;
+use App\Events\RepartidorRegresa;
 use App\Http\Controllers\ApiController;
 use App\Models\Despacho\Despacho;
 use App\Models\Logistica\ControlRuta;
@@ -25,11 +30,7 @@ class CentroLogisticoController extends ApiController
             'detalles.estado',
         ])
             ->whereDoesntHave('despacho')
-            ->whereIn('id_estado_pedido', function ($q) {
-                $q->select('id_estado_pedido')
-                    ->from('estados_pedido')
-                    ->whereIn('nombre_estado', ['Aprobado', 'En preparacion']);
-            })
+            ->where('id_estado_pedido', 2)
             ->orderBy('fecha_pedido', 'asc')
             ->get();
 
@@ -201,16 +202,20 @@ class CentroLogisticoController extends ApiController
                         'hora_estimada' => $horaEstimada,
                     ]);
 
-                    Despacho::create([
+                    $despacho = Despacho::create([
                         'id_pedido' => $pedido->id_pedido,
                         'id_parada' => $parada->id_parada,
                         'id_control_ruta' => $controlRuta->id_control_ruta,
                         'fecha_hora_despacho' => now(),
                         'id_estado_despacho' => 1,
                     ]);
-
-                    $pedido->update(['id_estado_pedido' => 4]);
                 }
+
+                event(new RutaIniciada(
+                    $controlRuta,
+                    $pedidoIds->toArray(),
+                    (int) $vehiculoId
+                ));
 
                 if ($request->filled('id_planificacion')) {
                     PlanificacionRuta::where('id_planificacion', $request->id_planificacion)->update([
@@ -219,8 +224,6 @@ class CentroLogisticoController extends ApiController
                         'fecha_confirmacion' => now(),
                     ]);
                 }
-
-                $repartidor->update(['id_estado_repartidor' => 2]);
 
                 return $this->jsonResponse([
                     'id_control_ruta' => $controlRuta->id_control_ruta,
@@ -251,7 +254,7 @@ class CentroLogisticoController extends ApiController
             ->map(function ($r) {
                 $totalDespachos = $r->despachos->count();
                 $completados = $r->despachos->filter(function ($d) {
-                    return in_array($d->estado->nombre_estado ?? '', ['Entregado', 'Fallido'], true);
+                    return in_array($d->estado->nombre_estado ?? '', ['Entregado completo', 'Fallido', 'Devolucion'], true);
                 })->count();
                 $repartidor = $r->repartidor;
                 $vehiculo = $r->vehiculo;
@@ -291,6 +294,67 @@ class CentroLogisticoController extends ApiController
             });
 
         return $this->jsonResponse($rutas);
+    }
+
+    public function marcarEntregaCompletada(Request $request, $idControlRuta)
+    {
+        $request->validate([
+            'id_parada' => 'required|integer|exists:control_ruta_paradas,id_control_ruta_parada',
+            'id_despacho' => 'required|integer|exists:despachos,id_despacho',
+            'id_pedido' => 'required|integer|exists:pedidos,id_pedido',
+        ]);
+
+        $parada = ControlRutaParada::findOrFail($request->id_parada);
+
+        event(new EntregaCompletada($parada, (int) $request->id_despacho, (int) $request->id_pedido));
+
+        return $this->jsonResponse(null, 'Entrega marcada como completada.');
+    }
+
+    public function marcarEntregaFallida(Request $request, $idControlRuta)
+    {
+        $request->validate([
+            'id_parada' => 'required|integer|exists:control_ruta_paradas,id_control_ruta_parada',
+            'id_despacho' => 'required|integer|exists:despachos,id_despacho',
+            'id_pedido' => 'required|integer|exists:pedidos,id_pedido',
+            'motivo' => 'nullable|string|max:500',
+        ]);
+
+        $parada = ControlRutaParada::findOrFail($request->id_parada);
+
+        event(new EntregaFallida($parada, (int) $request->id_despacho, (int) $request->id_pedido, $request->motivo ?? ''));
+
+        return $this->jsonResponse(null, 'Entrega marcada como fallida.');
+    }
+
+    public function marcarDevolucion(Request $request, $idControlRuta)
+    {
+        $request->validate([
+            'id_parada' => 'required|integer|exists:control_ruta_paradas,id_control_ruta_parada',
+            'id_despacho' => 'required|integer|exists:despachos,id_despacho',
+            'id_pedido' => 'required|integer|exists:pedidos,id_pedido',
+        ]);
+
+        $parada = ControlRutaParada::findOrFail($request->id_parada);
+
+        event(new DevolucionProducto($parada, (int) $request->id_despacho, (int) $request->id_pedido));
+
+        return $this->jsonResponse(null, 'Devolucion registrada.');
+    }
+
+    public function marcarRegresoAlmacen(Request $request, $idControlRuta)
+    {
+        $control = ControlRuta::with('repartidor')->findOrFail($idControlRuta);
+        $repartidor = $control->repartidor;
+
+        $asignacion = $repartidor->asignacionVehiculoActiva;
+        $vehiculoId = $asignacion->id_vehiculo ?? 0;
+
+        event(new RepartidorRegresa($control, $repartidor->id_repartidor, $vehiculoId));
+
+        $control->update(['id_estado_ruta' => 4]);
+
+        return $this->jsonResponse(null, 'Regreso al almacen registrado.');
     }
 
     public function detalleRutaActiva($id)

@@ -107,6 +107,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('planificacion/confirmar', [CentroLogisticoController::class, 'confirmarRuta']);
         Route::get('rutas-activas', [CentroLogisticoController::class, 'rutasActivas']);
         Route::get('rutas-activas/{id}', [CentroLogisticoController::class, 'detalleRutaActiva']);
+        Route::post('rutas-activas/{id}/entrega-completada', [CentroLogisticoController::class, 'marcarEntregaCompletada']);
+        Route::post('rutas-activas/{id}/entrega-fallida', [CentroLogisticoController::class, 'marcarEntregaFallida']);
+        Route::post('rutas-activas/{id}/devolucion', [CentroLogisticoController::class, 'marcarDevolucion']);
+        Route::post('rutas-activas/{id}/regreso-almacen', [CentroLogisticoController::class, 'marcarRegresoAlmacen']);
     });
 
     // Módulo: Reportes

@@ -166,13 +166,15 @@
 
 ## 3. Módulo de Pedidos
 
-### 3.1 Máquina de estados de pedidos (6 estados)
+### 3.1 Máquina de estados de pedidos (5 estados)
 
-- **Cómo funciona**: Los pedidos pueden estar en uno de 6 estados: Pendiente, Aprobado, En preparacion, Despachado, Entregado, Cancelado. El sistema NO valida transiciones válidas/inválidas — cualquier estado puede cambiarse a cualquier otro mediante el endpoint `cambiarEstado`.
+- **Cómo funciona**: Los pedidos pueden estar en uno de 5 estados: Pendiente (id=1), En preparacion (id=2), En ruta (id=3), Entregado (id=4), Cancelado (id=5). El sistema NO valida transiciones válidas/inválidas manualmente — las transiciones ahora ocurren automáticamente mediante eventos del sistema (ver regla 12.8).
 - **Dónde se aplica**:
   - `database/seeders/CatalogoSeeder.php:180-187` — Definición de estados
   - `app/Http/Controllers/Pedido/PedidoController.php:115-144` — Método `cambiarEstado()` sin validación de transiciones
   - `routes/api.php:47` — Ruta `POST /pedidos/{pedido}/cambiar-estado`
+  - Eventos: `app/Events/RutaIniciada.php`, `app/Events/EntregaCompletada.php`, `app/Events/EntregaFallida.php`, `app/Events/DevolucionProducto.php`
+  - Listeners: `app/Listeners/ActualizarEstadoPedidosListener.php`
 
 ### 3.2 Historial de cambios de estado
 
@@ -388,12 +390,14 @@
 
 ## 8. Módulo de Despachos
 
-### 8.1 Máquina de estados de despachos (4 estados)
+### 8.1 Máquina de estados de despachos (5 estados)
 
-- **Cómo funciona**: Los despachos pueden estar en Pendiente, En camino, Entregado o Fallido. Sin validación de transiciones.
+- **Cómo funciona**: Los despachos pueden estar en Pendiente (id=1), En camino (id=2), Entregado completo (id=3), Fallido (id=4) o Devolucion (id=5). Las transiciones ahora ocurren automáticamente mediante eventos del sistema (ver regla 12.8).
 - **Dónde se aplica**:
   - `database/seeders/CatalogoSeeder.php:201-206` — Estados semilla
   - `app/Http/Controllers/Despacho/DespachoController.php:110-139` — `cambiarEstado()`
+  - Eventos: `app/Events/EntregaCompletada.php`, `app/Events/EntregaFallida.php`, `app/Events/DevolucionProducto.php`
+  - Listeners: `app/Listeners/ActualizarEstadoDespachoListener.php`
 
 ### 8.2 Fecha/hora de despacho automática
 
@@ -587,17 +591,29 @@
   - Ningún modelo usa `SoftDeletes` trait
   - Ninguna migración incluye `softDeletes()`
 
-### 12.7 Sin validación de transiciones entre estados
+### 12.7 Sin validación de transiciones entre estados (manual)
 
-- **Cómo funciona**: En las 4 máquinas de estado (Pedido, Repartidor, Vehículo, Despacho), no hay lógica que valide si una transición es válida. Por ejemplo, un pedido puede pasar de "Entregado" a "Cancelado" o viceversa sin restricciones.
+- **Cómo funciona**: En las 4 máquinas de estado (Pedido, Repartidor, Vehículo, Despacho), el endpoint manual `cambiarEstado()` no valida si una transición es válida. Sin embargo, las transiciones automáticas gestionadas por eventos del sistema (regla 12.8) siguen reglas de negocio definidas. Por ejemplo, al completar una entrega, el evento `EntregaCompletada` cambia el pedido a "Entregado" (id=4) y el despacho a "Entregado completo" (id=3), siguiendo el flujo de trabajo esperado.
 - **Dónde se aplica**:
   - Ausencia de validación en todos los métodos `cambiarEstado()` de los 4 controladores
+  - Transiciones automáticas gestionadas por listeners en `app/Listeners/`
 
-### 12.8 Sin eventos de modelo (boot methods)
+### 12.8 Transiciones automáticas mediante eventos del sistema
 
-- **Cómo funciona**: Ningún modelo utiliza eventos de Eloquent (creating, created, updating, etc.) para lógica automática como logging, cambios en cascada entre entidades o notificaciones.
+- **Cómo funciona**: El sistema utiliza eventos de Laravel (`Event::subscribe()`) para automatizar cambios de estado cuando ocurren acciones en el flujo logístico. Los eventos son disparados desde `CentroLogisticoController` y gestionados por listeners especializados. Actualmente hay 5 eventos implementados:
+
+| Evento | Escenario | Efectos Automáticos |
+|--------|-----------|---------------------|
+| `RutaIniciada` | Se confirma una ruta con pedidos | Pedidos → "En ruta" (id=3), Repartidor → "En ruta" (id=2), Vehículo → "En movimiento" (id=4), Despachos → "En camino" (id=2) |
+| `EntregaCompletada` | Repartidor marca entrega exitosa | Pedido → "Entregado" (id=4), Despacho → "Entregado completo" (id=3), Captura `hora_llegada` en parada |
+| `EntregaFallida` | Repartidor reporta falla/incidencia | Pedido → "Cancelado" (id=5), Despacho → "Fallido" (id=4), Captura `hora_llegada` en parada |
+| `DevolucionProducto` | Cliente devuelve producto | Pedido → "Entregado" (id=4), Despacho → "Devolucion" (id=5), Captura `hora_llegada` en parada |
+| `RepartidorRegresa` | Repartidor vuelve al almacén | Repartidor → "Disponible" (id=1), Vehículo → "Operativo" (id=1) |
+
 - **Dónde se aplica**:
-  - Ausencia de `boot()` methods en todos los modelos
+  - Eventos: `app/Events/RutaIniciada.php`, `app/Events/EntregaCompletada.php`, `app/Events/EntregaFallida.php`, `app/Events/DevolucionProducto.php`, `app/Events/RepartidorRegresa.php`
+  - Listeners: `app/Listeners/ActualizarEstadoPedidosListener.php`, `app/Listeners/ActualizarEstadoRepartidorListener.php`, `app/Listeners/ActualizarEstadoVehiculoListener.php`, `app/Listeners/ActualizarEstadoDespachoListener.php`, `app/Listeners/RegistrarLlegadaParadaListener.php`
+  - Registro: `app/Providers/EventServiceProvider.php` — Método `boot()` con `Event::subscribe()`
 
 ### 12.9 Sin inventario ni productos en pedidos
 
@@ -631,12 +647,12 @@
 
 ## Resumen de Máquinas de Estado
 
-| Entidad | Estados Posibles | Validación de Transiciones |
-|---------|-----------------|---------------------------|
-| **Pedido** | Pendiente → Aprobado → En preparacion → Despachado → Entregado / Cancelado | ❌ No validada |
-| **Repartidor** | Disponible → En ruta → Inactivo | ❌ No validada |
-| **Vehículo** | Operativo → En mantenimiento → Fuera de servicio | ❌ No validada |
-| **Despacho** | Pendiente → En camino → Entregado / Fallido | ❌ No validada |
+| Entidad | Estados Posibles | Transiciones Manuales | Transiciones Automáticas (Eventos) |
+|---------|-----------------|----------------------|-----------------------------------|
+| **Pedido** | Pendiente (1) → En preparacion (2) → En ruta (3) → Entregado (4) / Cancelado (5) | ❌ Sin validación | ✅ RutaIniciada→(3), EntregaCompletada→(4), EntregaFallida→(5), Devolucion→(4) |
+| **Repartidor** | Disponible (1) → En ruta (2) → Inactivo (3) | ❌ Sin validación | ✅ RutaIniciada→(2), RepartidorRegresa→(1) |
+| **Vehículo** | Operativo (1) → En mantenimiento (2) → Fuera de servicio (3) → En movimiento (4) | ❌ Sin validación | ✅ RutaIniciada→(4), RepartidorRegresa→(1) |
+| **Despacho** | Pendiente (1) → En camino (2) → Entregado completo (3) / Fallido (4) / Devolucion (5) | ❌ Sin validación | ✅ RutaIniciada→(2), EntregaCompletada→(3), EntregaFallida→(4), Devolucion→(5) |
 
 ## Resumen de Roles y Permisos Base
 

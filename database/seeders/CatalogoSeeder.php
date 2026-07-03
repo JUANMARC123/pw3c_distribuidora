@@ -192,12 +192,11 @@ class CatalogoSeeder extends Seeder
         ]);
 
         EstadoPedido::insert([
-            ['nombre_estado' => 'Pendiente'],
-            ['nombre_estado' => 'Aprobado'],
-            ['nombre_estado' => 'En preparacion'],
-            ['nombre_estado' => 'Despachado'],
-            ['nombre_estado' => 'Entregado'],
-            ['nombre_estado' => 'Cancelado'],
+            ['nombre_estado' => 'Pendiente'],          // 1
+            ['nombre_estado' => 'En preparacion'],      // 2
+            ['nombre_estado' => 'En ruta'],             // 3
+            ['nombre_estado' => 'Entregado'],           // 4
+            ['nombre_estado' => 'Cancelado'],           // 5
         ]);
 
         EstadoRepartidor::insert([
@@ -215,7 +214,7 @@ class CatalogoSeeder extends Seeder
         EstadoDespacho::insert([
             ['nombre_estado' => 'Pendiente'],
             ['nombre_estado' => 'En camino'],
-            ['nombre_estado' => 'Entregado'],
+            ['nombre_estado' => 'Entregado completo'],
             ['nombre_estado' => 'Fallido'],
         ]);
 
