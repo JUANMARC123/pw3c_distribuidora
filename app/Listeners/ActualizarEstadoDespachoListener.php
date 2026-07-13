@@ -6,41 +6,42 @@ use App\Events\RutaIniciada;
 use App\Events\EntregaCompletada;
 use App\Events\EntregaFallida;
 use App\Events\DevolucionProducto;
-use App\Models\Despacho\Despacho;
+use App\Models\Despacho;
 
 class ActualizarEstadoDespachoListener
 {
-    public function onRutaIniciada(RutaIniciada $event): void
+    public function onRutaIniciada(RutaIniciada $event)
     {
-        Despacho::whereIn('id_pedido', $event->pedidoIds)
-            ->update(['id_estado_despacho' => 2]);
+        $detalleIds = $event->hojaRuta->detalles()->pluck('id_detalle');
+
+        Despacho::whereIn('id_detalle_hoja_ruta', $detalleIds)
+            ->where('estado_despacho', 'pendiente')
+            ->update(['estado_despacho' => 'pendiente']);
     }
 
-    public function onEntregaCompletada(EntregaCompletada $event): void
+    public function onEntregaCompletada(EntregaCompletada $event)
     {
         Despacho::where('id_despacho', $event->idDespacho)
-            ->update(['id_estado_despacho' => 3]);
+            ->update(['estado_despacho' => 'entregado']);
     }
 
-    public function onEntregaFallida(EntregaFallida $event): void
+    public function onEntregaFallida(EntregaFallida $event)
     {
         Despacho::where('id_despacho', $event->idDespacho)
-            ->update(['id_estado_despacho' => 4]);
+            ->update(['estado_despacho' => 'incidencia']);
     }
 
-    public function onDevolucionProducto(DevolucionProducto $event): void
+    public function onDevolucionProducto(DevolucionProducto $event)
     {
         Despacho::where('id_despacho', $event->idDespacho)
-            ->update(['id_estado_despacho' => 5]);
+            ->update(['estado_despacho' => 'incidencia']);
     }
 
-    public function subscribe($events): array
+    public function subscribe($events)
     {
-        return [
-            RutaIniciada::class => 'onRutaIniciada',
-            EntregaCompletada::class => 'onEntregaCompletada',
-            EntregaFallida::class => 'onEntregaFallida',
-            DevolucionProducto::class => 'onDevolucionProducto',
-        ];
+        $events->listen(RutaIniciada::class, [self::class, 'onRutaIniciada']);
+        $events->listen(EntregaCompletada::class, [self::class, 'onEntregaCompletada']);
+        $events->listen(EntregaFallida::class, [self::class, 'onEntregaFallida']);
+        $events->listen(DevolucionProducto::class, [self::class, 'onDevolucionProducto']);
     }
 }

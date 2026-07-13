@@ -2,7 +2,7 @@
 
 namespace App\Services\Pedido;
 
-use App\Models\Producto\Producto;
+use App\Models\Producto;
 use Smalot\PdfParser\Parser;
 
 class PedidoPdfExtractor
@@ -98,7 +98,7 @@ class PedidoPdfExtractor
     private function extraerNombreProducto(string $line): ?string
     {
         $cantidadPos = null;
-        if (preg_match('/(?:^|\s)(\d+(?:[.,]\d+)?)\s*-\s*(?:ud|und|unidad|unid|blt|cja|caja|pack)\b/i', $line, $match, PREG_OFFSET_CAPTURE)) {
+        if (preg_match('/(?:^|\s)(\d+(?:[.,]\d+)?)\s*[-–—]?\s*(?:ud|und|unidad|unid|blt|cja|caja|pack)\b/i', $line, $match, PREG_OFFSET_CAPTURE)) {
             $cantidadPos = $match[0][1];
         }
 
@@ -136,7 +136,7 @@ class PedidoPdfExtractor
 
     private function extraerCantidad(string $line): ?float
     {
-        if (preg_match('/(?:^|\s)(\d+(?:[.,]\d+)?)\s*-\s*(?:ud|und|unidad|unid|blt|cja|caja|pack)\b/i', $line, $match)) {
+        if (preg_match('/(?:^|\s)(\d+(?:[.,]\d+)?)\s*[-–—]?\s*(?:ud|und|unidad|unid|blt|cja|caja|pack)\b/i', $line, $match)) {
             return (float) str_replace(',', '.', $match[1]);
         }
 
@@ -149,7 +149,7 @@ class PedidoPdfExtractor
 
     private function extraerMontos(string $line): array
     {
-        preg_match_all('/(?<![A-Za-z])\d+[.,]\d{2}(?![A-Za-z])/', $line, $matches);
+        preg_match_all('/(?<![A-Za-z])\d+[.,]\d{1,2}(?![A-Za-z])/', $line, $matches);
 
         return collect($matches[0] ?? [])
             ->map(fn ($value) => (float) str_replace(',', '.', $value))

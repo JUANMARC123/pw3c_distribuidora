@@ -3,22 +3,21 @@
 namespace App\Http\Controllers\Pedido;
 
 use App\Http\Controllers\ApiController;
-use App\Models\Pedido\Pedido;
-use App\Models\Pedido\HistorialEstadoPedido;
+use App\Models\Pedido;
+use App\Models\DetallePedido;
 use App\Services\Pedido\PedidoPdfExtractor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\QueryException;
 
 class PedidoController extends ApiController
 {
     public function index(Request $request)
     {
-        $query = Pedido::with('farmacia', 'usuario', 'estado')
-            ->withCount('detalles');
+        $query = Pedido::with('farmacia', 'usuario', 'detalles.producto');
 
-        if ($request->filled('id_estado_pedido')) {
-            $query->where('id_estado_pedido', $request->id_estado_pedido);
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
         }
 
         if ($request->filled('id_farmacia')) {
@@ -33,38 +32,27 @@ class PedidoController extends ApiController
             $query->where('fecha_pedido', '<=', $request->fecha_hasta . ' 23:59:59');
         }
 
-        return $this->safePaginate(
-            $query->orderBy('fecha_pedido', 'desc'), $request
-        );
+        return $this->safePaginate($query->orderBy('fecha_pedido', 'desc'), $request);
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'id_farmacia' => 'required|integer|exists:farmacias,id_farmacia',
-            'id_usuario' => 'required|integer|exists:usuarios,id_usuario',
-            'id_estado_pedido' => 'required|integer|exists:estados_pedido,id_estado_pedido',
             'observaciones' => 'nullable|string',
-            'subtotal' => 'sometimes|numeric|min:0',
-            'descuento' => 'sometimes|numeric|min:0',
-            'total' => 'sometimes|numeric|min:0',
+            'subtotal' => 'nullable|numeric|min:0',
+            'descuento' => 'nullable|numeric|min:0',
+            'total' => 'nullable|numeric|min:0',
+            'archivo_pedido' => 'nullable|string',
         ]);
 
-        $data['fecha_pedido'] = now();
+        $validated['id_usuario'] = $request->user()->id_usuario;
+        $validated['estado'] = 'pendiente';
+        $validated['fecha_pedido'] = now();
 
-        $pedido = Pedido::create($data);
+        $pedido = Pedido::create($validated);
 
-        HistorialEstadoPedido::create([
-            'id_pedido' => $pedido->id_pedido,
-            'id_estado_pedido' => $data['id_estado_pedido'],
-            'fecha_inicio' => now(),
-        ]);
-
-        return $this->jsonResponse(
-            $pedido->load('farmacia', 'usuario', 'estado'),
-            'Pedido creado exitosamente.',
-            201
-        );
+        return $this->jsonResponse($pedido->load('farmacia', 'usuario'), 'Pedido creado exitosamente.', 201);
     }
 
     public function show($id)
@@ -72,11 +60,8 @@ class PedidoController extends ApiController
         $pedido = Pedido::with([
             'farmacia',
             'usuario',
-            'estado',
-            'historiales.estado',
-            'despacho',
             'detalles.producto',
-            'detalles.estado',
+            'despacho.hojaRutaDetalle.hojaRuta',
         ])->findOrFail($id);
 
         return $this->jsonResponse($pedido);
@@ -86,76 +71,61 @@ class PedidoController extends ApiController
     {
         $pedido = Pedido::findOrFail($id);
 
-        $data = $request->validate([
+        $validated = $request->validate([
             'id_farmacia' => 'sometimes|integer|exists:farmacias,id_farmacia',
-            'id_estado_pedido' => 'sometimes|integer|exists:estados_pedido,id_estado_pedido',
             'observaciones' => 'nullable|string',
-            'subtotal' => 'sometimes|numeric|min:0',
-            'descuento' => 'sometimes|numeric|min:0',
-            'total' => 'sometimes|numeric|min:0',
+            'estado' => 'sometimes|in:pendiente,aprobado,entregado,cancelado',
+            'metodo_pago' => 'nullable|in:efectivo,qr,transferencia,credito',
+            'subtotal' => 'nullable|numeric|min:0',
+            'descuento' => 'nullable|numeric|min:0',
+            'total' => 'nullable|numeric|min:0',
+            'archivo_pedido' => 'nullable|string',
         ]);
 
-        if (isset($data['id_estado_pedido']) && (int) $data['id_estado_pedido'] !== (int) $pedido->id_estado_pedido) {
-            $historialActual = HistorialEstadoPedido::where('id_pedido', $id)
-                ->whereNull('fecha_fin')
-                ->latest('fecha_inicio')
-                ->first();
+        $pedido->update($validated);
 
-            if ($historialActual) {
-                $historialActual->update(['fecha_fin' => now()]);
-            }
+        return $this->jsonResponse($pedido->load('farmacia', 'usuario'), 'Pedido actualizado exitosamente.');
+    }
 
-            HistorialEstadoPedido::create([
-                'id_pedido' => $id,
-                'id_estado_pedido' => $data['id_estado_pedido'],
-                'fecha_inicio' => now(),
-            ]);
+    public function destroy($id)
+    {
+        try {
+            $pedido = Pedido::findOrFail($id);
+            $pedido->detalles()->delete();
+            $pedido->delete();
+            return $this->jsonResponse(null, 'Pedido eliminado exitosamente.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('No se puede eliminar el pedido.', 409);
         }
-
-        $pedido->update($data);
-
-        return $this->jsonResponse(
-            $pedido->load('farmacia', 'usuario', 'estado'),
-            'Pedido actualizado exitosamente.'
-        );
     }
 
-   public function destroy($id)
-{
-    $pedido = Pedido::findOrFail($id);
+    public function cambiarEstado(Request $request, $id)
+    {
+        $pedido = Pedido::findOrFail($id);
 
-    try {
-        $pedido->delete();
+        $validated = $request->validate([
+            'estado' => 'required|in:pendiente,aprobado,entregado,cancelado',
+        ]);
 
-        return $this->jsonResponse(null, 'Pedido eliminado exitosamente.');
-    } catch (QueryException $e) {
-        if ($e->getCode() == 23000) {
-            return response()->json([
-                'success' => false,
-                'has_dispatch' => true,
-                'message' => 'No se puede eliminar este pedido porque tiene un despacho registrado.'
-            ], 409);
-        }
+        $pedido->update(['estado' => $validated['estado']]);
 
-        throw $e;
-    }
+        return $this->jsonResponse($pedido, 'Estado del pedido actualizado.');
     }
 
-    public function extraerPdf(Request $request, PedidoPdfExtractor $extractor)
+    public function extraerPdf(Request $request)
     {
         $request->validate([
             'archivo' => 'required|file|mimes:pdf|max:10240',
         ]);
 
         try {
-            $productos = $extractor->extraer($request->file('archivo')->getRealPath());
-        } catch (\Throwable $e) {
-            return $this->errorResponse('No se pudo procesar el PDF: ' . $e->getMessage(), 422);
-        }
+            $extractor = new PedidoPdfExtractor();
+            $resultado = $extractor->extraer($request->file('archivo'));
 
-        return $this->jsonResponse([
-            'productos' => $productos,
-        ], count($productos) ? 'Productos detectados.' : 'No se detectaron productos en el PDF.');
+            return $this->jsonResponse($resultado, 'PDF procesado exitosamente.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Error al procesar el PDF: ' . $e->getMessage(), 500);
+        }
     }
 
     public function subirArchivo(Request $request, $id)
@@ -166,21 +136,13 @@ class PedidoController extends ApiController
             'archivo' => 'required|file|mimes:pdf|max:10240',
         ]);
 
-        if ($request->hasFile('archivo')) {
-            if ($pedido->archivo_pedido && Storage::disk('public')->exists($pedido->archivo_pedido)) {
-                Storage::disk('public')->delete($pedido->archivo_pedido);
-            }
+        $archivo = $request->file('archivo');
+        $nombre = "pedido_{$id}_" . time() . ".pdf";
+        $ruta = $archivo->storeAs('pedidos', $nombre, 'public');
 
-            $path = $request->file('archivo')->store('pedidos/' . $id, 'public');
-            $pedido->update(['archivo_pedido' => $path]);
+        $pedido->update(['archivo_pedido' => $ruta]);
 
-            return $this->jsonResponse([
-                'archivo_pedido' => $path,
-                'url' => Storage::disk('public')->url($path),
-            ], 'Archivo subido exitosamente.');
-        }
-
-        return response()->json(['success' => false, 'message' => 'No se recibió ningún archivo.'], 400);
+        return $this->jsonResponse(['archivo_pedido' => $ruta], 'Archivo subido exitosamente.');
     }
 
     public function descargarArchivo($id)
@@ -188,41 +150,9 @@ class PedidoController extends ApiController
         $pedido = Pedido::findOrFail($id);
 
         if (!$pedido->archivo_pedido || !Storage::disk('public')->exists($pedido->archivo_pedido)) {
-            return response()->json(['success' => false, 'message' => 'El pedido no tiene archivo adjunto.'], 404);
+            return $this->errorResponse('Archivo no encontrado.', 404);
         }
 
-        $path = Storage::disk('public')->path($pedido->archivo_pedido);
-        return response()->file($path, ['Content-Type' => 'application/pdf']);
-    }
-
-    public function cambiarEstado(Request $request, $id)
-    {
-        $request->validate([
-            'id_estado_pedido' => 'required|integer|exists:estados_pedido,id_estado_pedido',
-        ]);
-
-        $pedido = Pedido::findOrFail($id);
-
-        $historialActual = HistorialEstadoPedido::where('id_pedido', $id)
-            ->whereNull('fecha_fin')
-            ->latest('fecha_inicio')
-            ->first();
-
-        if ($historialActual) {
-            $historialActual->update(['fecha_fin' => now()]);
-        }
-
-        HistorialEstadoPedido::create([
-            'id_pedido' => $id,
-            'id_estado_pedido' => $request->id_estado_pedido,
-            'fecha_inicio' => now(),
-        ]);
-
-        $pedido->update(['id_estado_pedido' => $request->id_estado_pedido]);
-
-        return $this->jsonResponse(
-            $pedido->load('estado', 'historiales.estado'),
-            'Estado del pedido actualizado exitosamente.'
-        );
+        return Storage::disk('public')->download($pedido->archivo_pedido);
     }
 }

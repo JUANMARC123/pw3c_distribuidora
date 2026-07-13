@@ -5,37 +5,35 @@ namespace App\Listeners;
 use App\Events\EntregaCompletada;
 use App\Events\EntregaFallida;
 use App\Events\DevolucionProducto;
-use Illuminate\Support\Facades\DB;
+use App\Models\HojaRutaDetalle;
 
 class RegistrarLlegadaParadaListener
 {
-    public function onEntregaCompletada(EntregaCompletada $event): void
+    public function handleEntrega(EntregaCompletada $event)
     {
-        DB::table('control_ruta_paradas')
-            ->where('id_control_ruta_parada', $event->parada->id_control_ruta_parada)
-            ->update(['hora_llegada' => now()->toTimeString()]);
+        if (!$event->detalle->hora_llegada) {
+            $event->detalle->update(['hora_llegada' => now()->toTimeString()]);
+        }
     }
 
-    public function onEntregaFallida(EntregaFallida $event): void
+    public function handleFallida(EntregaFallida $event)
     {
-        DB::table('control_ruta_paradas')
-            ->where('id_control_ruta_parada', $event->parada->id_control_ruta_parada)
-            ->update(['hora_llegada' => now()->toTimeString()]);
+        if (!$event->detalle->hora_llegada) {
+            $event->detalle->update(['hora_llegada' => now()->toTimeString()]);
+        }
     }
 
-    public function onDevolucionProducto(DevolucionProducto $event): void
+    public function handleDevolucion(DevolucionProducto $event)
     {
-        DB::table('control_ruta_paradas')
-            ->where('id_control_ruta_parada', $event->parada->id_control_ruta_parada)
-            ->update(['hora_llegada' => now()->toTimeString()]);
+        if (!$event->detalle->hora_llegada) {
+            $event->detalle->update(['hora_llegada' => now()->toTimeString()]);
+        }
     }
 
-    public function subscribe($events): array
+    public function subscribe($events)
     {
-        return [
-            EntregaCompletada::class => 'onEntregaCompletada',
-            EntregaFallida::class => 'onEntregaFallida',
-            DevolucionProducto::class => 'onDevolucionProducto',
-        ];
+        $events->listen(EntregaCompletada::class, [self::class, 'handleEntrega']);
+        $events->listen(EntregaFallida::class, [self::class, 'handleFallida']);
+        $events->listen(DevolucionProducto::class, [self::class, 'handleDevolucion']);
     }
 }

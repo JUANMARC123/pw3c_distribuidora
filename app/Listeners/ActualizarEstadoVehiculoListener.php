@@ -4,27 +4,25 @@ namespace App\Listeners;
 
 use App\Events\RutaIniciada;
 use App\Events\RepartidorRegresa;
-use App\Models\Vehiculo\Vehiculo;
+use App\Models\Vehiculo;
 
 class ActualizarEstadoVehiculoListener
 {
-    public function onRutaIniciada(RutaIniciada $event): void
-    {
-        Vehiculo::where('id_vehiculo', $event->vehiculoId)
-            ->update(['id_estado_vehiculo' => 4]);
-    }
-
-    public function onRepartidorRegresa(RepartidorRegresa $event): void
+    public function onRutaIniciada(RutaIniciada $event)
     {
         Vehiculo::where('id_vehiculo', $event->idVehiculo)
-            ->update(['id_estado_vehiculo' => 1]);
+            ->update(['estado' => 'en_ruta']);
     }
 
-    public function subscribe($events): array
+    public function onRepartidorRegresa(RepartidorRegresa $event)
     {
-        return [
-            RutaIniciada::class => 'onRutaIniciada',
-            RepartidorRegresa::class => 'onRepartidorRegresa',
-        ];
+        Vehiculo::where('id_vehiculo', $event->idVehiculo)
+            ->update(['estado' => 'disponible']);
+    }
+
+    public function subscribe($events)
+    {
+        $events->listen(RutaIniciada::class, [self::class, 'onRutaIniciada']);
+        $events->listen(RepartidorRegresa::class, [self::class, 'onRepartidorRegresa']);
     }
 }

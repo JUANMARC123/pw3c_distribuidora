@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Repartidor\Repartidor;
-use App\Models\Seguridad\Usuario;
-use App\Models\Seguridad\Rol;
+use App\Models\Usuario;
+use App\Models\Repartidor;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -12,36 +11,51 @@ class DemoDataSeeder extends Seeder
 {
     public function run()
     {
-        $roles = Rol::pluck('id_rol', 'nombre');
+        $admin = Usuario::create([
+            'nombre' => 'Admin',
+            'apellido' => 'Sistema',
+            'email' => 'admin@example.com',
+            'password_hash' => Hash::make('123456'),
+            'telefono' => '70000000',
+            'estado' => 'activo',
+        ]);
+        $admin->assignRole('Administrador');
 
-        $demoUsers = [
-            ['nombre' => 'Admin', 'apellido' => 'Sistema', 'email' => 'admin@distribuidora.com', 'rol' => 'Administrador'],
-            ['nombre' => 'Carlos', 'apellido' => 'Mendoza', 'email' => 'supervisor@distribuidora.com', 'rol' => 'Supervisor'],
-            ['nombre' => 'Lucía', 'apellido' => 'Paredes', 'email' => 'operador@distribuidora.com', 'rol' => 'Operador'],
-            ['nombre' => 'Pedro', 'apellido' => 'Quispe', 'email' => 'repartidor@distribuidora.com', 'rol' => 'Repartidor'],
-        ];
+        $supervisor = Usuario::create([
+            'nombre' => 'Supervisor',
+            'apellido' => 'Principal',
+            'email' => 'supervisor@example.com',
+            'password_hash' => Hash::make('123456'),
+            'telefono' => '70000001',
+            'estado' => 'activo',
+        ]);
+        $supervisor->assignRole('Supervisor');
 
-        foreach ($demoUsers as $userData) {
-            $usuario = Usuario::create([
-                'nombre' => $userData['nombre'],
-                'apellido' => $userData['apellido'],
-                'email' => $userData['email'],
-                'password_hash' => Hash::make('123456'),
-                'telefono' => fake()->phoneNumber(),
-                'id_estado_usuario' => 1,
-                'fecha_creacion' => now(),
-            ]);
-            $usuario->roles()->attach($roles[$userData['rol']]);
+        $operador = Usuario::create([
+            'nombre' => 'Operador',
+            'apellido' => 'General',
+            'email' => 'operador@example.com',
+            'password_hash' => Hash::make('123456'),
+            'telefono' => '70000002',
+            'estado' => 'activo',
+        ]);
+        $operador->assignRole('Operador');
 
-            if ($userData['rol'] === 'Repartidor') {
-                Repartidor::create([
-                    'id_usuario' => $usuario->id_usuario,
-                    'id_estado_repartidor' => 1,
-                    'ci' => (string) fake()->unique()->numberBetween(1000000, 9999999),
-                    'id_extension_ci' => fake()->numberBetween(1, 9),
-                    'id_licencia' => fake()->numberBetween(1, 5),
-                ]);
-            }
-        }
+        $repartidorUser = Usuario::create([
+            'nombre' => 'Repartidor',
+            'apellido' => 'Uno',
+            'email' => 'repartidor@example.com',
+            'password_hash' => Hash::make('123456'),
+            'telefono' => '70000003',
+            'estado' => 'activo',
+        ]);
+        $repartidorUser->assignRole('Repartidor');
+
+        Repartidor::create([
+            'id_usuario' => $repartidorUser->id_usuario,
+            'ci' => '12345678',
+            'categoria_licencia' => 'B',
+            'estado' => 'activo',
+        ]);
     }
 }

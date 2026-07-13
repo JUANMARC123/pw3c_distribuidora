@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirigiendo... - Pw3c Distribuidora</title>
+    <meta http-equiv="refresh" content="0; url=/pages/logistica.html#pedidos">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f8fafc; font-family: system-ui, sans-serif; color: #475569; }
+        .redirect-msg { text-align: center; padding: 40px; }
+        .redirect-msg h2 { margin: 0 0 8px; color: #1e293b; }
+        .redirect-msg p { margin: 0; font-size: 14px; }
+        .redirect-msg a { color: #3b82f6; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="redirect-msg">
+        <h2>Redirigiendo a Pedidos...</h2>
+        <p>Los pedidos ahora se gestionan desde la <strong>Torre Logística</strong>.</p>
+        <p>Si no eres redirigido automáticamente, <a href="/pages/logistica.html#pedidos">haz clic aquí</a>.</p>
+    </div>
+    <script>
+        if (!window.location.hash) {
+            window.location.replace('/pages/logistica.html#pedidos');
+        }
+    </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 # Documentación de Modelos - Pw3c Distribuidora
 
 > **Framework:** Laravel 9 (Eloquent ORM)
-> **Total de modelos:** 47 (56 tablas en BD, incluyendo 3 de Laravel + 1 dropeada + 5 pivotes)
+> **Total de modelos:** 47 (53 tablas en BD, incluyendo 3 de Laravel + 1 dropeada)
 
 ---
 
@@ -312,7 +312,6 @@ erDiagram
         smallint id_ruta FK
         bigint id_farmacia FK
         smallint orden_parada
-        time hora_estimada
     }
     control_rutas {
         bigint id_control_ruta PK
@@ -350,7 +349,7 @@ erDiagram
         bigint id_pedido FK "nullable"
         bigint id_farmacia FK
         integer orden_parada
-        time hora_estimada "nullable"
+        time hora_llegada "nullable"
         time hora_llegada_real "nullable"
         timestamp created_at
         timestamp updated_at
@@ -1079,6 +1078,8 @@ erDiagram
 
 **Tabla:** `detalle_pedido` | **PK:** `id_detalle` | **Timestamps:** No | **Traits:** HasFactory
 
+**Casts:** `cantidad_solicitada:decimal:2`, `cantidad_entregada:decimal:2`, `precio_unitario:decimal:2`, `subtotal:decimal:2`
+
 **Relaciones:**
 | Tipo | Método | Modelo destino | FK |
 |------|--------|----------------|----|
@@ -1262,7 +1263,8 @@ erDiagram
 | `id_ruta` | FK→`rutas` | Ruta asociada (cascade) |
 | `id_farmacia` | FK→`farmacias` | Farmacia de la parada (restrict) |
 | `orden_parada` | smallInteger | Orden de la parada en la ruta (>= 1) |
-| `hora_estimada` | time | Hora estimada de llegada (H:i:s) |
+
+> Columna `hora_estimada` eliminada por migración `2026_07_06_000001`.
 
 **Tabla:** `ruta_paradas` | **PK:** `id_parada` | **Timestamps:** No | **Traits:** HasFactory
 
@@ -1295,6 +1297,8 @@ erDiagram
 > `id_estado_ruta` agregado por migración `2024_06_11_000007`.
 
 **Unique compuesto:** `(id_ruta, fecha_ruta)`
+
+**Casts:** `fecha_ruta:date`, `hora_salida:string`, `hora_llegada_real:string`
 
 **Relaciones:**
 | Tipo | Método | Modelo destino | FK |
@@ -1380,12 +1384,16 @@ erDiagram
 | `id_pedido` | FK→`pedidos` | Pedido asociado (**nullable**, set null) |
 | `id_farmacia` | FK→`farmacias` | Farmacia destino (restrict) |
 | `orden_parada` | integer | Orden de la parada en la ejecución |
-| `hora_estimada` | time | Hora estimada (nullable) |
+| `hora_llegada` | time | Hora de llegada (nullable) |
 | `hora_llegada_real` | time | Hora de llegada real (nullable) |
+
+> Columna `hora_estimada` eliminada y `hora_llegada` agregada por migración `2026_07_06_000001`.
 
 **Tabla:** `control_ruta_paradas` | **PK:** `id_control_ruta_parada` | **Timestamps:** Sí (created_at, updated_at) | **Traits:** HasFactory
 
 **Unique compuesto:** `(id_control_ruta, orden_parada)`
+
+**Casts:** `hora_llegada_real:string`
 
 **Relaciones:**
 | Tipo | Método | Modelo destino | FK |
@@ -1411,6 +1419,8 @@ erDiagram
 **Tabla:** `asignaciones_vehiculo_repartidor` | **PK:** `id_asignacion` | **Timestamps:** Sí (created_at, updated_at)
 
 **Índices:** `asignaciones_repartidor_activo_index` (id_repartidor, activo), `asignaciones_vehiculo_activo_index` (id_vehiculo, activo)
+
+**Casts:** `fecha_inicio:datetime`, `fecha_fin:datetime`, `activo:boolean`
 
 **Relaciones:**
 | Tipo | Método | Modelo destino | FK |
@@ -1542,6 +1552,8 @@ erDiagram
 
 **Unique compuesto:** `(id_repartidor, fecha)`
 
+**Casts:** `fecha:date`, `monto_inicial:decimal:2`, `ingresos:decimal:2`, `gastos:decimal:2`, `monto_final:decimal:2`
+
 **Relaciones:**
 | Tipo | Método | Modelo destino | FK |
 |------|--------|----------------|----|
@@ -1646,3 +1658,184 @@ El sistema incluye 3 tablas de Laravel que no tienen modelo Eloquent propio:
 | `personal_access_tokens` | Tokens de API (Sanctum) |
 
 La tabla default `users` de Laravel fue **eliminada** (migración `2024_06_11_000001_drop_users_table.php`) en favor de la tabla personalizada `usuarios`.
+```mermaid
+erDiagram
+    usuarios {
+        bigint id_usuario PK
+        string nombre
+        string apellido
+        string email UK
+        string password_hash
+        string telefono
+        enum estado "['activo', 'bloqueado']"
+    }
+    repartidores {
+        bigint id_repartidor PK
+        bigint id_usuario FK, UK
+        string ci UK
+        emum categoria_licencia "['A', 'B', 'C']"
+        enum estado "['activo', 'inactivo', 'en_ruta']"
+        string firebase_uid UK
+    }
+    farmacias {
+        bigint id_farmacia PK
+        string nombre
+        text direccion
+        string telefono
+        string email UK
+        decimal latitud
+        decimal longitud
+        decimal geocerca
+    }
+    contactos_farmacia {
+        bigint id_contacto PK
+        bigint id_farmacia FK
+        string nombre_contacto
+        string cargo
+        string telefono
+        string email
+    }
+   
+    vehiculos {
+        bigint id_vehiculo PK
+        string placa UK
+        string marca
+        string modelo
+        enum estado "['disponible', 'taller', 'en_ruta']"
+    }
+    asignaciones_vehiculo_repartidor 
+    {
+    bigint id_asignacion PK
+    bigint id_repartidor FK
+    bigint id_vehiculo FK
+    timestamp fecha_asignacion
+    timestamp fecha_devolucion NULL -- Se llena cuando el repartidor devuelve el vehículo
+    }
+    productos {
+        bigint id_producto PK
+        string nombre
+        decimal precio_unitario
+        enum unidad_medida "['CAJA', 'BLISTER', 'TUBO', 'FRASCO' , 'AMPOLLA', 'KG']"
+
+    }
+    pedidos 
+    {
+    bigint id_pedido PK
+    bigint id_farmacia FK
+    bigint id_usuario FK -- El vendedor o administrador que registró el pedido
+    enum estado "['pendiente', 'aprobado', 'entregado', 'cancelado']"
+    enum metodo_pago "['efectivo', 'qr', 'transferencia', 'credito']" -- ¡Agregado para el repartidor!
+    timestamp fecha_pedido
+    text observaciones
+    decimal subtotal
+    decimal descuento
+    decimal total
+    string archivo_pedido -- URL de la PDF 
+    }
+    detalle_pedido {
+    bigint id_detalle PK
+    bigint id_pedido FK
+    bigint id_producto FK
+    integer cantidad_solicitada -- Cambiado a entero para precisión en unidades
+    integer cantidad_entregada
+    integer cantidad_rechazada
+    string motivo_rechazo
+    decimal precio_unitario -- Copia del precio del producto al momento de la venta
+    decimal subtotal
+}
+hojas_ruta {
+    bigint id_hoja_ruta PK
+    date fecha
+    time hora_salida
+    time hora_llegada
+    bigint id_repartidor FK
+    bigint id_vehiculo FK
+    enum estado_ruta "['planificado', 'en_progreso', 'completado', 'cancelado']"
+}
+
+hoja_ruta_detalles {
+    bigint id_detalle PK
+    bigint id_hoja_ruta FK
+    bigint id_pedido FK    -- ¡Importante! El pedido ya sabe a qué farmacia va.
+    integer orden_visita   -- El orden optimizado para ese día específico.
+    time hora_llegada -- Registra cuándo llegó el repartidor.
+    time hora_salida
+}
+   despachos {
+    bigint id_despacho PK
+    bigint id_pedido FK UK
+    bigint id_detalle_hoja_ruta FK -- ¡Corregido! Apunta a la nueva tabla hoja_ruta_detalles
+    timestamp fecha_hora_despacho
+    enum estado_despacho "['pendiente', 'entregado', 'incidencia']"
+    decimal monto_recibido
+}
+
+evidencias_entrega {
+    bigint id_evidencia PK
+    bigint id_despacho FK
+    enum tipo_evidencia "['firma', 'foto', 'sello']"
+    string archivo -- URL de la foto 
+}
+
+incidencias {
+    bigint id_incidencia PK
+    bigint id_despacho FK
+    enum tipo_incidencia "['cliente_ausente', 'producto_danado', 'retraso_trafico', 'otro']" -- Aquí incluyes 'devolucion_parcial'
+    text descripcion
+    string archivo -- URL de la foto 
+}
+   caja_repartidor {
+    bigint id_caja PK
+    bigint id_hoja_ruta FK UK -- ¡Corregido! Vinculado 1 a 1 con el viaje del día
+    bigint id_repartidor FK
+    date fecha
+    decimal ingresos -- Suma automática de lo cobrado en efectivo/qr en la ruta
+    decimal monto_final -- Dinero real entregado por el repartidor al rendir cuentas
+    decimal monto_inicial -- Dinero en efectivo entregado para cambio/sencillo
+    enum estado_caja "['abierta', 'cerrada', 'auditada']"
+    -- id_gasto PK FUE ELIMINADO de aquí porque causaba redundancia cíclica
+}
+
+gastos_operativos {
+    bigint id_gasto PK
+    bigint id_caja FK -- Vinculado a la caja del repartidor que ejecutó el gasto
+    string tipo_gasto -- Ej: 'Combustible', 'Peaje', 'Ponchadura'
+    string descripcion
+    decimal monto
+    string comprobante -- Foto de la factura o recibo del gasto
+    datetime fecha
+}
+    usuarios ||--o| repartidores : "tiene"
+    usuarios ||--o{ pedidos : "registra"
+    farmacias ||--o{ contactos_farmacia : "tiene"
+    farmacias ||--o{ pedidos : "solicita"
+    productos ||--o{ detalle_pedido : "incluido_en"
+    pedidos ||--|{ detalle_pedido : "contiene"
+    
+    repartidores ||--o{ asignaciones_vehiculo_repartidor : "recibe"
+    vehiculos ||--o{ asignaciones_vehiculo_repartidor : "asignado_a"
+    
+    repartidores ||--o{ hojas_ruta : "conduce"
+    vehiculos ||--o{ hojas_ruta : "utilizado_en"
+    
+    hojas_ruta ||--|{ hoja_ruta_detalles : "asigna"
+    pedidos ||--o{ hoja_ruta_detalles : "incluido_en"
+    
+    pedidos ||--|| despachos : "genera"
+    hoja_ruta_detalles ||--o{ despachos : "ejecuta"
+    
+    despachos ||--o{ evidencias_entrega : "respaldado_por"
+    despachos ||--o{ incidencias : "sufre"
+    
+    hojas_ruta ||--|| caja_repartidor : "rinde_cuentas_en"
+    repartidores ||--o{ caja_repartidor : "responsable_de"
+    caja_repartidor ||--o{ gastos_operativos : "registra"
+```
+<!--  Puedes usarlo con todos tus proyectos. El servidor MCP es global y almacena los índices en ~/.cache/codebase-memory-mcp/. 
+Para indexar otro proyecto, solo abre una terminal en ese proyecto y ejecuta:
+codebase-memory-mcp cli index_repository --repo_path "ruta\completa\del\proyecto"
+O desde OpenCode, pídele: "Index this project".
+Para que OpenCode lo reconozca en cada proyecto, debes tener un opencode.json con la configuración del MCP server en la raíz de cada proyecto (puedes copiar el mismo archivo que ya creamos).
+Para ver todos los proyectos indexados:
+codebase-memory-mcp cli list_projects
+Cada proyecto vive separado en la base de datos y lo consultas por nombre. No hay límite de cantidad. -->

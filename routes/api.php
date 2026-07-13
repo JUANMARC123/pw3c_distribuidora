@@ -2,23 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CatalogoController;
 use App\Http\Controllers\Seguridad\UsuarioController;
-use App\Http\Controllers\Seguridad\RolController;
 use App\Http\Controllers\Farmacia\FarmaciaController;
 use App\Http\Controllers\Farmacia\ContactoFarmaciaController;
 use App\Http\Controllers\Pedido\PedidoController;
 use App\Http\Controllers\Repartidor\RepartidorController;
 use App\Http\Controllers\Repartidor\RepartidorVehiculoController;
 use App\Http\Controllers\Vehiculo\VehiculoController;
-use App\Http\Controllers\Logistica\RutaController;
-use App\Http\Controllers\Logistica\ControlRutaController;
+use App\Http\Controllers\Logistica\HojaRutaController;
 use App\Http\Controllers\Despacho\DespachoController;
 use App\Http\Controllers\Despacho\IncidenciaController;
 use App\Http\Controllers\Despacho\EvidenciaController;
 use App\Http\Controllers\Producto\ProductoController;
 use App\Http\Controllers\Pedido\DetallePedidoController;
-use App\Http\Controllers\Logistica\CentroLogisticoController;
 use App\Http\Controllers\Caja\CajaController;
 use App\Http\Controllers\Reportes\ReporteController;
 
@@ -29,102 +25,84 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/user', [AuthController::class, 'user']);
 
-    // Módulo: Usuarios
-    Route::get('usuarios/{usuario}/roles', [UsuarioController::class, 'roles'])->middleware('permission:Usuarios,asignar-roles');
-    Route::post('usuarios/{usuario}/roles', [UsuarioController::class, 'assignRoles'])->middleware('permission:Usuarios,asignar-roles');
-    Route::apiResource('usuarios', UsuarioController::class)->middleware('permission:Usuarios');
+    // Usuarios
     Route::put('/usuarios/{id}/bloquear', [UsuarioController::class, 'bloquear']);
+    Route::apiResource('usuarios', UsuarioController::class);
 
-    // Módulo: Roles
-    Route::get('roles/{rol}/permisos', [RolController::class, 'permisos'])->middleware('permission:Roles,asignar-permisos');
-    Route::post('roles/{rol}/permisos', [RolController::class, 'assignPermisos'])->middleware('permission:Roles,asignar-permisos');
-    Route::apiResource('roles', RolController::class)->middleware('permission:Roles');
+    // Farmacias
+    Route::apiResource('farmacias', FarmaciaController::class);
+    Route::get('farmacias/{farmacia}/contactos', [ContactoFarmaciaController::class, 'index']);
+    Route::get('farmacias/{farmacia}/contactos/{contacto}', [ContactoFarmaciaController::class, 'show']);
+    Route::post('farmacias/{farmacia}/contactos', [ContactoFarmaciaController::class, 'store']);
+    Route::put('farmacias/{farmacia}/contactos/{contacto}', [ContactoFarmaciaController::class, 'update']);
+    Route::delete('farmacias/{farmacia}/contactos/{contacto}', [ContactoFarmaciaController::class, 'destroy']);
 
-    // Módulo: Farmacias
-    Route::apiResource('farmacias', FarmaciaController::class)->middleware('permission:Farmacias');
-    Route::get('farmacias/{farmacia}/contactos', [ContactoFarmaciaController::class, 'index'])->middleware('permission:Farmacias,listar');
-    Route::get('farmacias/{farmacia}/contactos/{contacto}', [ContactoFarmaciaController::class, 'show'])->middleware('permission:Farmacias,listar');
-    Route::post('farmacias/{farmacia}/contactos', [ContactoFarmaciaController::class, 'store'])->middleware('permission:Farmacias,gestionar-contactos');
-    Route::put('farmacias/{farmacia}/contactos/{contacto}', [ContactoFarmaciaController::class, 'update'])->middleware('permission:Farmacias,gestionar-contactos');
-    Route::delete('farmacias/{farmacia}/contactos/{contacto}', [ContactoFarmaciaController::class, 'destroy'])->middleware('permission:Farmacias,gestionar-contactos');
+    // Productos
+    Route::apiResource('productos', ProductoController::class);
 
-    // Módulo: Productos
-    Route::apiResource('productos', ProductoController::class)->middleware('permission:Productos');
+    // Pedidos
+    Route::post('pedidos/extraer-pdf', [PedidoController::class, 'extraerPdf']);
+    Route::post('pedidos/{pedido}/cambiar-estado', [PedidoController::class, 'cambiarEstado']);
+    Route::post('pedidos/{pedido}/subir-archivo', [PedidoController::class, 'subirArchivo']);
+    Route::get('pedidos/{pedido}/descargar-archivo', [PedidoController::class, 'descargarArchivo']);
+    Route::apiResource('pedidos', PedidoController::class);
+    Route::get('pedidos/{pedido}/detalles', [DetallePedidoController::class, 'index']);
+    Route::post('pedidos/{pedido}/detalles', [DetallePedidoController::class, 'store']);
+    Route::put('pedidos/{pedido}/detalles/{detalle}', [DetallePedidoController::class, 'update']);
+    Route::delete('pedidos/{pedido}/detalles/{detalle}', [DetallePedidoController::class, 'destroy']);
+    Route::put('pedidos/{pedido}/detalles/{detalle}/entrega', [DetallePedidoController::class, 'actualizarEntrega']);
 
-    // Módulo: Pedidos
-    Route::post('pedidos/extraer-pdf', [PedidoController::class, 'extraerPdf'])->middleware('permission:Pedidos,crear');
-    Route::post('pedidos/{pedido}/cambiar-estado', [PedidoController::class, 'cambiarEstado'])->middleware('permission:Pedidos,cambiar-estado');
-    Route::post('pedidos/{pedido}/subir-archivo', [PedidoController::class, 'subirArchivo'])->middleware('permission:Pedidos,editar');
-    Route::get('pedidos/{pedido}/descargar-archivo', [PedidoController::class, 'descargarArchivo'])->middleware('permission:Pedidos,listar');
-    Route::apiResource('pedidos', PedidoController::class)->middleware('permission:Pedidos');
-    Route::get('pedidos/{pedido}/detalles', [DetallePedidoController::class, 'index'])->middleware('permission:Pedidos,listar');
-    Route::post('pedidos/{pedido}/detalles', [DetallePedidoController::class, 'store'])->middleware('permission:Pedidos,crear');
-    Route::put('pedidos/{pedido}/detalles/{detalle}', [DetallePedidoController::class, 'update'])->middleware('permission:Pedidos,editar');
-    Route::delete('pedidos/{pedido}/detalles/{detalle}', [DetallePedidoController::class, 'destroy'])->middleware('permission:Pedidos,eliminar');
-    Route::put('pedidos/{pedido}/detalles/{detalle}/entrega', [DetallePedidoController::class, 'actualizarEntrega'])->middleware('permission:Pedidos,cambiar-estado');
+    // Repartidores
+    Route::post('repartidores/{repartidor}/cambiar-estado', [RepartidorController::class, 'cambiarEstado']);
+    Route::get('repartidores/{repartidor}/asignacion-vehiculo', [RepartidorVehiculoController::class, 'show']);
+    Route::post('repartidores/{repartidor}/asignacion-vehiculo', [RepartidorVehiculoController::class, 'store']);
+    Route::delete('repartidores/{repartidor}/asignacion-vehiculo', [RepartidorVehiculoController::class, 'destroy']);
+    Route::apiResource('repartidores', RepartidorController::class);
 
-    // Módulo: Repartidores
-    Route::post('repartidores/{repartidor}/cambiar-estado', [RepartidorController::class, 'cambiarEstado'])->middleware('permission:Repartidores,cambiar-estado');
-    Route::get('repartidores/{repartidor}/asignacion-vehiculo', [RepartidorVehiculoController::class, 'show'])->middleware('permission:Repartidores,listar');
-    Route::post('repartidores/{repartidor}/asignacion-vehiculo', [RepartidorVehiculoController::class, 'store'])->middleware('permission:Repartidores,editar');
-    Route::delete('repartidores/{repartidor}/asignacion-vehiculo', [RepartidorVehiculoController::class, 'destroy'])->middleware('permission:Repartidores,editar');
-    Route::apiResource('repartidores', RepartidorController::class)->middleware('permission:Repartidores');
+    // Vehículos
+    Route::post('vehiculos/{vehiculo}/cambiar-estado', [VehiculoController::class, 'cambiarEstado']);
+    Route::apiResource('vehiculos', VehiculoController::class);
 
-    // Módulo: Vehículos
-    Route::post('vehiculos/{vehiculo}/cambiar-estado', [VehiculoController::class, 'cambiarEstado'])->middleware('permission:Vehículos,cambiar-estado');
-    Route::apiResource('vehiculos', VehiculoController::class)->middleware('permission:Vehículos');
-
-    // Módulo: Rutas
-    Route::get('rutas/{ruta}/paradas', [RutaController::class, 'paradas'])->middleware('permission:Rutas,gestionar-paradas');
-    Route::post('rutas/{ruta}/paradas', [RutaController::class, 'storeParada'])->middleware('permission:Rutas,gestionar-paradas');
-    Route::put('rutas/{ruta}/paradas/{parada}', [RutaController::class, 'updateParada'])->middleware('permission:Rutas,gestionar-paradas');
-    Route::delete('rutas/{ruta}/paradas/{parada}', [RutaController::class, 'destroyParada'])->middleware('permission:Rutas,gestionar-paradas');
-    Route::apiResource('rutas', RutaController::class)->middleware('permission:Rutas');
-
-    // Módulo: Control Rutas
-    Route::post('controles-ruta/{control_ruta}/registrar-llegada', [ControlRutaController::class, 'registrarLlegada'])->middleware('permission:Control Rutas,registrar-llegada');
-    Route::apiResource('controles-ruta', ControlRutaController::class)->middleware('permission:Control Rutas');
-
-    // Módulo: Despachos
-    Route::post('despachos/{despacho}/cambiar-estado', [DespachoController::class, 'cambiarEstado'])->middleware('permission:Despachos,cambiar-estado');
-    Route::apiResource('despachos', DespachoController::class)->middleware('permission:Despachos');
-    Route::get('despachos/{despacho}/incidencias', [IncidenciaController::class, 'index'])->middleware('permission:Despachos,listar');
-    Route::get('despachos/{despacho}/incidencias/{incidencia}', [IncidenciaController::class, 'show'])->middleware('permission:Despachos,listar');
-    Route::post('despachos/{despacho}/incidencias', [IncidenciaController::class, 'store'])->middleware('permission:Despachos,gestionar-incidencias');
-    Route::put('despachos/{despacho}/incidencias/{incidencia}', [IncidenciaController::class, 'update'])->middleware('permission:Despachos,gestionar-incidencias');
-    Route::delete('despachos/{despacho}/incidencias/{incidencia}', [IncidenciaController::class, 'destroy'])->middleware('permission:Despachos,gestionar-incidencias');
-    Route::get('despachos/{despacho}/evidencias', [EvidenciaController::class, 'index'])->middleware('permission:Despachos,listar');
-    Route::get('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'show'])->middleware('permission:Despachos,listar');
-    Route::post('despachos/{despacho}/evidencias', [EvidenciaController::class, 'store'])->middleware('permission:Despachos,gestionar-evidencias');
-    Route::put('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'update'])->middleware('permission:Despachos,gestionar-evidencias');
-    Route::delete('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'destroy'])->middleware('permission:Despachos,gestionar-evidencias');
-
-    // Módulo: Centro Logístico
+    // Hojas de Ruta (Logística)
     Route::prefix('logistica')->group(function () {
-        Route::get('pedidos-pendientes', [CentroLogisticoController::class, 'pedidosPendientes']);
-        Route::get('repartidores-disponibles', [CentroLogisticoController::class, 'repartidoresDisponibles']);
-        Route::post('planificacion/borrador', [CentroLogisticoController::class, 'guardarBorrador']);
-        Route::post('planificacion/confirmar', [CentroLogisticoController::class, 'confirmarRuta']);
-        Route::get('rutas-activas', [CentroLogisticoController::class, 'rutasActivas']);
-        Route::get('rutas-activas/{id}', [CentroLogisticoController::class, 'detalleRutaActiva']);
-        Route::post('rutas-activas/{id}/entrega-completada', [CentroLogisticoController::class, 'marcarEntregaCompletada']);
-        Route::post('rutas-activas/{id}/entrega-fallida', [CentroLogisticoController::class, 'marcarEntregaFallida']);
-        Route::post('rutas-activas/{id}/devolucion', [CentroLogisticoController::class, 'marcarDevolucion']);
-        Route::post('rutas-activas/{id}/regreso-almacen', [CentroLogisticoController::class, 'marcarRegresoAlmacen']);
+        Route::get('pedidos-pendientes', [HojaRutaController::class, 'pedidosPendientes']);
+        Route::get('repartidores-disponibles', [HojaRutaController::class, 'repartidoresDisponibles']);
+        Route::get('rutas-activas', [HojaRutaController::class, 'rutasActivas']);
     });
+    Route::post('hojas-ruta/{id}/iniciar', [HojaRutaController::class, 'iniciarRuta']);
+    Route::post('hojas-ruta/{id}/registrar-llegada', [HojaRutaController::class, 'registrarLlegada']);
+    Route::post('hojas-ruta/{id}/entrega-completada', [HojaRutaController::class, 'marcarEntregaCompletada']);
+    Route::post('hojas-ruta/{id}/entrega-fallida', [HojaRutaController::class, 'marcarEntregaFallida']);
+    Route::post('hojas-ruta/{id}/devolucion', [HojaRutaController::class, 'marcarDevolucion']);
+    Route::post('hojas-ruta/{id}/regreso-almacen', [HojaRutaController::class, 'regresoAlmacen']);
+    Route::apiResource('hojas-ruta', HojaRutaController::class);
 
-    // Módulo: Reportes
+    // Despachos
+    Route::post('despachos/{despacho}/cambiar-estado', [DespachoController::class, 'cambiarEstado']);
+    Route::apiResource('despachos', DespachoController::class);
+    Route::get('despachos/{despacho}/incidencias', [IncidenciaController::class, 'index']);
+    Route::get('despachos/{despacho}/incidencias/{incidencia}', [IncidenciaController::class, 'show']);
+    Route::post('despachos/{despacho}/incidencias', [IncidenciaController::class, 'store']);
+    Route::put('despachos/{despacho}/incidencias/{incidencia}', [IncidenciaController::class, 'update']);
+    Route::delete('despachos/{despacho}/incidencias/{incidencia}', [IncidenciaController::class, 'destroy']);
+    Route::get('despachos/{despacho}/evidencias', [EvidenciaController::class, 'index']);
+    Route::get('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'show']);
+    Route::post('despachos/{despacho}/evidencias', [EvidenciaController::class, 'store']);
+    Route::put('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'update']);
+    Route::delete('despachos/{despacho}/evidencias/{evidencia}', [EvidenciaController::class, 'destroy']);
+
+    // Reportes
     Route::prefix('reportes')->group(function () {
-        Route::get('resumen', [ReporteController::class, 'resumen'])->middleware('permission:Reportes,acceder');
-        Route::get('pedidos-por-estado', [ReporteController::class, 'pedidosPorEstado'])->middleware('permission:Reportes,listar');
-        Route::get('despachos-por-estado', [ReporteController::class, 'despachosPorEstado'])->middleware('permission:Reportes,listar');
-        Route::get('pedidos-por-dia', [ReporteController::class, 'pedidosPorDia'])->middleware('permission:Reportes,listar');
-        Route::get('repartidores-por-estado', [ReporteController::class, 'repartidoresPorEstado'])->middleware('permission:Reportes,listar');
-        Route::get('vehiculos-por-estado', [ReporteController::class, 'vehiculosPorEstado'])->middleware('permission:Reportes,listar');
-        Route::get('incidencias-por-tipo', [ReporteController::class, 'incidenciasPorTipo'])->middleware('permission:Reportes,listar');
+        Route::get('resumen', [ReporteController::class, 'resumen']);
+        Route::get('pedidos-por-estado', [ReporteController::class, 'pedidosPorEstado']);
+        Route::get('despachos-por-estado', [ReporteController::class, 'despachosPorEstado']);
+        Route::get('pedidos-por-dia', [ReporteController::class, 'pedidosPorDia']);
+        Route::get('repartidores-por-estado', [ReporteController::class, 'repartidoresPorEstado']);
+        Route::get('vehiculos-por-estado', [ReporteController::class, 'vehiculosPorEstado']);
+        Route::get('incidencias-por-tipo', [ReporteController::class, 'incidenciasPorTipo']);
     });
 
-    // Módulo: Caja Diaria
+    // Caja Diaria
     Route::prefix('caja')->group(function () {
         Route::post('abrir', [CajaController::class, 'abrirCaja']);
         Route::post('ingreso', [CajaController::class, 'registrarIngreso']);
@@ -132,33 +110,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('cerrar/{id}', [CajaController::class, 'cerrarCaja']);
         Route::get('dia', [CajaController::class, 'cajaDelDia']);
         Route::get('resumen', [CajaController::class, 'resumenDiario']);
-    });
-
-    // Catálogos (lectura: cualquier autenticado; escritura: requiere permisos del módulo Usuarios vía auto-detección)
-    Route::prefix('catalogos')->group(function () {
-        Route::get('modelos-por-marca/{idMarca}', [CatalogoController::class, 'modelosPorMarca']);
-        Route::get('estados-usuario', [CatalogoController::class, 'estadosUsuario']);
-        Route::get('roles', [CatalogoController::class, 'roles']);
-        Route::get('modulos', [CatalogoController::class, 'modulos']);
-        Route::get('acciones', [CatalogoController::class, 'acciones']);
-        Route::get('tablas-sistema', [CatalogoController::class, 'tablasSistema']);
-        Route::get('estados-pedido', [CatalogoController::class, 'estadosPedido']);
-        Route::get('estados-repartidor', [CatalogoController::class, 'estadosRepartidor']);
-        Route::get('estados-vehiculo', [CatalogoController::class, 'estadosVehiculo']);
-        Route::get('estados-despacho', [CatalogoController::class, 'estadosDespacho']);
-        Route::get('extensiones-ci', [CatalogoController::class, 'extensionesCi']);
-        Route::get('licencias', [CatalogoController::class, 'licencias']);
-        Route::get('marcas', [CatalogoController::class, 'marcas']);
-        Route::get('modelos', [CatalogoController::class, 'modelos']);
-        Route::get('capacidades', [CatalogoController::class, 'capacidades']);
-        Route::get('tipos-incidencia', [CatalogoController::class, 'tiposIncidencia']);
-        Route::get('tipos-evidencia', [CatalogoController::class, 'tiposEvidencia']);
-        Route::get('cargos', [CatalogoController::class, 'cargos']);
-
-        Route::middleware('permission:Usuarios')->group(function () {
-            Route::post('{catalogo}', [CatalogoController::class, 'store']);
-            Route::put('{catalogo}/{id}', [CatalogoController::class, 'update'])->whereNumber('id');
-            Route::delete('{catalogo}/{id}', [CatalogoController::class, 'destroy'])->whereNumber('id');
-        });
     });
 });

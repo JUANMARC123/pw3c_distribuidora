@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Farmacia;
 
 use App\Http\Controllers\ApiController;
-use App\Models\Farmacia\ContactoFarmacia;
-use App\Models\Farmacia\Farmacia;
+use App\Models\ContactoFarmacia;
+use App\Models\Farmacia;
 use Illuminate\Http\Request;
 
 class ContactoFarmaciaController extends ApiController
@@ -12,57 +12,46 @@ class ContactoFarmaciaController extends ApiController
     public function index($farmaciaId)
     {
         $farmacia = Farmacia::findOrFail($farmaciaId);
-        return $this->jsonResponse(
-            $farmacia->contactos()->with('cargo')->get()
-        );
+        return $this->jsonResponse($farmacia->contactos);
+    }
+
+    public function show($farmaciaId, $id)
+    {
+        $contacto = ContactoFarmacia::where('id_farmacia', $farmaciaId)->findOrFail($id);
+        return $this->jsonResponse($contacto);
     }
 
     public function store(Request $request, $farmaciaId)
     {
         $farmacia = Farmacia::findOrFail($farmaciaId);
 
-        $data = $request->validate([
-            'nombre_contacto' => 'required|string|max:150',
-            'id_cargo' => 'required|integer|exists:cargos,id_cargo',
+        $validated = $request->validate([
+            'nombre_contacto' => 'required|string|max:255',
+            'cargo' => 'nullable|string|max:255',
             'telefono' => 'required|string|max:20',
             'email' => 'nullable|email|max:180',
         ]);
 
-        $data['id_farmacia'] = $farmacia->id_farmacia;
-        $contacto = ContactoFarmacia::create($data);
+        $validated['id_farmacia'] = $farmacia->id_farmacia;
+        $contacto = ContactoFarmacia::create($validated);
 
-        return $this->jsonResponse(
-            $contacto->load('cargo'),
-            'Contacto creado exitosamente.',
-            201
-        );
-    }
-
-    public function show($farmaciaId, $id)
-    {
-        $contacto = ContactoFarmacia::where('id_farmacia', $farmaciaId)
-            ->with('cargo', 'farmacia')
-            ->findOrFail($id);
-        return $this->jsonResponse($contacto);
+        return $this->jsonResponse($contacto, 'Contacto creado exitosamente.', 201);
     }
 
     public function update(Request $request, $farmaciaId, $id)
     {
         $contacto = ContactoFarmacia::where('id_farmacia', $farmaciaId)->findOrFail($id);
 
-        $data = $request->validate([
-            'nombre_contacto' => 'sometimes|string|max:150',
-            'id_cargo' => 'sometimes|integer|exists:cargos,id_cargo',
+        $validated = $request->validate([
+            'nombre_contacto' => 'sometimes|string|max:255',
+            'cargo' => 'nullable|string|max:255',
             'telefono' => 'sometimes|string|max:20',
             'email' => 'nullable|email|max:180',
         ]);
 
-        $contacto->update($data);
+        $contacto->update($validated);
 
-        return $this->jsonResponse(
-            $contacto->load('cargo'),
-            'Contacto actualizado exitosamente.'
-        );
+        return $this->jsonResponse($contacto, 'Contacto actualizado exitosamente.');
     }
 
     public function destroy($farmaciaId, $id)

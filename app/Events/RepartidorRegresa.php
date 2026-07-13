@@ -2,20 +2,22 @@
 
 namespace App\Events;
 
-use App\Models\Logistica\ControlRuta;
+use App\Models\HojaRuta;
+use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class RepartidorRegresa
 {
-    use Dispatchable;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public ControlRuta $controlRuta;
+    public HojaRuta $hojaRuta;
     public int $idRepartidor;
     public int $idVehiculo;
 
-    public function __construct(ControlRuta $controlRuta, int $idRepartidor, int $idVehiculo)
+    public function __construct(HojaRuta $hojaRuta, int $idRepartidor, int $idVehiculo)
     {
-        $this->controlRuta = $controlRuta;
+        $this->hojaRuta = $hojaRuta;
         $this->idRepartidor = $idRepartidor;
         $this->idVehiculo = $idVehiculo;
     }

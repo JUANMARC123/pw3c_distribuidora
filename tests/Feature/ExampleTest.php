@@ -1,21 +1,11 @@
 <?php
 
-namespace Tests\Feature;
+test('the application returns a successful response', function () {
+    // Preparar
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+    // Actuar
+    $response = $this->get('/');
 
-class ExampleTest extends TestCase
-{
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function test_the_application_returns_a_successful_response()
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-    }
-}
+    // Verificar
+    $response->assertStatus(200);
+});

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Producto;
 
 use App\Http\Controllers\ApiController;
-use App\Models\Producto\Producto;
+use App\Models\Producto;
 use Illuminate\Http\Request;
 
 class ProductoController extends ApiController
@@ -12,32 +12,22 @@ class ProductoController extends ApiController
     {
         $query = Producto::query();
 
-        if ($request->filled('search')) {
-            $search = $request->search;
+        if ($search = $request->search) {
             $query->where('nombre', 'like', "%{$search}%");
         }
 
-        if ($request->filled('estado')) {
-            $query->where('estado', $request->estado);
-        }
-
-        return $this->safePaginate(
-            $query->orderBy('nombre'), $request
-        );
+        return $this->safePaginate($query->orderBy('nombre'), $request);
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'nombre' => 'required|string|max:200',
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
             'precio_unitario' => 'required|numeric|min:0',
-            'unidad_medida' => 'nullable|string|max:20',
-            'estado' => 'boolean',
+            'unidad_medida' => 'required|in:CAJA,BLISTER,TUBO,FRASCO,AMPOLLA,KG',
         ]);
 
-        $data['unidad_medida'] = $data['unidad_medida'] ?? 'UNIDAD';
-
-        $producto = Producto::create($data);
+        $producto = Producto::create($validated);
 
         return $this->jsonResponse($producto, 'Producto creado exitosamente.', 201);
     }
@@ -52,31 +42,25 @@ class ProductoController extends ApiController
     {
         $producto = Producto::findOrFail($id);
 
-        $data = $request->validate([
-            'nombre' => 'sometimes|required|string|max:200',
-            'precio_unitario' => 'sometimes|required|numeric|min:0',
-            'unidad_medida' => 'nullable|string|max:20',
-            'estado' => 'boolean',
+        $validated = $request->validate([
+            'nombre' => 'sometimes|string|max:255',
+            'precio_unitario' => 'sometimes|numeric|min:0',
+            'unidad_medida' => 'sometimes|in:CAJA,BLISTER,TUBO,FRASCO,AMPOLLA,KG',
         ]);
 
-        $producto->update($data);
+        $producto->update($validated);
 
         return $this->jsonResponse($producto, 'Producto actualizado exitosamente.');
     }
 
     public function destroy($id)
     {
-        $producto = Producto::findOrFail($id);
-
-        if ($producto->detalles()->exists()) {
-            return $this->errorResponse(
-                'No se puede eliminar el producto porque tiene registros asociados en pedidos.',
-                409
-            );
+        try {
+            $producto = Producto::findOrFail($id);
+            $producto->delete();
+            return $this->jsonResponse(null, 'Producto eliminado exitosamente.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('No se puede eliminar el producto porque tiene registros asociados.', 409);
         }
-
-        $producto->delete();
-
-        return $this->jsonResponse(null, 'Producto eliminado exitosamente.');
     }
 }

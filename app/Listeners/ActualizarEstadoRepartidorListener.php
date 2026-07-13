@@ -4,28 +4,25 @@ namespace App\Listeners;
 
 use App\Events\RutaIniciada;
 use App\Events\RepartidorRegresa;
-use App\Models\Repartidor\Repartidor;
+use App\Models\Repartidor;
 
 class ActualizarEstadoRepartidorListener
 {
-    public function onRutaIniciada(RutaIniciada $event): void
+    public function onRutaIniciada(RutaIniciada $event)
     {
-        $repartidorId = $event->controlRuta->id_repartidor;
-        Repartidor::where('id_repartidor', $repartidorId)
-            ->update(['id_estado_repartidor' => 2]);
+        Repartidor::where('id_repartidor', $event->hojaRuta->id_repartidor)
+            ->update(['estado' => 'en_ruta']);
     }
 
-    public function onRepartidorRegresa(RepartidorRegresa $event): void
+    public function onRepartidorRegresa(RepartidorRegresa $event)
     {
         Repartidor::where('id_repartidor', $event->idRepartidor)
-            ->update(['id_estado_repartidor' => 1]);
+            ->update(['estado' => 'activo']);
     }
 
-    public function subscribe($events): array
+    public function subscribe($events)
     {
-        return [
-            RutaIniciada::class => 'onRutaIniciada',
-            RepartidorRegresa::class => 'onRepartidorRegresa',
-        ];
+        $events->listen(RutaIniciada::class, [self::class, 'onRutaIniciada']);
+        $events->listen(RepartidorRegresa::class, [self::class, 'onRepartidorRegresa']);
     }
 }

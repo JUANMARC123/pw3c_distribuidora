@@ -3,47 +3,46 @@
 namespace App\Http\Controllers\Farmacia;
 
 use App\Http\Controllers\ApiController;
-use App\Models\Farmacia\Farmacia;
+use App\Models\Farmacia;
 use Illuminate\Http\Request;
 
 class FarmaciaController extends ApiController
 {
-   public function index(Request $request)
-{
-    $query = Farmacia::withCount('contactos');
+    public function index(Request $request)
+    {
+        $query = Farmacia::withCount('contactos');
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('nombre', 'like', "%{$search}%")
-              ->orWhere('direccion', 'like', "%{$search}%")
-              ->orWhere('telefono', 'like', "%{$search}%");
-        });
+        if ($search = $request->search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('telefono', 'like', "%{$search}%");
+            });
+        }
+
+        return $this->safePaginate($query->orderBy('nombre'), $request);
     }
 
-    return $this->safePaginate(
-        $query->orderBy('nombre'), $request
-    );
-}
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'nombre' => 'required|string|max:150',
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
             'direccion' => 'required|string',
             'telefono' => 'required|string|max:20',
-            'email' => 'nullable|email|max:180|unique:farmacias,email',
-            'latitud' => 'nullable|numeric|between:-90,90',
-            'longitud' => 'nullable|numeric|between:-180,180',
+            'email' => 'required|email|max:180|unique:farmacias,email',
+            'latitud' => 'required|numeric',
+            'longitud' => 'required|numeric',
+            'geocerca' => 'nullable|numeric|min:0',
         ]);
 
-        $farmacia = Farmacia::create($data);
+        $farmacia = Farmacia::create($validated);
 
         return $this->jsonResponse($farmacia, 'Farmacia creada exitosamente.', 201);
     }
 
     public function show($id)
     {
-        $farmacia = Farmacia::with('contactos.cargo')->findOrFail($id);
+        $farmacia = Farmacia::with('contactos')->findOrFail($id);
         return $this->jsonResponse($farmacia);
     }
 
@@ -51,25 +50,29 @@ class FarmaciaController extends ApiController
     {
         $farmacia = Farmacia::findOrFail($id);
 
-        $data = $request->validate([
-            'nombre' => 'sometimes|string|max:150',
+        $validated = $request->validate([
+            'nombre' => 'sometimes|string|max:255',
             'direccion' => 'sometimes|string',
             'telefono' => 'sometimes|string|max:20',
-            'email' => 'nullable|email|max:180|unique:farmacias,email,' . $id . ',id_farmacia',
-            'latitud' => 'sometimes|nullable|numeric|between:-90,90',
-            'longitud' => 'sometimes|nullable|numeric|between:-180,180',
+            'email' => "sometimes|email|max:180|unique:farmacias,email,{$id},id_farmacia",
+            'latitud' => 'sometimes|numeric',
+            'longitud' => 'sometimes|numeric',
+            'geocerca' => 'nullable|numeric|min:0',
         ]);
 
-        $farmacia->update($data);
+        $farmacia->update($validated);
 
         return $this->jsonResponse($farmacia, 'Farmacia actualizada exitosamente.');
     }
 
     public function destroy($id)
     {
-        $farmacia = Farmacia::findOrFail($id);
-        $farmacia->delete();
-
-        return $this->jsonResponse(null, 'Farmacia eliminada exitosamente.');
+        try {
+            $farmacia = Farmacia::findOrFail($id);
+            $farmacia->delete();
+            return $this->jsonResponse(null, 'Farmacia eliminada exitosamente.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('No se puede eliminar la farmacia porque tiene registros asociados.', 409);
+        }
     }
 }

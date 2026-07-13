@@ -1,60 +1,65 @@
 <?php
 
 namespace App\Http\Controllers\Seguridad;
-use Illuminate\Database\QueryException;
+
 use App\Http\Controllers\ApiController;
-use App\Http\Requests\Seguridad\UsuarioStoreRequest;
-use App\Models\Seguridad\Usuario;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class UsuarioController extends ApiController
 {
     public function index(Request $request)
     {
-        $query = Usuario::with('estado', 'roles');
+        $query = Usuario::with('roles');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
+        if ($search = $request->search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('apellido', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('apellido', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
-        if ($request->filled('id_estado_usuario')) {
-            $query->where('id_estado_usuario', $request->id_estado_usuario);
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
         }
 
-        return $this->safePaginate(
-            $query->orderBy('id_usuario', 'desc'), $request
-        );
+        return $this->safePaginate($query->orderBy('id_usuario', 'desc'), $request);
     }
 
-    public function store(UsuarioStoreRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->validated();
-        $data['password_hash'] = Hash::make($data['password']);
-        $data['fecha_creacion'] = now();
-        unset($data['password']);
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
+            'email' => 'required|email|max:180|unique:usuarios,email',
+            'password' => 'required|string|min:6',
+            'telefono' => 'nullable|string|max:20',
+            'estado' => 'sometimes|in:activo,bloqueado',
+        ]);
 
-        $usuario = Usuario::create($data);
+        $validated['password_hash'] = Hash::make($validated['password']);
+        unset($validated['password']);
+        $validated['estado'] = $validated['estado'] ?? 'activo';
+
+        $usuario = Usuario::create($validated);
 
         if ($request->filled('roles')) {
-            $usuario->roles()->attach($request->roles);
+            $usuario->syncRoles($request->roles);
+        } else {
+            $usuario->assignRole('Operador');
         }
 
-        return $this->jsonResponse(
-            $usuario->load('estado', 'roles'),
-            'Usuario creado exitosamente.',
-            201
-        );
+        $usuario->load('roles');
+
+        return $this->jsonResponse($usuario, 'Usuario creado exitosamente.', 201);
     }
 
     public function show($id)
     {
-        $usuario = Usuario::with('estado', 'roles', 'repartidor')->findOrFail($id);
+        $usuario = Usuario::with('roles', 'repartidor')->findOrFail($id);
         return $this->jsonResponse($usuario);
     }
 
@@ -65,87 +70,48 @@ class UsuarioController extends ApiController
         $rules = [
             'nombre' => 'sometimes|string|max:100',
             'apellido' => 'sometimes|string|max:100',
-            'email' => 'sometimes|email|max:180|unique:usuarios,email,' . $id . ',id_usuario',
-            'telefono' => 'sometimes|string|max:20',
-            'id_estado_usuario' => 'sometimes|integer|exists:estados_usuario,id_estado_usuario',
-            'password' => 'sometimes|string|min:6',
-            'roles' => 'sometimes|array',
-            'roles.*' => 'integer|exists:roles,id_rol',
+            'email' => "sometimes|email|max:180|unique:usuarios,email,{$id},id_usuario",
+            'telefono' => 'nullable|string|max:20',
+            'estado' => 'sometimes|in:activo,bloqueado',
         ];
 
-        $data = $request->validate($rules);
-
-        if (isset($data['password'])) {
-            $data['password_hash'] = Hash::make($data['password']);
-            unset($data['password']);
+        if ($request->filled('password')) {
+            $rules['password'] = 'string|min:6';
         }
 
-        $usuario->update($data);
+        $validated = $request->validate($rules);
 
-        if ($request->has('roles')) {
-            $usuario->roles()->sync($request->roles);
+        if ($request->filled('password')) {
+            $validated['password_hash'] = Hash::make($validated['password']);
+            unset($validated['password']);
         }
 
-        return $this->jsonResponse(
-            $usuario->load('estado', 'roles'),
-            'Usuario actualizado exitosamente.'
-        );
+        $usuario->update($validated);
+
+        if ($request->filled('roles')) {
+            $usuario->syncRoles($request->roles);
+        }
+
+        $usuario->load('roles');
+
+        return $this->jsonResponse($usuario, 'Usuario actualizado exitosamente.');
     }
 
     public function destroy($id)
-{
-    $usuario = Usuario::findOrFail($id);
-
-    try {
-        $usuario->delete();
-
-        return $this->jsonResponse(null, 'Usuario eliminado exitosamente.');
-    } catch (QueryException $e) {
-        if ($e->getCode() == 23000) {
-            return response()->json([
-                'success' => false,
-                'can_block' => true,
-                'message' => 'No se puede eliminar este usuario porque tiene pedidos registrados.'
-            ], 409);
+    {
+        try {
+            $usuario = Usuario::findOrFail($id);
+            $usuario->delete();
+            return $this->jsonResponse(null, 'Usuario eliminado exitosamente.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('No se puede eliminar el usuario porque tiene registros asociados.', 409);
         }
-
-        throw $e;
-    }
-}
-
-public function bloquear($id)
-{
-    $usuario = Usuario::findOrFail($id);
-
-    $usuario->update([
-        'id_estado_usuario' => 2 // Bloqueado
-    ]);
-
-    return $this->jsonResponse(
-        $usuario->load('estado', 'roles'),
-        'Usuario bloqueado exitosamente.'
-    );
-}
-
-    public function roles($id)
-    {
-        $usuario = Usuario::findOrFail($id);
-        return $this->jsonResponse($usuario->roles);
     }
 
-    public function assignRoles(Request $request, $id)
+    public function bloquear($id)
     {
-        $request->validate([
-            'roles' => 'required|array',
-            'roles.*' => 'integer|exists:roles,id_rol',
-        ]);
-
         $usuario = Usuario::findOrFail($id);
-        $usuario->roles()->sync($request->roles);
-
-        return $this->jsonResponse(
-            $usuario->roles,
-            'Roles asignados exitosamente.'
-        );
+        $usuario->update(['estado' => 'bloqueado']);
+        return $this->jsonResponse($usuario, 'Usuario bloqueado exitosamente.');
     }
 }

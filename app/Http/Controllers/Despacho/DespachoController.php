@@ -3,63 +3,40 @@
 namespace App\Http\Controllers\Despacho;
 
 use App\Http\Controllers\ApiController;
-use App\Models\Despacho\Despacho;
-use App\Models\Despacho\HistorialEstadoDespacho;
+use App\Models\Despacho;
 use Illuminate\Http\Request;
 
 class DespachoController extends ApiController
 {
     public function index(Request $request)
     {
-        $query = Despacho::with('pedido.farmacia', 'estado', 'controlRuta.ruta', 'parada.farmacia');
+        $query = Despacho::with('pedido.farmacia', 'pedido.usuario', 'hojaRutaDetalle.hojaRuta');
 
-        if ($request->filled('id_estado_despacho')) {
-            $query->where('id_estado_despacho', $request->id_estado_despacho);
+        if ($request->filled('estado_despacho')) {
+            $query->where('estado_despacho', $request->estado_despacho);
         }
 
         if ($request->filled('id_pedido')) {
             $query->where('id_pedido', $request->id_pedido);
         }
 
-        if ($request->filled('id_control_ruta')) {
-            $query->where('id_control_ruta', $request->id_control_ruta);
-        }
-
-        if ($request->filled('fecha_desde')) {
-            $query->where('fecha_hora_despacho', '>=', $request->fecha_desde);
-        }
-
-        if ($request->filled('fecha_hasta')) {
-            $query->where('fecha_hora_despacho', '<=', $request->fecha_hasta . ' 23:59:59');
-        }
-
-        return $this->safePaginate(
-            $query->orderBy('fecha_hora_despacho', 'desc'), $request
-        );
+        return $this->safePaginate($query->orderBy('fecha_hora_despacho', 'desc'), $request);
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'id_pedido' => 'required|integer|exists:pedidos,id_pedido|unique:despachos,id_pedido',
-            'id_parada' => 'required|integer|exists:ruta_paradas,id_parada',
-            'id_control_ruta' => 'required|integer|exists:control_rutas,id_control_ruta',
-            'id_estado_despacho' => 'required|integer|exists:estados_despacho,id_estado_despacho',
-            'fecha_hora_despacho' => 'nullable|date',
+        $validated = $request->validate([
+            'id_pedido' => 'required|integer|unique:despachos,id_pedido|exists:pedidos,id_pedido',
+            'id_detalle_hoja_ruta' => 'required|integer|exists:hoja_ruta_detalles,id_detalle',
         ]);
 
-        $data['fecha_hora_despacho'] = $data['fecha_hora_despacho'] ?? now();
+        $validated['estado_despacho'] = 'pendiente';
+        $validated['fecha_hora_despacho'] = now();
 
-        $despacho = Despacho::create($data);
-
-        HistorialEstadoDespacho::create([
-            'id_despacho' => $despacho->id_despacho,
-            'id_estado_despacho' => $data['id_estado_despacho'],
-            'fecha_inicio' => now(),
-        ]);
+        $despacho = Despacho::create($validated);
 
         return $this->jsonResponse(
-            $despacho->load('pedido.farmacia', 'estado', 'controlRuta.ruta', 'parada.farmacia'),
+            $despacho->load('pedido.farmacia', 'hojaRutaDetalle.hojaRuta'),
             'Despacho creado exitosamente.',
             201
         );
@@ -70,14 +47,11 @@ class DespachoController extends ApiController
         $despacho = Despacho::with([
             'pedido.farmacia',
             'pedido.usuario',
-            'parada.farmacia',
-            'controlRuta.ruta',
-            'controlRuta.repartidor.usuario',
-            'controlRuta.vehiculo',
-            'estado',
-            'historiales.estado',
-            'incidencias.tipoIncidencia',
-            'evidencias.tipoEvidencia',
+            'pedido.detalles.producto',
+            'hojaRutaDetalle.hojaRuta.repartidor.usuario',
+            'hojaRutaDetalle.hojaRuta.vehiculo',
+            'evidencias',
+            'incidencias',
         ])->findOrFail($id);
 
         return $this->jsonResponse($despacho);
@@ -87,75 +61,37 @@ class DespachoController extends ApiController
     {
         $despacho = Despacho::findOrFail($id);
 
-        $data = $request->validate([
-            'id_pedido' => 'sometimes|integer|exists:pedidos,id_pedido|unique:despachos,id_pedido,' . $id . ',id_despacho',
-            'id_parada' => 'sometimes|integer|exists:ruta_paradas,id_parada',
-            'id_control_ruta' => 'sometimes|integer|exists:control_rutas,id_control_ruta',
-            'id_estado_despacho' => 'sometimes|integer|exists:estados_despacho,id_estado_despacho',
-            'fecha_hora_despacho' => 'sometimes|date',
+        $validated = $request->validate([
+            'estado_despacho' => 'sometimes|in:pendiente,entregado,incidencia',
+            'monto_recibido' => 'nullable|numeric|min:0',
         ]);
 
-        if (isset($data['id_estado_despacho']) && (int) $data['id_estado_despacho'] !== (int) $despacho->id_estado_despacho) {
-            $historialActual = HistorialEstadoDespacho::where('id_despacho', $id)
-                ->whereNull('fecha_fin')
-                ->latest('fecha_inicio')
-                ->first();
+        $despacho->update($validated);
 
-            if ($historialActual) {
-                $historialActual->update(['fecha_fin' => now()]);
-            }
-
-            HistorialEstadoDespacho::create([
-                'id_despacho' => $id,
-                'id_estado_despacho' => $data['id_estado_despacho'],
-                'fecha_inicio' => now(),
-            ]);
-        }
-
-        $despacho->update($data);
-
-        return $this->jsonResponse(
-            $despacho->load('pedido.farmacia', 'estado', 'controlRuta.ruta', 'parada.farmacia'),
-            'Despacho actualizado exitosamente.'
-        );
+        return $this->jsonResponse($despacho, 'Despacho actualizado exitosamente.');
     }
 
     public function destroy($id)
     {
-        $despacho = Despacho::findOrFail($id);
-        $despacho->delete();
-
-        return $this->jsonResponse(null, 'Despacho eliminado exitosamente.');
+        try {
+            $despacho = Despacho::findOrFail($id);
+            $despacho->delete();
+            return $this->jsonResponse(null, 'Despacho eliminado exitosamente.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('No se puede eliminar el despacho.', 409);
+        }
     }
 
     public function cambiarEstado(Request $request, $id)
     {
-        $request->validate([
-            'id_estado_despacho' => 'required|integer|exists:estados_despacho,id_estado_despacho',
-        ]);
-
         $despacho = Despacho::findOrFail($id);
 
-        $historialActual = HistorialEstadoDespacho::where('id_despacho', $id)
-            ->whereNull('fecha_fin')
-            ->latest('fecha_inicio')
-            ->first();
-
-        if ($historialActual) {
-            $historialActual->update(['fecha_fin' => now()]);
-        }
-
-        HistorialEstadoDespacho::create([
-            'id_despacho' => $id,
-            'id_estado_despacho' => $request->id_estado_despacho,
-            'fecha_inicio' => now(),
+        $validated = $request->validate([
+            'estado_despacho' => 'required|in:pendiente,entregado,incidencia',
         ]);
 
-        $despacho->update(['id_estado_despacho' => $request->id_estado_despacho]);
+        $despacho->update(['estado_despacho' => $validated['estado_despacho']]);
 
-        return $this->jsonResponse(
-            $despacho->load('estado', 'historiales.estado'),
-            'Estado del despacho actualizado exitosamente.'
-        );
+        return $this->jsonResponse($despacho, 'Estado del despacho actualizado.');
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Despacho;
 
 use App\Http\Controllers\ApiController;
-use App\Models\Despacho\Despacho;
-use App\Models\Evidencia\Incidencia;
+use App\Models\Despacho;
+use App\Models\Incidencia;
 use Illuminate\Http\Request;
 
 class IncidenciaController extends ApiController
@@ -12,55 +12,52 @@ class IncidenciaController extends ApiController
     public function index($despachoId)
     {
         $despacho = Despacho::findOrFail($despachoId);
-        return $this->jsonResponse(
-            $despacho->incidencias()->with('tipoIncidencia')->get()
-        );
+        return $this->jsonResponse($despacho->incidencias);
+    }
+
+    public function show($despachoId, $id)
+    {
+        $incidencia = Incidencia::where('id_despacho', $despachoId)->findOrFail($id);
+        return $this->jsonResponse($incidencia);
     }
 
     public function store(Request $request, $despachoId)
     {
         $despacho = Despacho::findOrFail($despachoId);
 
-        $data = $request->validate([
-            'id_tipo_incidencia' => 'required|integer|exists:tipos_incidencia,id_tipo_incidencia',
-            'descripcion' => 'required|string',
+        $validated = $request->validate([
+            'tipo_incidencia' => 'required|in:cliente_ausente,producto_danado,retraso_trafico,devolucion_parcial,otro',
+            'descripcion' => 'nullable|string|max:500',
+            'archivo' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf|max:2048',
         ]);
 
-        $data['id_despacho'] = $despacho->id_despacho;
-        $data['fecha_incidencia'] = now();
+        $data = [
+            'id_despacho' => $despacho->id_despacho,
+            'tipo_incidencia' => $validated['tipo_incidencia'],
+            'descripcion' => $validated['descripcion'] ?? null,
+        ];
+
+        if ($request->hasFile('archivo')) {
+            $data['archivo'] = $request->file('archivo')->store('incidencias', 'public');
+        }
 
         $incidencia = Incidencia::create($data);
 
-        return $this->jsonResponse(
-            $incidencia->load('tipoIncidencia'),
-            'Incidencia registrada exitosamente.',
-            201
-        );
-    }
-
-    public function show($despachoId, $id)
-    {
-        $incidencia = Incidencia::where('id_despacho', $despachoId)
-            ->with('tipoIncidencia', 'despacho')
-            ->findOrFail($id);
-        return $this->jsonResponse($incidencia);
+        return $this->jsonResponse($incidencia, 'Incidencia registrada exitosamente.', 201);
     }
 
     public function update(Request $request, $despachoId, $id)
     {
         $incidencia = Incidencia::where('id_despacho', $despachoId)->findOrFail($id);
 
-        $data = $request->validate([
-            'id_tipo_incidencia' => 'sometimes|integer|exists:tipos_incidencia,id_tipo_incidencia',
-            'descripcion' => 'sometimes|string',
+        $validated = $request->validate([
+            'tipo_incidencia' => 'sometimes|in:cliente_ausente,producto_danado,retraso_trafico,devolucion_parcial,otro',
+            'descripcion' => 'nullable|string|max:500',
         ]);
 
-        $incidencia->update($data);
+        $incidencia->update($validated);
 
-        return $this->jsonResponse(
-            $incidencia->load('tipoIncidencia'),
-            'Incidencia actualizada exitosamente.'
-        );
+        return $this->jsonResponse($incidencia, 'Incidencia actualizada exitosamente.');
     }
 
     public function destroy($despachoId, $id)

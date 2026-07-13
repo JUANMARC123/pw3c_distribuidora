@@ -1,0 +1,933 @@
+.logistica-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 4px;
+    box-shadow: var(--shadow);
+}
+
+.logistica-tab {
+    flex: 1;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.logistica-tab:hover {
+    background: var(--bg);
+    color: var(--text);
+}
+
+.logistica-tab.active {
+    background: var(--primary);
+    color: white;
+}
+
+.logistica-tab i {
+    font-size: 14px;
+}
+
+/* Pedido card para drag */
+.pedido-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    cursor: grab;
+    transition: var(--transition);
+    font-size: 12px;
+    user-select: none;
+}
+
+.pedido-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(59,130,246,0.15);
+}
+
+.pedido-card:active {
+    cursor: grabbing;
+}
+
+.pedido-card .pedido-id {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 13px;
+}
+
+.pedido-card .pedido-farmacia {
+    color: var(--text);
+    font-weight: 500;
+    margin: 2px 0;
+}
+
+.pedido-card .pedido-meta {
+    color: var(--text-muted);
+    font-size: 11px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pedido-card .pedido-productos {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px dashed var(--border);
+}
+
+/* Repartidor card en columna */
+.repartidor-card {
+    background: var(--card-bg);
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    transition: var(--transition);
+}
+
+.repartidor-card.drag-over {
+    border-color: var(--primary);
+    background: #f0f7ff;
+}
+
+.repartidor-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.repartidor-card-header .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.repartidor-card-header .info {
+    flex: 1;
+    min-width: 0;
+}
+
+.repartidor-card-header .info .name {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.repartidor-card-header .info .vehiculo {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.repartidor-card .dropzone {
+    min-height: 40px;
+    padding: 4px;
+    border-radius: 4px;
+    background: #f8fafc;
+    margin-top: 6px;
+}
+
+.repartidor-card .dropzone .pedido-card {
+    font-size: 11px;
+    padding: 6px 8px;
+    margin-bottom: 4px;
+}
+
+.repartidor-card .btn-iniciar {
+    width: 100%;
+    margin-top: 6px;
+    padding: 6px;
+    font-size: 12px;
+    border: none;
+    border-radius: 4px;
+    background: var(--success);
+    color: white;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.repartidor-card .btn-iniciar:hover {
+    background: #059669;
+}
+
+.repartidor-card .btn-iniciar:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* Tracking tab */
+.tracking-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 12px;
+    height: calc(100vh - 200px);
+    min-height: 500px;
+}
+
+.tracking-list {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow-y: auto;
+}
+
+.tracking-list-header {
+    padding: 12px 16px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--card-bg);
+    z-index: 1;
+}
+
+.tracking-card {
+    padding: 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tracking-card:hover {
+    background: var(--bg);
+}
+
+.tracking-card.active {
+    background: #eff6ff;
+    border-left: 3px solid var(--primary);
+}
+
+.tracking-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px 0;
+}
+
+.tracking-card-head > strong {
+    font-size: 13px;
+    color: var(--primary);
+}
+
+.tracking-card-body {
+    padding: 8px 14px 12px;
+}
+
+.tracking-card-repartidor strong {
+    font-size: 14px;
+    display: block;
+}
+
+.tracking-card-repartidor p {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 1px 0;
+}
+
+.tracking-hora-salida {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.tracking-hora-salida i {
+    margin-right: 3px;
+}
+
+.tracking-card-progress-section {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+}
+
+.tracking-card-progress-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.tracking-card-progress-header .badge {
+    min-width: 36px;
+    text-align: center;
+}
+
+.tracking-card .tracking-progress {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.tracking-card .tracking-progress-bar {
+    height: 100%;
+    background: var(--success);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+.tracking-card-progress-section > small {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+.tracking-card-top,
+.tracking-card .tracking-meta {
+    display: none;
+}
+
+.tracking-mapa {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.tracking-mapa #tracking-map {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+}
+
+@media (max-width: 1200px) {
+}
+
+@media (max-width: 768px) {
+    .tracking-grid {
+        grid-template-columns: 1fr;
+    }
+    .logistica-tab span {
+        display: none;
+    }
+}
+
+/* Redisenio operativo */
+.route-shell {
+    display: grid;
+    grid-template-columns: 290px minmax(360px, 1fr) 360px;
+    gap: 12px;
+    min-height: calc(100vh - 220px);
+}
+
+.route-panel,
+.route-map-panel,
+.tracking-detail {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.route-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.route-panel.wide {
+    min-width: 0;
+}
+
+.route-panel-toolbar {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.route-panel-body {
+    flex: 1;
+    max-height: calc(100vh - 290px);
+}
+
+.route-map-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.route-map-header {
+    min-height: 54px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.route-map-header span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.route-map {
+    flex: 1;
+    min-height: 460px;
+}
+
+.pedido-card.assigned-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.pedido-card.missing-coords {
+    border-color: #f59e0b;
+}
+
+.pedido-card-line {
+    align-items: flex-start;
+}
+
+.pedido-flags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.repartidor-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.repartidor-card.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(59,130,246,.12);
+}
+
+.repartidor-summary {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 8px 0;
+}
+
+.repartidor-card .dropzone {
+    min-height: 78px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 7px;
+    padding: 8px;
+}
+
+.repartidor-card .dropzone .pedido-card {
+    margin-bottom: 8px;
+}
+
+.tracking-grid {
+    display: grid;
+    grid-template-columns: 320px minmax(360px, 1fr) 340px;
+    gap: 12px;
+    height: calc(100vh - 220px);
+    min-height: 520px;
+}
+
+.tracking-list,
+.tracking-mapa,
+.tracking-detail {
+    min-height: 0;
+}
+
+.tracking-list {
+    border: 1px solid var(--border);
+}
+
+.tracking-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tracking-card-top {
+    align-items: flex-start;
+}
+
+.tracking-detail-header {
+    align-items: flex-start;
+}
+
+.tracking-detail-header h3,
+.tracking-detail-header p {
+    margin: 0;
+}
+
+.tracking-mapa #tracking-map {
+    min-height: 520px;
+}
+
+@media (max-width: 1250px) {
+    .route-shell,
+    .tracking-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .route-panel-body {
+        max-height: none;
+    }
+
+    .route-map,
+    .tracking-mapa #tracking-map {
+        min-height: 360px;
+    }
+}
+
+@media (max-width: 900px) {
+    .logistica-tabs {
+        overflow-x: auto;
+    }
+
+    .logistica-tab {
+        min-width: 130px;
+        flex: 0 0 auto;
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .logistica-tab span {
+        display: none;
+    }
+}
+
+/* Kanban board dentro de seguimiento */
+#kanban-container .kanban-board {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(220px, 1fr));
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+#kanban-container .kanban-column {
+    min-width: 220px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px;
+}
+
+#kanban-container .kanban-column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+#kanban-container .kanban-column-body {
+    display: grid;
+    gap: 8px;
+    min-height: 60px;
+}
+
+#kanban-container .kanban-column-body .empty-state {
+    padding: 20px 10px;
+    font-size: 12px;
+}
+
+#kanban-container .order-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    cursor: grab;
+    transition: var(--transition);
+    user-select: none;
+}
+
+#kanban-container .order-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(59,130,246,0.12);
+}
+
+#kanban-container .order-card:active {
+    cursor: grabbing;
+}
+
+#kanban-container .order-card .order-id {
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 13px;
+}
+
+#kanban-container .order-card h4 {
+    margin: 6px 0;
+    font-size: 14px;
+}
+
+#kanban-container .order-card .order-meta {
+    display: flex;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+#kanban-container .order-card .delivery-progress {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+#kanban-container .order-card .delivery-progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+#kanban-container .order-card .delivery-progress-bar span {
+    display: block;
+    height: 100%;
+    background: var(--success);
+    border-radius: 999px;
+    transition: none;
+}
+
+#kanban-container .order-card .delivery-progress small {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+#kanban-container .order-card .order-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 6px;
+    border-top: 1px dashed var(--border);
+    font-size: 12px;
+}
+
+#kanban-container .order-card .order-total span {
+    color: var(--text-muted);
+}
+
+#kanban-container .order-card .order-total strong {
+    font-size: 14px;
+}
+
+/* Entregado column - cards not shown, only count */
+#kanban-container .kanban-column[data-column="entregado"] .kanban-column-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Table within kanban container */
+#kanban-container .ops-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+#kanban-container .card-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#kanban-container .card-body {
+    padding: 16px;
+}
+
+#kanban-container .product-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#kanban-container .product-detail-table th,
+#kanban-container .product-detail-table td {
+    font-size: 12px;
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+#kanban-container .product-detail-table th {
+    background: #f8fafc;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+#kanban-container .product-detail-table td .actions {
+    display: flex;
+    gap: 6px;
+}
+
+@media (max-width: 1100px) {
+    #kanban-container .kanban-board {
+        grid-template-columns: repeat(3, minmax(240px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    #kanban-container .kanban-board {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ─────────── GPS marker ─────────── */
+.gps-marker {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(15,23,42,.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    transition: background 0.5s ease;
+}
+.gps-trail-dot {
+    width: 8px;
+    height: 8px;
+    background: #2563eb;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.6);
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* ─── Estilos para paradas en tracking ─── */
+
+.tracking-stop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.tracking-stop:last-child {
+    border-bottom: none;
+}
+
+.tracking-stop .stop-index {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.tracking-stop .stop-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.tracking-stop .stop-info strong {
+    display: block;
+    font-size: 13px;
+}
+
+.tracking-stop .stop-info p {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin: 2px 0 0;
+}
+
+.tracking-stop .stop-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.btn-llegar {
+    white-space: nowrap;
+    font-size: 11px;
+    padding: 4px 10px;
+}
+
+.stop-llegada-badge {
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.tracking-hora-salida {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.tracking-hora-salida i {
+    margin-right: 4px;
+}
+
+/* ─── Stop action modal ─── */
+
+.stop-action-modal {
+    max-width: 520px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.stop-action-modal .stop-modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stop-action-modal .stop-modal-header h3 {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stop-action-modal .stop-modal-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.stop-modal-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.stop-modal-section {
+    margin-bottom: 16px;
+}
+
+.stop-modal-section h4 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stop-modal-subsection {
+    margin-bottom: 8px;
+    padding: 8px;
+    background: #f8fafc;
+    border-radius: 6px;
+    min-height: 32px;
+}
+
+.incidencia-item,
+.evidencia-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 12px;
+}
+
+.stop-modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.stop-modal-actions .btn {
+    flex: 1;
+    font-size: 13px;
+    padding: 10px 12px;
+}
+
+.loading-sm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+
+.loading-sm .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+/* ─── Tracking completadas toggle ─── */
+
+.tracking-stop-completed {
+    opacity: 0.6;
+}
+
+.tracking-completadas-toggle {
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+}
+
+.tracking-completadas-toggle:hover {
+    background: #f8fafc;
+}
+
+.tracking-completadas-toggle.open .fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.tracking-completadas-toggle .fa-chevron-down {
+    transition: transform 0.2s;
+    margin-left: auto;
+}
+
+.tracking-completadas-list {
+    border-top: 1px solid var(--border);
+}
