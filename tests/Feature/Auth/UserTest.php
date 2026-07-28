@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * BDD: docs/specs/auth.md -> Escenario A1 (Obtener usuario autenticado)
+ * @see \App\Http\Controllers\AuthController::user
+ */
+
 uses()->group('auth', 'user');
 
 it('obtiene el usuario autenticado', function () {

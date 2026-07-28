@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * BDD: docs/specs/auth.md -> Escenarios A1, A2, A3 (Login, credenciales incorrectas, usuario bloqueado)
+ * @see \App\Http\Controllers\AuthController::login
+ */
+
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

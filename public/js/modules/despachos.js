@@ -1,20 +1,20 @@
 let despachosTable, editingId = null;
-let pedidosList = [], paradasList = [], controlesList = [], estadosDesp = [];
+let pedidosList = [];
 let tiposIncidencia = [], tiposEvidencia = [];
+
+const ESTADOS_DESPACHO = ['pendiente', 'entregado', 'incidencia'];
+const TIPOS_INCIDENCIA = ['cliente_ausente', 'producto_danado', 'retraso_trafico', 'devolucion_parcial', 'otro'];
+const TIPOS_EVIDENCIA = ['firma', 'foto', 'sello'];
 
 document.addEventListener('DOMContentLoaded', async function () {
     if (!checkAuth()) return;
-    await Promise.all([loadCatalogos()]);
+    if (!hasPermission('Despachos', 'acceder')) { window.location.href = '../dashboard.html'; return; }
+    await loadCatalogos();
     renderPage();
 });
 
 async function loadCatalogos() {
     try { const d = await apiFetch('/pedidos'); pedidosList = Array.isArray(d) ? d : (d.data || []); } catch (e) { pedidosList = []; }
-    try { const d = await apiFetch('/controles-ruta'); controlesList = Array.isArray(d) ? d : (d.data || []); } catch (e) { controlesList = []; }
-    try { const d = await apiFetch('/catalogos/estados-despacho'); estadosDesp = Array.isArray(d) ? d : (d.data || []); } catch (e) { estadosDesp = [{ id_estado_despacho: 1, nombre_estado: 'Pendiente' }, { id_estado_despacho: 2, nombre_estado: 'En camino' }, { id_estado_despacho: 3, nombre_estado: 'Entregado completo' }, { id_estado_despacho: 4, nombre_estado: 'Fallido' }, { id_estado_despacho: 5, nombre_estado: 'Devolucion' }]; }
-    try { const d = await apiFetch('/catalogos/tipos-incidencia'); tiposIncidencia = Array.isArray(d) ? d : (d.data || []); } catch (e) { tiposIncidencia = [{ id_tipo_incidencia: 1, nombre_tipo: 'Producto dañado' }, { id_tipo_incidencia: 2, nombre_tipo: 'Retraso' }, { id_tipo_incidencia: 3, nombre_tipo: 'Dirección incorrecta' }, { id_tipo_incidencia: 4, nombre_tipo: 'Cliente ausente' }]; }
-    try { const d = await apiFetch('/catalogos/tipos-evidencia'); tiposEvidencia = Array.isArray(d) ? d : (d.data || []); } catch (e) { tiposEvidencia = [{ id_tipo_evidencia: 1, nombre_tipo: 'Foto' }, { id_tipo_evidencia: 2, nombre_tipo: 'Firma' }, { id_tipo_evidencia: 3, nombre_tipo: 'PDF' }]; }
-    try { const d = await apiFetch('/rutas'); const rutas = Array.isArray(d) ? d : (d.data || []); const allParadas = []; for (const r of rutas) { try { const p = await apiFetch(`/rutas/${r.id_ruta}/paradas`); const parsed = Array.isArray(p) ? p : (p.data || []); parsed.forEach(p2 => allParadas.push({ ...p2, ruta_nombre: r.nombre_ruta })); } catch (e) {} } paradasList = allParadas; } catch (e) { paradasList = []; }
 }
 
 function renderPage() {
@@ -26,7 +26,7 @@ function renderPage() {
             </div>
             <div class="card-body">
                 <div class="table-container"><table id="main-table" class="display" style="width:100%"><thead><tr>
-                    <th>ID</th><th>Pedido</th><th>Parada</th><th>Control Ruta</th><th>Estado</th><th>Fecha</th><th>Acciones</th>
+                    <th>ID</th><th>Pedido</th><th>Estado</th><th>Fecha</th><th>Acciones</th>
                 </tr></thead></table></div>
             </div>
         </div>
@@ -34,14 +34,8 @@ function renderPage() {
             <div class="modal-header"><h3 id="modal-title">Nuevo Despacho</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
             <div class="modal-body">
                 <form id="main-form">
-                    <div class="form-row">
-                        <div class="form-group"><label>Pedido *</label><select id="f-pedido" class="form-control" required><option value="">Seleccione...</option>${pedidosList.map(p => `<option value="${p.id_pedido}">#${p.id_pedido} - ${p.farmacia?.nombre || ''}</option>`).join('')}</select></div>
-                        <div class="form-group"><label>Parada</label><select id="f-parada" class="form-control"><option value="">Seleccione...</option>${paradasList.map(p => `<option value="${p.id_parada}">${p.ruta_nombre || '?'} - ${p.farmacia?.nombre || p.nombre_farmacia || '?'} (Ord:${p.orden_parada})</option>`).join('')}</select></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Control de Ruta</label><select id="f-control" class="form-control"><option value="">Seleccione...</option>${controlesList.map(c => `<option value="${c.id_control_ruta}">${c.ruta?.nombre_ruta || ''} - ${formatDateShort(c.fecha_ruta)}</option>`).join('')}</select></div>
-                        <div class="form-group"><label>Estado</label><select id="f-estado" class="form-control">${estadosDesp.map(e => `<option value="${e.id_estado_despacho}">${e.nombre_estado}</option>`).join('')}</select></div>
-                    </div>
+                    <div class="form-group"><label>Pedido *</label><select id="f-pedido" class="form-control" required><option value="">Seleccione...</option>${pedidosList.map(p => `<option value="${p.id_pedido}">#${p.id_pedido} - ${p.farmacia?.nombre || ''}</option>`).join('')}</select></div>
+                    <div class="form-group"><label>Estado</label><select id="f-estado" class="form-control">${ESTADOS_DESPACHO.map(e => `<option value="${e}">${e.charAt(0).toUpperCase() + e.slice(1)}</option>`).join('')}</select></div>
                     <div class="form-group"><label>Fecha y Hora de Despacho</label><input type="datetime-local" id="f-fecha" class="form-control"></div>
                 </form>
             </div>
@@ -51,7 +45,7 @@ function renderPage() {
             <div class="modal-header"><h3>Cambiar Estado</h3><button class="modal-close" onclick="closeEstadoModal()">&times;</button></div>
             <div class="modal-body">
                 <p class="text-muted mb-4">Nuevo estado para despacho <strong id="estado-ref"></strong></p>
-                <div class="form-group"><label>Estado</label><select id="s-estado" class="form-control">${estadosDesp.map(e => `<option value="${e.id_estado_despacho}">${e.nombre_estado}</option>`).join('')}</select></div>
+                <div class="form-group"><label>Estado</label><select id="s-estado" class="form-control">${ESTADOS_DESPACHO.map(e => `<option value="${e}">${e.charAt(0).toUpperCase() + e.slice(1)}</option>`).join('')}</select></div>
             </div>
             <div class="modal-footer"><button class="btn btn-secondary" onclick="closeEstadoModal()">Cancelar</button><button class="btn btn-primary" onclick="changeEstado()">Cambiar</button></div>
         </div></div>
@@ -68,7 +62,7 @@ function renderPage() {
             <div class="modal-header"><h3 id="incidencia-form-title">Nueva Incidencia</h3><button class="modal-close" onclick="closeIncidenciaForm()">&times;</button></div>
             <div class="modal-body">
                 <form id="incidencia-form">
-                    <div class="form-group"><label>Tipo *</label><select id="i-tipo" class="form-control" required><option value="">Seleccione...</option>${tiposIncidencia.map(t => `<option value="${t.id_tipo_incidencia}">${t.nombre_tipo}</option>`).join('')}</select></div>
+                    <div class="form-group"><label>Tipo *</label><select id="i-tipo" class="form-control" required><option value="">Seleccione...</option>${TIPOS_INCIDENCIA.map(t => `<option value="${t}">${t.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>`).join('')}</select></div>
                     <div class="form-group"><label>Descripción *</label><textarea id="i-descripcion" class="form-control" rows="3" required></textarea></div>
                 </form>
             </div>
@@ -87,7 +81,7 @@ function renderPage() {
             <div class="modal-header"><h3 id="evidencia-form-title">Subir Evidencia</h3><button class="modal-close" onclick="closeEvidenciaForm()">&times;</button></div>
             <div class="modal-body">
                 <form id="evidencia-form">
-                    <div class="form-group"><label>Tipo de Evidencia *</label><select id="e-tipo" class="form-control" required><option value="">Seleccione...</option>${tiposEvidencia.map(t => `<option value="${t.id_tipo_evidencia}">${t.nombre_tipo}</option>`).join('')}</select></div>
+                    <div class="form-group"><label>Tipo de Evidencia *</label><select id="e-tipo" class="form-control" required><option value="">Seleccione...</option>${TIPOS_EVIDENCIA.map(t => `<option value="${t}">${t.charAt(0).toUpperCase() + t.slice(1)}</option>`).join('')}</select></div>
                     <div class="form-group"><label>Archivo *</label><input type="file" id="e-archivo" class="form-control" required style="padding:8px;"></div>
                 </form>
             </div>
@@ -108,9 +102,7 @@ async function loadTable() {
             columns: [
                 { data: 'id_despacho' },
                 { data: null, render: r => `#${r.pedido?.id_pedido || r.id_pedido || '?'}` },
-                { data: null, render: r => r.parada?.farmacia?.nombre || r.nombre_farmacia || '—' },
-                { data: null, render: r => r.control_ruta?.ruta?.nombre_ruta || r.nombre_ruta || '—' },
-                { data: null, render: r => getStatusBadge(r.estado?.nombre_estado || r.nombre_estado || '—') },
+                { data: null, render: r => getStatusBadge(r.estado_despacho || r.estado || '—') },
                 { data: null, render: r => formatDate(r.fecha_hora_despacho) },
                 { data: null, render: r => `<div class="actions">
                     ${hasPermission('Despachos', 'gestionar-incidencias') ? `<button class="btn btn-sm btn-info" onclick="openIncidenciasModal(${r.id_despacho})" title="Incidencias"><i class="fas fa-exclamation-triangle"></i></button>` : ''}
@@ -138,9 +130,7 @@ async function edit(id) {
         const desp = d.despacho || d.data || d;
         editingId = id; document.getElementById('modal-title').textContent = 'Editar Despacho';
         document.getElementById('f-pedido').value = desp.id_pedido || '';
-        document.getElementById('f-parada').value = desp.id_parada || '';
-        document.getElementById('f-control').value = desp.id_control_ruta || '';
-        document.getElementById('f-estado').value = desp.id_estado_despacho || '';
+        document.getElementById('f-estado').value = desp.estado_despacho || desp.estado || 'pendiente';
         document.getElementById('f-fecha').value = desp.fecha_hora_despacho ? desp.fecha_hora_despacho.slice(0, 16) : '';
         document.getElementById('main-modal').classList.add('active');
     } catch (e) { Swal.fire('Error', 'No se pudo cargar el despacho', 'error'); }
@@ -149,15 +139,10 @@ async function edit(id) {
 async function save() {
     const body = {
         id_pedido: parseInt(document.getElementById('f-pedido').value),
-        id_parada: parseInt(document.getElementById('f-parada').value) || null,
-        id_control_ruta: parseInt(document.getElementById('f-control').value) || null,
-        id_estado_despacho: parseInt(document.getElementById('f-estado').value),
+        estado_despacho: document.getElementById('f-estado').value,
         fecha_hora_despacho: document.getElementById('f-fecha').value || null,
     };
     if (!body.id_pedido) return Swal.fire('Validación', 'Seleccione un pedido', 'warning');
-    if (!body.id_parada) return Swal.fire('Validación', 'Seleccione una parada', 'warning');
-    if (!body.id_control_ruta) return Swal.fire('Validación', 'Seleccione un control de ruta', 'warning');
-    if (!body.id_estado_despacho) return Swal.fire('Validación', 'Seleccione un estado', 'warning');
     try {
         if (editingId) { await apiFetch(`/despachos/${editingId}`, { method: 'PUT', body }); Swal.fire('Actualizado', 'Despacho actualizado', 'success'); }
         else { await apiFetch('/despachos', { method: 'POST', body }); Swal.fire('Creado', 'Despacho creado', 'success'); }
@@ -172,18 +157,16 @@ async function del(id) {
     catch (e) { Swal.fire('Error', e.message || 'Error al eliminar', 'error'); }
 }
 
-// Cambiar estado
 let estadoDespId = null;
 function openEstadoModal(id, ref) { estadoDespId = id; document.getElementById('estado-ref').textContent = ref; document.getElementById('s-estado').value = ''; document.getElementById('estado-modal').classList.add('active'); }
 function closeEstadoModal() { document.getElementById('estado-modal').classList.remove('active'); estadoDespId = null; }
 async function changeEstado() {
-    const id_estado_despacho = parseInt(document.getElementById('s-estado').value);
-    if (!id_estado_despacho) return Swal.fire('Validación', 'Seleccione un estado', 'warning');
-    try { await apiFetch(`/despachos/${estadoDespId}/cambiar-estado`, { method: 'POST', body: { id_estado_despacho } }); Swal.fire('Actualizado', 'Estado cambiado', 'success'); closeEstadoModal(); if (despachosTable) await reloadDataTable(despachosTable, '/despachos'); }
+    const estado = document.getElementById('s-estado').value;
+    if (!estado) return Swal.fire('Validación', 'Seleccione un estado', 'warning');
+    try { await apiFetch(`/despachos/${estadoDespId}/cambiar-estado`, { method: 'POST', body: { estado_despacho: estado } }); Swal.fire('Actualizado', 'Estado cambiado', 'success'); closeEstadoModal(); if (despachosTable) await reloadDataTable(despachosTable, '/despachos'); }
     catch (e) { Swal.fire('Error', e.message || 'Error al cambiar estado', 'error'); }
 }
 
-// Incidencias nested
 let currentDespachoId = null, incidenciasDT = null, editingIncidenciaId = null;
 
 async function openIncidenciasModal(id) {
@@ -202,9 +185,9 @@ async function loadIncidencias() {
             data, pageLength: 5, pagingType: 'simple', order: [[2, 'desc']], searching: false,
             language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
             columns: [
-                { data: null, render: r => r.tipo?.nombre_tipo || r.nombre_tipo || '—' },
+                { data: null, render: r => r.tipo_incidencia || r.nombre_tipo || '—' },
                 { data: 'descripcion' },
-                { data: null, render: r => formatDate(r.fecha_incidencia) },
+                { data: null, render: r => formatDate(r.created_at) },
                 { data: null, render: r => `<div class="actions">
                     ${hasPermission('Despachos', 'gestionar-incidencias') ? `<button class="btn btn-sm btn-warning" onclick="editIncidencia(${r.id_incidencia})"><i class="fas fa-edit"></i></button>` : ''}
                     ${hasPermission('Despachos', 'gestionar-incidencias') ? `<button class="btn btn-sm btn-danger" onclick="delIncidencia(${r.id_incidencia})"><i class="fas fa-trash"></i></button>` : ''}
@@ -228,7 +211,7 @@ async function editIncidencia(id) {
         const inc = d.incidencia || d.data || d;
         editingIncidenciaId = id;
         document.getElementById('incidencia-form-title').textContent = 'Editar Incidencia';
-        document.getElementById('i-tipo').value = inc.id_tipo_incidencia || '';
+        document.getElementById('i-tipo').value = inc.tipo_incidencia || '';
         document.getElementById('i-descripcion').value = inc.descripcion || '';
         document.getElementById('incidencia-form-modal').classList.add('active');
     } catch (e) { Swal.fire('Error', 'No se pudo cargar la incidencia', 'error'); }
@@ -236,10 +219,10 @@ async function editIncidencia(id) {
 
 async function saveIncidencia() {
     const body = {
-        id_tipo_incidencia: parseInt(document.getElementById('i-tipo').value),
+        tipo_incidencia: document.getElementById('i-tipo').value,
         descripcion: document.getElementById('i-descripcion').value.trim(),
     };
-    if (!body.id_tipo_incidencia || !body.descripcion) return Swal.fire('Validación', 'Tipo y descripción son obligatorios', 'warning');
+    if (!body.tipo_incidencia || !body.descripcion) return Swal.fire('Validación', 'Tipo y descripción son obligatorios', 'warning');
     try {
         if (editingIncidenciaId) { await apiFetch(`/despachos/${currentDespachoId}/incidencias/${editingIncidenciaId}`, { method: 'PUT', body }); Swal.fire('Actualizada', 'Incidencia actualizada', 'success'); }
         else { await apiFetch(`/despachos/${currentDespachoId}/incidencias`, { method: 'POST', body }); Swal.fire('Creada', 'Incidencia registrada', 'success'); }
@@ -254,7 +237,6 @@ async function delIncidencia(id) {
     catch (e) { Swal.fire('Error', e.message || 'Error al eliminar', 'error'); }
 }
 
-// Evidencias nested
 let evidenciasDT = null, editingEvidenciaId = null;
 
 async function openEvidenciasModal(id) {
@@ -273,13 +255,13 @@ async function loadEvidencias() {
             data, pageLength: 5, pagingType: 'simple', order: [[2, 'desc']], searching: false,
             language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
             columns: [
-                { data: null, render: r => r.tipoEvidencia?.nombre_tipo || r.tipo?.nombre_tipo || r.nombre_tipo || '—' },
+                { data: null, render: r => r.tipo_evidencia || r.nombre_tipo || '—' },
                 { data: null, render: r => {
                     if (!r.archivo) return '—';
-                    const url = r.archivo.startsWith('http') ? r.archivo : `http://127.0.0.1:8000/storage/${r.archivo}`;
+                    const url = r.archivo.startsWith('http') ? r.archivo : `${window.location.origin}/storage/${r.archivo}`;
                     return `<a href="${url}" target="_blank" class="btn btn-sm btn-outline"><i class="fas fa-eye"></i> Ver</a>`;
                 }},
-                { data: null, render: r => formatDate(r.fecha_registro) },
+                { data: null, render: r => formatDate(r.created_at) },
                 { data: null, render: r => `<div class="actions">
                     ${hasPermission('Despachos', 'gestionar-evidencias') ? `<button class="btn btn-sm btn-danger" onclick="delEvidencia(${r.id_evidencia})"><i class="fas fa-trash"></i></button>` : ''}
                 </div>`, orderable: false }
@@ -295,12 +277,12 @@ function openEvidenciaForm() {
 function closeEvidenciaForm() { document.getElementById('evidencia-form-modal').classList.remove('active'); }
 
 async function saveEvidencia() {
-    const id_tipo_evidencia = parseInt(document.getElementById('e-tipo').value);
+    const tipo_evidencia = document.getElementById('e-tipo').value;
     const archivo = document.getElementById('e-archivo').files[0];
-    if (!id_tipo_evidencia || !archivo) return Swal.fire('Validación', 'Tipo y archivo son obligatorios', 'warning');
+    if (!tipo_evidencia || !archivo) return Swal.fire('Validación', 'Tipo y archivo son obligatorios', 'warning');
 
     const formData = new FormData();
-    formData.append('id_tipo_evidencia', id_tipo_evidencia);
+    formData.append('tipo_evidencia', tipo_evidencia);
     formData.append('archivo', archivo);
 
     try {

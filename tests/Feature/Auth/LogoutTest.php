@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * BDD: docs/specs/auth.md -> Escenario A4 (Logout invalida token)
+ * @see \App\Http\Controllers\AuthController::logout
+ */
+
 uses()->group('auth', 'logout');
 
 it('cierra sesion correctamente', function () {

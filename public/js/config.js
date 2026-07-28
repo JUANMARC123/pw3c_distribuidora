@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:8000/api';
+const API_URL = window.location.origin + '/api';
 
 const ROOT_PATH = (() => {
     const path = window.location.pathname;
@@ -70,7 +70,14 @@ async function apiFetch(endpoint, options = {}) {
             throw err;
         }
 
-        return data;
+        if (data && data.meta) {
+            const result = data.data;
+            result.meta = data.meta;
+            result.paginator = data.meta;
+            return result;
+        }
+
+        return data.data !== undefined ? data.data : data;
     } catch (error) {
         if (error.status) throw error;
 

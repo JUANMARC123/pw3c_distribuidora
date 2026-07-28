@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * BDD: docs/specs/reportes.md -> Escenarios R1, R2, R3 (Resumen, reportes por estado, incidencias)
+ * @see \App\Http\Controllers\Reportes\ReporteController
+ */
+
 use App\Models\Pedido;
 use App\Models\Despacho;
 

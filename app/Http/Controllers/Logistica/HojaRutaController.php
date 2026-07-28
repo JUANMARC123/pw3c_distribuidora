@@ -65,18 +65,27 @@ class HojaRutaController extends ApiController
 
                     $detalle = HojaRutaDetalle::create([
                         'id_hoja_ruta' => $hojaRuta->id_hoja_ruta,
-                        'id_pedido' => $pedido->id_pedido,
+                        'id_pedido' => $pedidoData['id_pedido'],
                         'orden_visita' => $pedidoData['orden_visita'],
                     ]);
 
-                    Despacho::create([
-                        'id_pedido' => $pedido->id_pedido,
-                        'id_detalle_hoja_ruta' => $detalle->id_detalle,
-                        'fecha_hora_despacho' => now(),
-                        'estado_despacho' => 'pendiente',
-                    ]);
+                    $despachoExistente = Despacho::where('id_pedido', $pedidoData['id_pedido'])->first();
+                    if ($despachoExistente) {
+                        $despachoExistente->update([
+                            'id_detalle_hoja_ruta' => $detalle->id_detalle,
+                            'fecha_hora_despacho' => now(),
+                            'estado_despacho' => 'pendiente',
+                        ]);
+                    } else {
+                        Despacho::create([
+                            'id_pedido' => $pedidoData['id_pedido'],
+                            'id_detalle_hoja_ruta' => $detalle->id_detalle,
+                            'fecha_hora_despacho' => now(),
+                            'estado_despacho' => 'pendiente',
+                        ]);
+                    }
 
-                    $pedidoIds[] = $pedido->id_pedido;
+                    $pedidoIds[] = $pedidoData['id_pedido'];
                 }
 
                 return $this->jsonResponse(

@@ -19,14 +19,40 @@ const VALID_TABS = ['pedidos', 'planificacion', 'seguimiento', 'historial'];
 document.addEventListener('DOMContentLoaded', async function () {
     if (!checkAuth()) return;
     if (!canAccessLogistica()) { window.location.href = '../dashboard.html'; return; }
+
+    // Ocultar tabs según permisos
+    document.querySelectorAll('.logistica-tab').forEach(el => {
+        const tab = el.dataset.tab;
+        if (!canAccessTab(tab)) {
+            el.style.display = 'none';
+        }
+    });
+
     const initialTab = getInitialTab();
-    switchTab(initialTab, false);
+    const accessibleTab = canAccessTab(initialTab) ? initialTab : (getFirstAccessibleTab() || 'pedidos');
+    switchTab(accessibleTab, accessibleTab !== initialTab);
 });
 
 function canAccessLogistica() {
     return hasPermission('Pedidos', 'acceder')
         || hasPermission('Despachos', 'acceder')
+        || hasPermission('Logistica', 'acceder')
+        || hasPermission('Rutas', 'acceder')
         || hasPermission('Control Rutas', 'acceder');
+}
+
+function canAccessTab(tab) {
+    switch (tab) {
+        case 'pedidos': return hasPermission('Pedidos', 'acceder');
+        case 'planificacion': return hasPermission('Rutas', 'acceder');
+        case 'seguimiento': return hasPermission('Control Rutas', 'acceder') || hasPermission('Rutas', 'acceder');
+        case 'historial': return hasPermission('Despachos', 'acceder') || hasPermission('Logistica', 'acceder');
+        default: return false;
+    }
+}
+
+function getFirstAccessibleTab() {
+    return VALID_TABS.find(tab => canAccessTab(tab)) || null;
 }
 
 function getInitialTab() {
@@ -42,7 +68,11 @@ function normalizeTab(tab) {
 function switchTab(tab, updateHash = true) {
     currentTab = normalizeTab(tab);
     if (!VALID_TABS.includes(currentTab)) {
-        currentTab = 'pedidos';
+        currentTab = getFirstAccessibleTab() || 'pedidos';
+    }
+
+    if (!canAccessTab(currentTab)) {
+        currentTab = getFirstAccessibleTab() || 'pedidos';
     }
 
     document.querySelectorAll('.logistica-tab').forEach(el => {

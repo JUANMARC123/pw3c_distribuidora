@@ -1,4 +1,3 @@
-let cargosList = [];
 let farmaciasData = [];
 let pedidosData = [];
 let editingFarmaciaId = null;
@@ -10,18 +9,9 @@ let markerModal = null;
 let mapaGlobal = null;
 let marcadoresGlobales = [];
 
-const DEFAULT_CARGOS = [
-    { id_cargo: 1, nombre_cargo: 'Gerente' },
-    { id_cargo: 2, nombre_cargo: 'Encargado' },
-    { id_cargo: 3, nombre_cargo: 'Farmacéutico' },
-    { id_cargo: 4, nombre_cargo: 'Administrador' },
-    { id_cargo: 5, nombre_cargo: 'Recepcionista' },
-];
-
 document.addEventListener('DOMContentLoaded', async function () {
     if (!checkAuth()) return;
     if (!hasPermission('Farmacias', 'acceder')) { window.location.href = '../dashboard.html'; return; }
-    await loadCargos();
     renderPage();
 });
 
@@ -31,15 +21,6 @@ function esEmailValido(email) {
 
 function validarEmailInput(input) {
     input.style.borderColor = input.value && !esEmailValido(input.value) ? '#ef4444' : '';
-}
-
-async function loadCargos() {
-    try {
-        const data = await apiFetch('/catalogos/cargos');
-        cargosList = Array.isArray(data) ? data : (data.data || []);
-    } catch (e) {
-        cargosList = DEFAULT_CARGOS;
-    }
 }
 
 function renderPage() {
@@ -54,30 +35,47 @@ function renderPage() {
                     ${hasPermission('Pedidos', 'crear') ? '<a class="btn btn-success" href="/pages/logistica.html#pedidos"><i class="fas fa-box"></i> Nuevo pedido</a>' : ''}
                 </div>
             </div>
-            <div class="ops-panel">
-                <div class="card-header"><h3><i class="fas fa-map-marked-alt"></i> Mapa</h3><span id="mapa-contador" class="text-muted"></span></div>
-                <div class="card-body" style="padding:0;">
-                    <div id="mapa-farmacias-global" style="height:270px;border-radius:0 0 var(--radius) var(--radius);"></div>
+        </section>
+
+        <div class="ops-split">
+            <div class="ops-split-left">
+                <section class="ops-toolbar">
+                    <div class="ops-search">
+                        <i class="fas fa-search"></i>
+                        <input class="form-control" id="farmacias-search" placeholder="Buscar farmacia o dirección" oninput="renderFarmaciaCards()">
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline" onclick="reloadFarmaciasView()"><i class="fas fa-rotate"></i> Actualizar</button>
+                    </div>
+                </section>
+
+                <section class="ops-table-container">
+                    <table class="table" id="farmacias-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Dirección</th>
+                                <th>Ubicación</th>
+                                <th style="width:240px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="farmacias-cards">
+                            <tr><td colspan="4"><div class="loading"><div class="spinner"></div>Cargando farmacias...</div></td></tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+            <div class="ops-split-right">
+                <div class="ops-panel" style="position:sticky;top:20px;">
+                    <div class="card-header"><h3><i class="fas fa-map-marked-alt"></i> Mapa</h3><span id="mapa-contador" class="text-muted"></span></div>
+                    <div class="card-body" style="padding:0;">
+                        <div id="mapa-farmacias-global" style="height:850px;border-radius:0 0 var(--radius) var(--radius);"></div>
+                    </div>
                 </div>
             </div>
-        </section>
-
-        <section class="ops-toolbar">
-            <div class="ops-search">
-                <i class="fas fa-search"></i>
-                <input class="form-control" id="farmacias-search" placeholder="Buscar farmacia, zona, teléfono o dirección" oninput="renderFarmaciaCards()">
-            </div>
-            <div class="flex gap-2">
-                <button class="btn btn-outline" onclick="reloadFarmaciasView()"><i class="fas fa-rotate"></i> Actualizar</button>
-            </div>
-        </section>
-
-        <section class="ops-card-grid" id="farmacias-cards">
-            <div class="loading"><div class="spinner"></div>Cargando farmacias...</div>
-        </section>
+        </div>
 
         ${renderFarmaciaModal()}
-        ${renderProfileModal()}
         ${renderContactosModal()}
         ${renderContactoFormModal()}
     `;
@@ -96,15 +94,9 @@ function renderFarmaciaModal() {
                 </div>
                 <div class="modal-body">
                     <form id="form-farmacia">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Nombre *</label>
-                                <input type="text" id="f-nombre" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Teléfono</label>
-                                <input type="text" id="f-telefono" class="form-control" placeholder="8 dígitos" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)">
-                            </div>
+                        <div class="form-group">
+                            <label>Nombre *</label>
+                            <input type="text" id="f-nombre" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label>Dirección *</label>
@@ -112,18 +104,12 @@ function renderFarmaciaModal() {
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Email</label>
-                                <input type="text" id="f-email" class="form-control" placeholder="ejemplo@correo.com" oninput="validarEmailInput(this)">
+                                <label>Latitud *</label>
+                                <input type="number" step="any" id="f-latitud" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label>Latitud</label>
-                                <input type="number" step="any" id="f-latitud" class="form-control">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Longitud</label>
-                                <input type="number" step="any" id="f-longitud" class="form-control">
+                                <label>Longitud *</label>
+                                <input type="number" step="any" id="f-longitud" class="form-control" required>
                             </div>
                         </div>
                         <div id="coords-display" class="text-muted text-center" style="font-size:12px;margin-bottom:8px;">Haz clic en el mapa para seleccionar ubicación</div>
@@ -133,23 +119,6 @@ function renderFarmaciaModal() {
                 <div class="modal-footer">
                     <button class="btn btn-secondary" onclick="closeFarmaciaModal()">Cancelar</button>
                     <button class="btn btn-primary" onclick="saveFarmacia()">Guardar</button>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function renderProfileModal() {
-    return `
-        <div id="modal-farmacia-profile" class="modal-overlay">
-            <div class="modal" style="max-width:900px;">
-                <div class="modal-header">
-                    <h3 id="profile-title">Ficha de farmacia</h3>
-                    <button class="modal-close" onclick="closeProfileModal()">&times;</button>
-                </div>
-                <div class="modal-body" id="profile-body"></div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" onclick="closeProfileModal()">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -190,7 +159,7 @@ function renderContactoFormModal() {
                 <div class="modal-body">
                     <form id="form-contacto">
                         <div class="form-group"><label>Nombre del contacto *</label><input type="text" id="c-nombre" class="form-control" required></div>
-                        <div class="form-group"><label>Cargo *</label><select id="c-cargo" class="form-control" required><option value="">Seleccione un cargo...</option>${cargosList.map(c => `<option value="${c.id_cargo}">${c.nombre_cargo}</option>`).join('')}</select></div>
+                        <div class="form-group"><label>Cargo *</label><input type="text" id="c-cargo" class="form-control" required placeholder="Ej: Gerente, Encargado..."></div>
                         <div class="form-row">
                             <div class="form-group"><label>Teléfono</label><input type="text" id="c-telefono" class="form-control" placeholder="8 dígitos" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)"></div>
                             <div class="form-group"><label>Email</label><input type="text" id="c-email" class="form-control" placeholder="ejemplo@correo.com" oninput="validarEmailInput(this)"></div>
@@ -221,127 +190,49 @@ async function reloadFarmaciasView() {
     }
 }
 
-function getFarmaciaStats(idFarmacia) {
-    const pedidos = pedidosData.filter(p => String(p.id_farmacia || p.farmacia?.id_farmacia) === String(idFarmacia));
-    const hoy = new Date().toISOString().slice(0, 10);
-    const today = pedidos.filter(p => String(p.fecha_pedido || '').slice(0, 10) === hoy);
-    const byStatus = name => pedidos.filter(p => normalizeStatus(p.estado?.nombre_estado || p.nombre_estado).includes(name)).length;
-    const activeDebt = pedidos
-        .filter(p => !normalizeStatus(p.estado?.nombre_estado || p.nombre_estado).includes('entregado'))
-        .reduce((sum, p) => sum + parseFloat(p.total || 0), 0);
-    return {
-        total: pedidos.length,
-        today: today.length,
-        pendientes: byStatus('pendiente'),
-        enRuta: byStatus('ruta') + byStatus('despachado'),
-        entregados: byStatus('entregado'),
-        activeDebt,
-        recientes: pedidos.slice(0, 4),
-    };
-}
-
-function normalizeStatus(value) { return normalize(value); }
-
 function renderFarmaciaCards() {
     const term = (document.getElementById('farmacias-search')?.value || '').trim().toLowerCase();
     const filtered = farmaciasData.filter(f => {
-        const text = `${f.nombre || ''} ${f.direccion || ''} ${f.telefono || ''} ${f.email || ''}`.toLowerCase();
+        const text = `${f.nombre || ''} ${f.direccion || ''}`.toLowerCase();
         return !term || text.includes(term);
     });
 
     const container = document.getElementById('farmacias-cards');
     if (!filtered.length) {
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-hospital"></i><h4>Sin farmacias</h4><p>No se encontraron farmacias con ese criterio.</p></div>';
+        container.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="fas fa-hospital"></i><h4>Sin farmacias</h4><p>No se encontraron farmacias con ese criterio.</p></div></td></tr>';
         return;
     }
 
     container.innerHTML = filtered.map(f => {
-        const stats = getFarmaciaStats(f.id_farmacia);
         const hasCoords = f.latitud && f.longitud;
         return `
-            <article class="client-card">
-                <div class="client-card-header">
-                    <div>
-                        <h4>${f.nombre || 'Farmacia sin nombre'}</h4>
-                        <div class="client-meta">
-                            <span><i class="fas fa-location-dot"></i> ${f.direccion || 'Sin dirección'}</span>
-                            <span><i class="fas fa-phone"></i> ${f.telefono || 'Sin teléfono'}</span>
-                            <span><i class="fas fa-envelope"></i> ${f.email || 'Sin email'}</span>
-                        </div>
+            <tr data-farmacia-id="${f.id_farmacia}" style="cursor:pointer;">
+                <td><strong>${f.nombre || 'Farmacia sin nombre'}</strong></td>
+                <td>${f.direccion || 'Sin dirección'}</td>
+                <td><span class="badge ${hasCoords ? 'badge-success' : 'badge-warning'}">${hasCoords ? 'Con mapa' : 'Sin mapa'}</span></td>
+                <td>
+                    <div class="actions">
+                        ${hasPermission('Farmacias', 'gestionar-contactos') ? `<button class="btn btn-sm btn-info" onclick="openContactosModal(${f.id_farmacia}, '${escapeAttr(f.nombre || '')}')"><i class="fas fa-address-book"></i></button>` : ''}
+                        ${hasPermission('Farmacias', 'editar') ? `<button class="btn btn-sm btn-warning" onclick="editFarmacia(${f.id_farmacia})"><i class="fas fa-edit"></i></button>` : ''}
+                        ${hasPermission('Farmacias', 'eliminar') ? `<button class="btn btn-sm btn-danger" onclick="deleteFarmacia(${f.id_farmacia}, '${escapeAttr(f.nombre || '')}')"><i class="fas fa-trash"></i></button>` : ''}
                     </div>
-                    <span class="badge ${hasCoords ? 'badge-success' : 'badge-warning'}">${hasCoords ? 'Con mapa' : 'Sin mapa'}</span>
-                </div>
-                <div class="client-stats">
-                    <div class="client-stat"><strong>${stats.today}</strong><span>Hoy</span></div>
-                    <div class="client-stat"><strong>${stats.pendientes}</strong><span>Pendientes</span></div>
-                    <div class="client-stat"><strong>${stats.enRuta}</strong><span>En ruta</span></div>
-                </div>
-                <div class="client-stats">
-                    <div class="client-stat"><strong>${stats.entregados}</strong><span>Entregados</span></div>
-                    <div class="client-stat" style="grid-column:span 2;"><strong>Bs ${stats.activeDebt.toFixed(2)}</strong><span>Monto activo</span></div>
-                </div>
-                <div class="card-actions">
-                    <button class="btn btn-sm btn-outline" onclick="openFarmaciaProfile(${f.id_farmacia})"><i class="fas fa-eye"></i> Ver pedidos</button>
-                    ${hasPermission('Pedidos', 'crear') ? `<button class="btn btn-sm btn-success" onclick="crearPedidoDesdeFarmacia(${f.id_farmacia})"><i class="fas fa-plus"></i> Crear pedido</button>` : ''}
-                    ${hasPermission('Farmacias', 'gestionar-contactos') ? `<button class="btn btn-sm btn-info" onclick="openContactosModal(${f.id_farmacia}, '${escapeAttr(f.nombre || '')}')"><i class="fas fa-address-book"></i> Contactos</button>` : ''}
-                    ${hasPermission('Farmacias', 'editar') ? `<button class="btn btn-sm btn-warning" onclick="editFarmacia(${f.id_farmacia})"><i class="fas fa-edit"></i></button>` : ''}
-                    ${hasPermission('Farmacias', 'eliminar') ? `<button class="btn btn-sm btn-danger" onclick="deleteFarmacia(${f.id_farmacia}, '${escapeAttr(f.nombre || '')}')"><i class="fas fa-trash"></i></button>` : ''}
-                </div>
-            </article>
+                </td>
+            </tr>
         `;
     }).join('');
+
+    Array.from(container.querySelectorAll('tr[data-farmacia-id]')).forEach(tr => {
+        tr.addEventListener('mouseenter', function () {
+            highlightMapMarker(this.dataset.farmaciaId);
+        });
+        tr.addEventListener('mouseleave', function () {
+            unhighlightMapMarker(this.dataset.farmaciaId);
+        });
+    });
 }
 
 function escapeAttr(value) {
     return String(value).replace(/'/g, "\\'").replace(/"/g, '&quot;');
-}
-
-function crearPedidoDesdeFarmacia(idFarmacia) {
-    window.location.href = '/pages/logistica.html#pedidos';
-}
-
-function openFarmaciaProfile(idFarmacia) {
-    const farmacia = farmaciasData.find(f => String(f.id_farmacia) === String(idFarmacia));
-    if (!farmacia) return;
-    const stats = getFarmaciaStats(idFarmacia);
-    document.getElementById('profile-title').textContent = farmacia.nombre || 'Ficha de farmacia';
-    document.getElementById('profile-body').innerHTML = `
-        <div class="operations-split">
-            <div>
-                <div class="client-meta" style="font-size:14px;">
-                    <span><strong>Dirección:</strong> ${farmacia.direccion || 'Sin dirección'}</span>
-                    <span><strong>Teléfono:</strong> ${farmacia.telefono || 'Sin teléfono'}</span>
-                    <span><strong>Email:</strong> ${farmacia.email || 'Sin email'}</span>
-                </div>
-                <div class="client-stats mt-4">
-                    <div class="client-stat"><strong>${stats.pendientes}</strong><span>Pendientes</span></div>
-                    <div class="client-stat"><strong>${stats.enRuta}</strong><span>En ruta</span></div>
-                    <div class="client-stat"><strong>${stats.entregados}</strong><span>Entregados</span></div>
-                </div>
-                <div class="ops-actions">
-                    ${hasPermission('Pedidos', 'crear') ? `<button class="btn btn-success" onclick="crearPedidoDesdeFarmacia(${idFarmacia})"><i class="fas fa-plus"></i> Nuevo pedido</button>` : ''}
-                    <button class="btn btn-outline" onclick="openContactosModal(${idFarmacia}, '${escapeAttr(farmacia.nombre || '')}')"><i class="fas fa-address-book"></i> Contactos</button>
-                </div>
-            </div>
-            <div>
-                <h4>Pedidos recientes</h4>
-                ${stats.recientes.length ? stats.recientes.map(p => `
-                    <div class="order-card" style="margin-top:8px;">
-                        <div class="order-card-header">
-                            <div><div class="order-id">Pedido #${p.id_pedido}</div><h4>${p.detalles_count ?? p.detalles?.length ?? 0} productos</h4></div>
-                            ${getStatusBadge(p.estado?.nombre_estado || p.nombre_estado || 'Pendiente')}
-                        </div>
-                        <div class="order-meta"><span>${formatDate(p.fecha_pedido)}</span><span>Bs ${parseFloat(p.total || 0).toFixed(2)}</span></div>
-                    </div>
-                `).join('') : '<p class="text-muted">Esta farmacia aún no tiene pedidos cargados.</p>'}
-            </div>
-        </div>
-    `;
-    document.getElementById('modal-farmacia-profile').classList.add('active');
-}
-
-function closeProfileModal() {
-    document.getElementById('modal-farmacia-profile').classList.remove('active');
 }
 
 function openFarmaciaModal() {
@@ -370,8 +261,6 @@ async function editFarmacia(id) {
         document.getElementById('farmacia-modal-title').textContent = 'Editar farmacia';
         document.getElementById('f-nombre').value = farmacia.nombre || '';
         document.getElementById('f-direccion').value = farmacia.direccion || '';
-        document.getElementById('f-telefono').value = farmacia.telefono || '';
-        document.getElementById('f-email').value = farmacia.email || '';
         document.getElementById('f-latitud').value = farmacia.latitud || '';
         document.getElementById('f-longitud').value = farmacia.longitud || '';
         document.getElementById('modal-farmacia').classList.add('active');
@@ -395,21 +284,17 @@ async function editFarmacia(id) {
 async function saveFarmacia() {
     const nombre = document.getElementById('f-nombre').value.trim();
     const direccion = document.getElementById('f-direccion').value.trim();
-    const telefono = document.getElementById('f-telefono').value.trim();
-    const email = document.getElementById('f-email').value.trim();
     const latitud = document.getElementById('f-latitud').value;
     const longitud = document.getElementById('f-longitud').value;
 
     if (!nombre || !direccion) return Swal.fire('Validación', 'Nombre y dirección son obligatorios', 'warning');
-    if (telefono && telefono.length !== 8) return Swal.fire('Validación', 'El teléfono debe tener exactamente 8 dígitos', 'warning');
-    if (email && !esEmailValido(email)) return Swal.fire('Validación', 'El email ingresado no es válido', 'warning');
 
-    const latNum = latitud ? parseFloat(latitud) : null;
-    const lngNum = longitud ? parseFloat(longitud) : null;
-    if (latNum !== null && (latNum < -90 || latNum > 90)) return Swal.fire('Validación', 'La latitud debe estar entre -90 y 90', 'warning');
-    if (lngNum !== null && (lngNum < -180 || lngNum > 180)) return Swal.fire('Validación', 'La longitud debe estar entre -180 y 180', 'warning');
+    const latNum = parseFloat(latitud);
+    const lngNum = parseFloat(longitud);
+    if (isNaN(latNum) || latNum < -90 || latNum > 90) return Swal.fire('Validación', 'La latitud es obligatoria y debe estar entre -90 y 90', 'warning');
+    if (isNaN(lngNum) || lngNum < -180 || lngNum > 180) return Swal.fire('Validación', 'La longitud es obligatoria y debe estar entre -180 y 180', 'warning');
 
-    const body = { nombre, direccion, telefono, email, latitud: latNum, longitud: lngNum };
+    const body = { nombre, direccion, latitud: latNum, longitud: lngNum };
     try {
         if (editingFarmaciaId) {
             await apiFetch(`/farmacias/${editingFarmaciaId}`, { method: 'PUT', body });
@@ -475,7 +360,7 @@ async function loadContactos() {
                         const cid = c.id_contacto;
                         return `<tr>
                             <td>${c.nombre_contacto || '—'}</td>
-                            <td>${c.cargo?.nombre_cargo || c.nombre_cargo || '—'}</td>
+                            <td>${c.cargo || '—'}</td>
                             <td>${c.telefono || '—'}</td>
                             <td>${c.email || '—'}</td>
                             <td>
@@ -513,7 +398,7 @@ async function editContacto(id) {
         editingContactoId = id;
         document.getElementById('contacto-modal-title').textContent = 'Editar contacto';
         document.getElementById('c-nombre').value = contacto.nombre_contacto || '';
-        document.getElementById('c-cargo').value = contacto.id_cargo || '';
+        document.getElementById('c-cargo').value = contacto.cargo || '';
         document.getElementById('c-telefono').value = contacto.telefono || '';
         document.getElementById('c-email').value = contacto.email || '';
         document.getElementById('modal-contacto').classList.add('active');
@@ -524,13 +409,13 @@ async function editContacto(id) {
 
 async function saveContacto() {
     const nombre = document.getElementById('c-nombre').value.trim();
-    const id_cargo = document.getElementById('c-cargo').value;
+    const cargo = document.getElementById('c-cargo').value.trim();
     const telefono = document.getElementById('c-telefono').value.trim();
     const email = document.getElementById('c-email').value.trim();
-    if (!nombre || !id_cargo) return Swal.fire('Validación', 'Nombre y cargo son obligatorios', 'warning');
+    if (!nombre || !cargo) return Swal.fire('Validación', 'Nombre y cargo son obligatorios', 'warning');
     if (telefono && telefono.length !== 8) return Swal.fire('Validación', 'El teléfono debe tener exactamente 8 dígitos', 'warning');
     if (email && !esEmailValido(email)) return Swal.fire('Validación', 'El email ingresado no es válido', 'warning');
-    const body = { nombre_contacto: nombre, id_cargo: parseInt(id_cargo), telefono, email };
+    const body = { nombre_contacto: nombre, cargo, telefono, email };
     try {
         if (editingContactoId) {
             await apiFetch(`/farmacias/${currentFarmaciaId}/contactos/${editingContactoId}`, { method: 'PUT', body });
@@ -566,6 +451,35 @@ async function deleteContacto(id, nombre) {
     } catch (e) {
         Swal.fire('Error', e.message || 'Error al eliminar', 'error');
     }
+}
+
+function highlightMapMarker(id) {
+    const entry = marcadoresGlobales.find(m => String(m.id) === String(id));
+    if (!entry) return;
+    const marker = entry.marker;
+    marker.setStyle({
+        radius: 12,
+        fillColor: '#f59e0b',
+        color: '#fff',
+        weight: 3,
+        fillOpacity: 1
+    });
+    if (marker._popup) marker.openPopup();
+    marker.bringToFront();
+}
+
+function unhighlightMapMarker(id) {
+    const entry = marcadoresGlobales.find(m => String(m.id) === String(id));
+    if (!entry) return;
+    const marker = entry.marker;
+    marker.setStyle({
+        radius: 7,
+        fillColor: '#3b82f6',
+        color: '#fff',
+        weight: 2,
+        fillOpacity: 0.85
+    });
+    marker.closePopup();
 }
 
 function initMapaModal() {
@@ -641,8 +555,7 @@ function actualizarMarcadoresGlobales(farmacias) {
             opacity: 1,
             fillOpacity: 0.85
         }).addTo(mapaGlobal);
-        marker.bindPopup(`<b>${f.nombre}</b><br>${f.direccion || 'Sin dirección'}<br>${f.telefono || ''}`);
-        marker.on('click', () => openFarmaciaProfile(f.id_farmacia));
+        marker.bindPopup(`<b>${f.nombre}</b><br>${f.direccion || 'Sin dirección'}`);
         marcadoresGlobales.push({ id: f.id_farmacia, marker, data: f });
     });
     const counter = document.getElementById('mapa-contador');

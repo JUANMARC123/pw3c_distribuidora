@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * BDD: docs/specs/despachos.md -> Escenario D4 (Gestion de evidencias e incidencias)
+ * @see \App\Http\Controllers\Despacho\EvidenciaController
+ * @see \App\Http\Controllers\Despacho\IncidenciaController
+ */
+
 use App\Models\Despacho;
 use App\Models\Farmacia;
 use App\Models\Pedido;

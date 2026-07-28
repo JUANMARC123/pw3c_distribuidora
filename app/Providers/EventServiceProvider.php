@@ -12,6 +12,7 @@ use App\Listeners\ActualizarEstadoRepartidorListener;
 use App\Listeners\ActualizarEstadoVehiculoListener;
 use App\Listeners\ActualizarEstadoDespachoListener;
 use App\Listeners\RegistrarLlegadaParadaListener;
+use App\Listeners\SyncRutaToFirebaseListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -32,5 +33,6 @@ class EventServiceProvider extends ServiceProvider
         Event::subscribe(ActualizarEstadoVehiculoListener::class);
         Event::subscribe(ActualizarEstadoDespachoListener::class);
         Event::subscribe(RegistrarLlegadaParadaListener::class);
+        Event::subscribe(SyncRutaToFirebaseListener::class);
     }
 }

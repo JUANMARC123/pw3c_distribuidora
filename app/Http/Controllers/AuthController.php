@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Models\Repartidor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -25,17 +26,22 @@ class AuthController extends ApiController
             return $this->errorResponse('Cuenta de usuario bloqueada.', 403);
         }
 
-        $user->save();
-
         $token = $user->createToken('api-token')->plainTextToken;
 
-        $user->load('roles');
-        $permisos = $user->getAllPermissions()->pluck('name');
+        $repartidor = Repartidor::where('id_usuario', $user->id_usuario)->first();
 
         return $this->jsonResponse([
-            'user' => $user,
             'token' => $token,
-            'permisos' => $permisos,
+            'usuario' => [
+                'id_usuario' => $user->id_usuario,
+                'nombre' => $user->nombre,
+                'email' => $user->email,
+            ],
+            'repartidor' => $repartidor ? [
+                'id_repartidor' => $repartidor->id_repartidor,
+                'firebase_uid' => $repartidor->firebase_uid,
+                'estado' => $repartidor->estado,
+            ] : null,
         ], 'Inicio de sesión exitoso.');
     }
 

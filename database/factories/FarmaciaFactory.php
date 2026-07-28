@@ -14,8 +14,6 @@ class FarmaciaFactory extends Factory
         return [
             'nombre' => $this->faker->company(),
             'direccion' => $this->faker->address(),
-            'telefono' => $this->faker->phoneNumber(),
-            'email' => $this->faker->unique()->companyEmail(),
             'latitud' => $this->faker->latitude(-17, -16),
             'longitud' => $this->faker->longitude(-68, -67),
             'geocerca' => $this->faker->randomFloat(2, 50, 500),

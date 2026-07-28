@@ -7,6 +7,7 @@ const TIPOS_GASTO = ['COMBUSTIBLE', 'ALIMENTACION', 'PEAJE', 'MANTENIMIENTO', 'I
 
 document.addEventListener('DOMContentLoaded', async function () {
     if (!checkAuth()) return;
+    if (!hasPermission('Caja Diaria', 'acceder')) { window.location.href = '../dashboard.html'; return; }
     await loadRepartidores();
     renderPage();
     await renderResumen();
@@ -50,9 +51,9 @@ function renderPage() {
                 <h1 class="ops-title">Caja y arqueo de repartidores</h1>
                 <p class="ops-subtitle">Registra apertura, ingresos, gastos de ruta y cierre de caja por repartidor al final de la jornada.</p>
                 <div class="ops-actions">
-                    <button class="btn btn-primary" onclick="openAbrirCajaModal()"><i class="fas fa-cash-register"></i> Abrir caja</button>
-                    <button class="btn btn-success" onclick="openIngresoModal()"><i class="fas fa-plus-circle"></i> Registrar ingreso</button>
-                    <button class="btn btn-danger" onclick="abrirGastoModal()"><i class="fas fa-minus-circle"></i> Registrar gasto</button>
+                    ${hasPermission('Caja Diaria', 'crear') ? '<button class="btn btn-primary" onclick="openAbrirCajaModal()"><i class="fas fa-cash-register"></i> Abrir caja</button>' : ''}
+                    ${hasPermission('Caja Diaria', 'editar') ? '<button class="btn btn-success" onclick="openIngresoModal()"><i class="fas fa-plus-circle"></i> Registrar ingreso</button>' : ''}
+                    ${hasPermission('Caja Diaria', 'editar') ? '<button class="btn btn-danger" onclick="abrirGastoModal()"><i class="fas fa-minus-circle"></i> Registrar gasto</button>' : ''}
                 </div>
             </div>
             <div class="ops-panel">
@@ -262,9 +263,9 @@ function renderCajaCard(c) {
             </div>
             <div class="cash-actions">
                 ${abierta ? `
-                    <button class="btn btn-sm btn-success" onclick="openIngresoModal(${c.id_caja})"><i class="fas fa-plus"></i> Ingreso</button>
-                    <button class="btn btn-sm btn-danger" onclick="abrirGastoModal(${c.id_caja})"><i class="fas fa-minus"></i> Gasto</button>
-                    <button class="btn btn-sm btn-primary" onclick="cerrarCaja(${c.id_caja})"><i class="fas fa-check"></i> Cerrar</button>
+                    ${hasPermission('Caja Diaria', 'editar') ? `<button class="btn btn-sm btn-success" onclick="openIngresoModal(${c.id_caja})"><i class="fas fa-plus"></i> Ingreso</button>` : ''}
+                    ${hasPermission('Caja Diaria', 'editar') ? `<button class="btn btn-sm btn-danger" onclick="abrirGastoModal(${c.id_caja})"><i class="fas fa-minus"></i> Gasto</button>` : ''}
+                    ${hasPermission('Caja Diaria', 'cerrar') ? `<button class="btn btn-sm btn-primary" onclick="cerrarCaja(${c.id_caja})"><i class="fas fa-check"></i> Cerrar</button>` : ''}
                 ` : '<span class="text-muted">Caja cerrada</span>'}
             </div>
             ${gastos.length ? `
@@ -303,7 +304,7 @@ async function abrirCaja() {
     try {
         await apiFetch('/caja/abrir', {
             method: 'POST',
-            body: { repartidor_id: repartidorId, id_repartidor: repartidorId, monto_inicial: montoInicial }
+            body: { repartidor_id: repartidorId, id_repartidor: repartidorId, monto_inicial: montoInicial, id_hoja_ruta: null }
         });
         Swal.fire('Caja abierta', 'Caja diaria creada para el repartidor.', 'success');
         closeAbrirCajaModal();
@@ -398,8 +399,9 @@ async function cerrarCaja(id) {
     });
     if (!r.isConfirmed) return;
 
+    const montoFinal = caja ? parseMoney(caja.monto_final ?? (parseMoney(caja.monto_inicial) + parseMoney(caja.ingresos) - parseMoney(caja.gastos_totales ?? caja.total_gastos))) : 0;
     try {
-        await apiFetch(`/caja/cerrar/${id}`, { method: 'PUT' });
+        await apiFetch(`/caja/cerrar/${id}`, { method: 'PUT', body: { monto_final: montoFinal } });
         Swal.fire('Cerrada', 'Caja cerrada exitosamente.', 'success');
         await renderResumen();
     } catch (e) {

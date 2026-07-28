@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * BDD: docs/specs/caja.md -> Escenarios J1, J2 (Ciclo de vida de caja, consultas)
+ * @see \App\Http\Controllers\Caja\CajaController
+ */
+
 use App\Models\CajaRepartidor;
 use App\Models\Repartidor;
 use App\Models\Vehiculo;

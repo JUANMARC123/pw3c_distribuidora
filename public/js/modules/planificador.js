@@ -36,11 +36,10 @@ async function loadPedidosPendientes() {
         const d = await apiFetch('/pedidos?per_page=200');
         const all = Array.isArray(d) ? d : (d.data || []);
         pedidosPendientes = all.filter(p => {
-            const estadoId = p.id_estado_pedido;
-            const estadoName = (p.estado?.nombre_estado || p.nombre_estado || '').toLowerCase();
+            const estadoName = (p.estado?.nombre_estado || p.nombre_estado || p.estado || '').toLowerCase();
             const excluir = estadoName.includes('entreg') || estadoName.includes('cancel') || estadoName.includes('ruta') || estadoName.includes('despach');
             if (excluir) return false;
-            return estadoId <= 2 || estadoName.includes('pend') || estadoName.includes('prepar');
+            return estadoName.includes('pend') || estadoName.includes('prepar') || estadoName.includes('aprob');
         });
     } catch (e) {
         console.error('Error loading pedidos:', e);
@@ -50,7 +49,7 @@ async function loadPedidosPendientes() {
 
 async function loadRepartidores() {
     try {
-        const d = await apiFetch('/logistica/repartidores-disponibles');
+        const d = await apiFetch('/repartidores?per_page=-1');
         repartidoresData = Array.isArray(d) ? d : (d.data || []);
     } catch (e) {
         console.error('Error loading repartidores:', e);
@@ -63,7 +62,6 @@ function renderPlannerState() {
     renderRepartidores();
     updatePlanificadorSummary();
     updateMapRoute();
-    setTimeout(initSortables, 0);
 }
 
 function renderPedidos() {
@@ -179,6 +177,7 @@ function renderRepartidores() {
             </article>
         `;
     }).join('');
+    setTimeout(initSortables, 0);
 }
 
 function initPlanificadorMap() {
@@ -269,11 +268,19 @@ function handleDrop(evt) {
         return;
     }
 
+    const MAX_PEDIDOS_POR_REPARTIDOR = 100;
+    const currentCount = (assignmentsByRepartidor[targetRepartidorId] || []).length;
+    if (currentCount >= MAX_PEDIDOS_POR_REPARTIDOR) {
+        evt.item.remove();
+        Swal.fire('Límite alcanzado', `Máximo ${MAX_PEDIDOS_POR_REPARTIDOR} pedidos por repartidor.`, 'warning');
+        return;
+    }
+
     removePedidoFromAllAssignments(pedidoId);
     if (!assignmentsByRepartidor[targetRepartidorId]) assignmentsByRepartidor[targetRepartidorId] = [];
     assignmentsByRepartidor[targetRepartidorId].push(pedidoId);
     evt.item.remove();
-    renderPlannerState();
+    setTimeout(() => renderPlannerState(), 0);
 }
 
 function syncRepartidorOrder(repartidorId) {
@@ -444,7 +451,7 @@ async function iniciarRuta(repartidorId) {
 
     const repartidor = findRepartidor(repartidorId);
     const vehiculo = getRepartidorVehiculo(repartidor);
-    const pedidos = pedidoIds.map((id, idx) => ({ id_pedido: id, orden: idx + 1 }));
+    const pedidos = pedidoIds.map((id, idx) => ({ id_pedido: id, orden_visita: idx + 1 }));
     const pedidosSinCoords = pedidoIds.map(pid => findPedido(pid)).filter(p => p && !getPedidoCoords(p));
 
     if (!vehiculo || !(vehiculo.id_vehiculo || vehiculo.id)) {
@@ -473,13 +480,18 @@ async function iniciarRuta(repartidorId) {
     if (!result.isConfirmed) return;
 
     try {
-        await apiFetch('/logistica/planificacion/confirmar', {
+        const rutaCreada = await apiFetch('/hojas-ruta', {
             method: 'POST',
             body: {
-                repartidor_id: repartidorId,
-                vehiculo_id: vehiculo ? (vehiculo.id_vehiculo || vehiculo.id || null) : null,
+                id_repartidor: repartidorId,
+                id_vehiculo: vehiculo ? (vehiculo.id_vehiculo || vehiculo.id || null) : null,
+                fecha: new Date().toISOString().slice(0, 10),
                 pedidos,
             },
+        });
+
+        await apiFetch(`/hojas-ruta/${rutaCreada.id_hoja_ruta}/iniciar`, {
+            method: 'POST',
         });
 
         Swal.fire({
@@ -546,7 +558,7 @@ function getPedidoCoords(p) {
 
 function getRepartidorVehiculo(r) {
     if (!r) return null;
-    const asignacion = r.asignacion_vehiculo_activa || r.asignacionVehiculoActiva || null;
+    const asignacion = r.asignacion_activa || null;
     if (asignacion?.vehiculo) return asignacion.vehiculo;
     if (r.vehiculo || r.vehiculos?.[0]) return r.vehiculo || r.vehiculos[0];
     if (r.id_vehiculo) {
@@ -613,22 +625,11 @@ function initFirebasePlanificador() {
 
 async function mostrarHistorialRepartidor(repartidorId) {
     try {
-        const [despachos, controles] = await Promise.all([
-            apiFetch('/despachos?per_page=-1').catch(() => []),
-            apiFetch('/controles-ruta?per_page=-1').catch(() => []),
-        ]);
+        const despachos = await apiFetch('/despachos?per_page=-1').catch(() => []);
         const despachosArr = Array.isArray(despachos) ? despachos : (despachos.data || []);
-        const controlesArr = Array.isArray(controles) ? controles : (controles.data || []);
 
         const hoy = new Date().toISOString().slice(0, 10);
 
-        const controlesHoy = controlesArr.filter(c => {
-            const repId = c.id_repartidor || c.repartidor?.id_repartidor;
-            const fecha = (c.fecha_salida || c.hora_salida || c.created_at || '').slice(0, 10);
-            return String(repId) === String(repartidorId) && fecha === hoy;
-        });
-
-        const controlIds = controlesHoy.map(c => c.id_control_ruta);
         const despachosHoy = despachosArr.filter(d => {
             const repId = d.id_repartidor || d.repartidor?.id_repartidor;
             const fecha = (d.fecha_despacho || d.created_at || '').slice(0, 10);
@@ -636,7 +637,7 @@ async function mostrarHistorialRepartidor(repartidorId) {
         });
 
         const entregados = despachosHoy.filter(d => {
-            const est = (d.estado?.nombre_estado || d.estado || '').toLowerCase();
+            const est = (d.estado_despacho || d.estado || d.estado?.nombre_estado || '').toLowerCase();
             return est.includes('entreg');
         }).length;
 
@@ -652,12 +653,8 @@ async function mostrarHistorialRepartidor(repartidorId) {
             html: `
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;">
                     <div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;">
-                        <div style="font-size:28px;font-weight:700;color:#3b82f6;">${controlesHoy.length}</div>
-                        <div style="font-size:12px;color:#64748b;">Rutas realizadas</div>
-                    </div>
-                    <div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;">
                         <div style="font-size:28px;font-weight:700;color:#10b981;">${despachosHoy.length}</div>
-                        <div style="font-size:12px;color:#64748b;">Despachos totales</div>
+                        <div style="font-size:12px;color:#64748b;">Despachos del dia</div>
                     </div>
                     <div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;">
                         <div style="font-size:28px;font-weight:700;color:#059669;">${entregados}</div>
@@ -668,16 +665,6 @@ async function mostrarHistorialRepartidor(repartidorId) {
                         <div style="font-size:12px;color:#64748b;">Incidencias</div>
                     </div>
                 </div>
-                ${controlesHoy.length ? `
-                    <div style="text-align:left;border-top:1px solid var(--border);padding-top:12px;">
-                        <strong style="font-size:13px;">Rutas de hoy:</strong>
-                        ${controlesHoy.map(c => `
-                            <div style="font-size:12px;padding:4px 0;color:var(--text-muted);">
-                                Control #${c.id_control_ruta} &middot; ${c.ruta?.nombre_ruta || 'Sin ruta'}
-                            </div>
-                        `).join('')}
-                    </div>
-                ` : ''}
             `,
             confirmButtonText: 'Cerrar',
             width: 460,

@@ -15,8 +15,6 @@ class Farmacia extends Model
     protected $fillable = [
         'nombre',
         'direccion',
-        'telefono',
-        'email',
         'latitud',
         'longitud',
         'geocerca',

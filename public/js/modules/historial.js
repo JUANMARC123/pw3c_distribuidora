@@ -1,5 +1,5 @@
 let historialTab = 'pedidos';
-let historialData = { pedidos: [], despachos: [], controles: [] };
+let historialData = { pedidos: [], despachos: [], hojasRuta: [] };
 let historialMapa = null;
 let historialMapaMarkers = [];
 let historialMapaLinea = null;
@@ -44,9 +44,6 @@ function renderPage(containerId = 'page-content') {
             <button class="historial-tab" data-tab="rutas" onclick="switchHistorialTab('rutas')">
                 <i class="fas fa-route"></i> Rutas / Despachos
             </button>
-            <button class="historial-tab" data-tab="logs" onclick="switchHistorialTab('logs')">
-                <i class="fas fa-list-timeline"></i> Historial de cambios
-            </button>
         </div>
         <div id="historial-content"></div>
         <div id="historial-drawer-overlay" class="drawer-overlay" onclick="closeHistorialDrawer()"></div>
@@ -75,8 +72,6 @@ async function loadTab(tab) {
         await loadPedidosTab(container);
     } else if (tab === 'rutas') {
         await loadRutasTab(container);
-    } else if (tab === 'logs') {
-        loadLogsTab(container);
     }
 }
 
@@ -252,6 +247,13 @@ async function openPedidoDrawer(pedidoId) {
     const overlay = document.getElementById('historial-drawer-overlay');
     if (!drawer) return;
 
+    // Destroy previous map if exists
+    if (window.historialPedidoMapa) {
+        window.historialPedidoMapa.remove();
+        window.historialPedidoMapa = null;
+    }
+
+    drawer.classList.add('wide');
     drawer.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando detalle...</div>';
     drawer.classList.add('open');
     overlay.classList.add('active');
@@ -263,12 +265,34 @@ async function openPedidoDrawer(pedidoId) {
         const totalSolicitado = detalles.reduce((s, d) => s + (parseMoneyHistorial(d.cantidad_solicitada) * parseMoneyHistorial(d.precio_unitario)), 0) || parseMoneyHistorial(pedido.total);
         const totalEntregado = detalles.reduce((s, d) => s + (Math.min(parseMoneyHistorial(d.cantidad_entregada), parseMoneyHistorial(d.cantidad_solicitada)) * parseMoneyHistorial(d.precio_unitario)), 0);
 
-        drawer.innerHTML = `
-            <div class="historial-drawer-header">
-                <h3>Pedido #${pedido.id_pedido}</h3>
-                <button class="modal-close" onclick="closeHistorialDrawer()">&times;</button>
-            </div>
-            <div class="historial-drawer-body">
+        // Fetch despacho + ruta data if available
+        let despachoFull = null;
+        let incidencias = [];
+        let evidencias = [];
+        let hojaRuta = null;
+
+        const despachoId = pedido.despacho?.id_despacho;
+        const rutaId = pedido.despacho?.hojaRutaDetalle?.hojaRuta?.id_hoja_ruta;
+
+        if (despachoId) {
+            const results = await Promise.all([
+                apiFetch(`/despachos/${despachoId}`).catch(() => ({})),
+                apiFetch(`/despachos/${despachoId}/incidencias`).catch(() => []),
+                apiFetch(`/despachos/${despachoId}/evidencias`).catch(() => []),
+            ]);
+            despachoFull = results[0].despacho || results[0].data || results[0];
+            incidencias = Array.isArray(results[1]) ? results[1] : (results[1].data || []);
+            evidencias = Array.isArray(results[2]) ? results[2] : (results[2].data || []);
+        }
+
+        if (rutaId) {
+            const rResp = await apiFetch(`/hojas-ruta/${rutaId}`).catch(() => null);
+            if (rResp) hojaRuta = rResp.data || rResp;
+        }
+
+        // Build info column HTML
+        let infoHtml = `
+            <div class="historial-drawer-pedido-info">
                 <div class="info-grid">
                     <div><strong>Farmacia:</strong> ${escapeHtml(pedido.farmacia?.nombre || getFarmaciaNameHistorial(pedido.id_farmacia))}</div>
                     <div><strong>Estado:</strong> ${getStatusBadge(getEstadoNameHistorial(pedido))}</div>
@@ -278,16 +302,46 @@ async function openPedidoDrawer(pedidoId) {
                     <div><strong>Faltante:</strong> Bs ${(totalSolicitado - totalEntregado).toFixed(2)}</div>
                 </div>
                 ${pedido.observaciones ? `<div class="historial-section"><strong>Observaciones:</strong><p>${escapeHtml(pedido.observaciones)}</p></div>` : ''}
-                ${pedido.despacho ? `
+                ${despachoFull ? `
                 <div class="historial-section">
-                    <h4><i class="fas fa-truck"></i> Despacho asociado</h4>
+                    <h4><i class="fas fa-truck"></i> Despacho #${despachoId}</h4>
                     <div class="info-grid">
-                        <div><strong>Despacho:</strong> #${pedido.despacho.id_despacho}</div>
-                        <div><strong>Repartidor:</strong> ${escapeHtml(pedido.despacho.repartidor?.nombre || '—')}</div>
-                        <div><strong>Hora despacho:</strong> ${formatDateTime(pedido.despacho.fecha_hora_despacho)}</div>
-                        <div><strong>Hora entrega:</strong> ${pedido.despacho.fecha_entrega ? formatDateTime(pedido.despacho.fecha_entrega) : '—'}</div>
+                        <div><strong>Estado:</strong> ${getStatusBadge(despachoFull.estado?.nombre_estado || despachoFull.nombre_estado || despachoFull.estado_despacho || '—')}</div>
+                        <div><strong>Repartidor:</strong> ${escapeHtml(despachoFull.repartidor?.nombre || '—')}</div>
+                        <div><strong>Hora salida:</strong> ${formatDateTime(despachoFull.fecha_hora_despacho)}</div>
+                        <div><strong>Hora entrega:</strong> ${despachoFull.fecha_entrega ? formatDateTime(despachoFull.fecha_entrega) : '—'}</div>
                     </div>
                 </div>` : ''}
+                ${hojaRuta ? `
+                <div class="historial-section">
+                    <h4><i class="fas fa-route"></i> Ruta #${hojaRuta.id_hoja_ruta}</h4>
+                    <div class="info-grid">
+                        <div><strong>Repartidor:</strong> ${escapeHtml(hojaRuta.repartidor?.usuario?.nombre || hojaRuta.repartidor?.nombre || '—')}</div>
+                        <div><strong>Vehículo:</strong> ${escapeHtml(hojaRuta.vehiculo?.placa || '—')}</div>
+                        <div><strong>Hora salida:</strong> ${hojaRuta.hora_salida ? hojaRuta.hora_salida.substring(0, 5) : '—'}</div>
+                        <div><strong>Hora llegada:</strong> ${hojaRuta.hora_llegada ? hojaRuta.hora_llegada.substring(0, 5) : '—'}</div>
+                        <div><strong>Estado ruta:</strong> ${getStatusBadge(hojaRuta.estado_ruta || '—')}</div>
+                    </div>
+                </div>` : ''}
+                <div class="historial-section">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Incidencias (${incidencias.length})</h4>
+                    ${incidencias.length ? incidencias.map(inc => `
+                        <div class="incidencia-item" style="padding:4px 0;">
+                            <span class="badge badge-warning">${escapeHtml(inc.tipo_incidencia || inc.tipo?.nombre_tipo || inc.nombre_tipo || '—')}</span>
+                            <span>${escapeHtml(inc.descripcion || '')}</span>
+                        </div>
+                    `).join('') : '<p class="text-muted">Sin incidencias registradas.</p>'}
+                </div>
+                <div class="historial-section">
+                    <h4><i class="fas fa-camera"></i> Evidencias (${evidencias.length})</h4>
+                    ${evidencias.length ? evidencias.map(ev => {
+                        const url = ev.archivo ? (ev.archivo.startsWith('http') ? ev.archivo : window.location.origin + '/storage/' + ev.archivo) : null;
+                        return `<div class="evidencia-item" style="padding:4px 0;">
+                            <span class="badge badge-info">${escapeHtml(ev.tipo_evidencia || ev.tipoEvidencia?.nombre_tipo || ev.tipo?.nombre_tipo || ev.nombre_tipo || '—')}</span>
+                            ${url ? '<a href="' + url + '" target="_blank" class="btn btn-sm btn-outline"><i class="fas fa-eye"></i> Ver</a>' : '<span class="text-muted">Sin archivo</span>'}
+                        </div>`;
+                    }).join('') : '<p class="text-muted">Sin evidencias registradas.</p>'}
+                </div>
                 <div class="historial-section">
                     <h4>Productos</h4>
                     ${detalles.length ? `
@@ -320,6 +374,98 @@ async function openPedidoDrawer(pedidoId) {
                 </div>
             </div>
         `;
+
+        drawer.innerHTML = `
+            <div class="historial-drawer-header">
+                <h3>Pedido #${pedido.id_pedido}</h3>
+                <button class="modal-close" onclick="closeHistorialDrawer()">&times;</button>
+            </div>
+            <div class="historial-drawer-body">
+                ${infoHtml}
+                <div class="historial-drawer-map-col">
+                    <div id="historial-pedido-mapa"></div>
+                    <div id="historial-pedido-stops" class="historial-pedido-stops"></div>
+                </div>
+            </div>
+        `;
+
+        // Initialize map
+        setTimeout(() => {
+            const mapaContainer = document.getElementById('historial-pedido-mapa');
+            if (!mapaContainer) return;
+
+            window.historialPedidoMapa = L.map('historial-pedido-mapa').setView([-16.4897, -67.8217], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(window.historialPedidoMapa);
+
+            setTimeout(() => window.historialPedidoMapa.invalidateSize(), 200);
+
+            const farmaciaLat = parseFloat(pedido.farmacia?.latitud);
+            const farmaciaLng = parseFloat(pedido.farmacia?.longitud);
+            const stopsContainer = document.getElementById('historial-pedido-stops');
+
+            if (hojaRuta?.detalles?.length) {
+                const coords = [];
+                let html = '<div class="timeline">';
+                hojaRuta.detalles.forEach((det, idx) => {
+                    const far = det.pedido?.farmacia || {};
+                    const desp = det.despachos?.[0] || {};
+                    const lat = parseFloat(far.latitud);
+                    const lng = parseFloat(far.longitud);
+                    if (isNaN(lat) || isNaN(lng)) return;
+
+                    coords.push([lat, lng]);
+                    const est = normalizeHistorial(desp.estado_despacho || det.estado || '');
+                    const isCurrent = det.id_pedido === pedido.id_pedido;
+                    const color = est.includes('entreg') ? '#10b981'
+                        : est.includes('fall') || est.includes('cancel') ? '#ef4444'
+                        : '#64748b';
+
+                    const marker = L.circleMarker([lat, lng], {
+                        radius: isCurrent ? 10 : 7,
+                        fillColor: isCurrent ? '#f59e0b' : color,
+                        color: '#fff',
+                        weight: 2,
+                        fillOpacity: 0.9,
+                    }).addTo(window.historialPedidoMapa);
+                    marker.bindPopup(`<b>${escapeHtml(far.nombre || 'Parada')}</b><br>${isCurrent ? '<strong>Pedido actual</strong><br>' : ''}Estado: ${escapeHtml(est || 'Pendiente')}`);
+
+                    html += `
+                        <div class="timeline-item" style="opacity:${isCurrent ? 1 : 0.7};">
+                            <div class="timeline-marker" style="background:${color};"></div>
+                            <div class="timeline-content">
+                                <strong>${idx + 1}. ${escapeHtml(far.nombre || 'Parada')}</strong>
+                                ${isCurrent ? '<span class="badge badge-warning">Pedido actual</span>' : ''}
+                                <span>Estado: ${escapeHtml(est || 'Pendiente')}</span>
+                            </div>
+                        </div>`;
+                });
+                html += '</div>';
+                if (stopsContainer) stopsContainer.innerHTML = html;
+
+                if (coords.length > 1) {
+                    const polyline = L.polyline(coords, { color: '#64748b', weight: 3, opacity: 0.6, dashArray: '8, 8' }).addTo(window.historialPedidoMapa);
+                    window.historialMapaLinea = polyline;
+                    window.historialPedidoMapa.fitBounds(polyline.getBounds(), { padding: [40, 40], animate: false });
+                } else if (coords.length === 1) {
+                    window.historialPedidoMapa.setView(coords[0], 14);
+                }
+            } else if (Number.isFinite(farmaciaLat) && Number.isFinite(farmaciaLng)) {
+                L.circleMarker([farmaciaLat, farmaciaLng], {
+                    radius: 10,
+                    fillColor: '#f59e0b',
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.9,
+                }).addTo(window.historialPedidoMapa)
+                  .bindPopup(`<b>${escapeHtml(pedido.farmacia?.nombre || 'Farmacia')}</b>`);
+                window.historialPedidoMapa.setView([farmaciaLat, farmaciaLng], 14);
+                if (stopsContainer) stopsContainer.innerHTML = '<p class="text-muted">Solo se muestra la farmacia de este pedido.</p>';
+            } else {
+                if (stopsContainer) stopsContainer.innerHTML = '<p class="text-muted">Sin coordenadas disponibles para este pedido.</p>';
+            }
+        }, 100);
     } catch (e) {
         drawer.innerHTML = `
             <div class="historial-drawer-header">
@@ -336,8 +482,15 @@ async function openPedidoDrawer(pedidoId) {
 function closeHistorialDrawer() {
     const drawer = document.getElementById('historial-drawer');
     const overlay = document.getElementById('historial-drawer-overlay');
-    if (drawer) drawer.classList.remove('open');
+    if (drawer) {
+        drawer.classList.remove('open');
+        drawer.classList.remove('wide');
+    }
     if (overlay) overlay.classList.remove('active');
+    if (window.historialPedidoMapa) {
+        window.historialPedidoMapa.remove();
+        window.historialPedidoMapa = null;
+    }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -376,12 +529,12 @@ async function loadRutasTab(container) {
     `;
 
     try {
-        const [despachos, controles] = await Promise.all([
+        const [despachos, hojasRuta] = await Promise.all([
             apiFetch('/despachos?per_page=100').catch(() => []),
-            apiFetch('/controles-ruta?per_page=100').catch(() => []),
+            apiFetch('/hojas-ruta?per_page=100').catch(() => []),
         ]);
         historialData.despachos = Array.isArray(despachos) ? despachos : (despachos.data || []);
-        historialData.controles = Array.isArray(controles) ? controles : (controles.data || []);
+        historialData.hojasRuta = Array.isArray(hojasRuta) ? hojasRuta : (hojasRuta.data || []);
         renderRutasTable();
     } catch (e) {
         document.getElementById('historial-rutas-body').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h4>Error</h4><p>${escapeHtml(e.message || 'No se pudieron cargar los datos')}</p></div>`;
@@ -449,32 +602,33 @@ function renderRutasTable() {
 function buildRutasList() {
     const items = [];
 
-    historialData.controles.forEach(c => {
+    historialData.hojasRuta.forEach(h => {
+        const rep = h.repartidor || {};
+        const veh = h.vehiculo || {};
         items.push({
             tipo: 'Ruta',
-            ref: `Control #${c.id_control_ruta}`,
-            repartidor: c.repartidor?.nombre || '',
-            vehiculo: c.vehiculo?.placa || '',
-            estado: c.estado?.nombre_estado || c.estado || 'Completado',
-            fecha: c.fecha_salida || c.hora_salida || c.created_at,
-            _data: c,
-            _tipo: 'control',
+            ref: `Hoja de Ruta #${h.id_hoja_ruta}`,
+            repartidor: rep.nombre || '',
+            vehiculo: veh.placa || '',
+            estado: h.estado_ruta || 'Completado',
+            fecha: h.hora_salida || h.fecha || h.created_at,
+            _data: h,
+            _tipo: 'hoja_ruta',
         });
     });
 
     historialData.despachos.forEach(d => {
         const pedido = d.pedido || {};
-        const controlRuta = d.control_ruta || {};
         items.push({
             tipo: 'Despacho',
             ref: `Despacho #${d.id_despacho}`,
             pedidoRef: pedido.id_pedido ? `#${pedido.id_pedido}` : (d.id_pedido ? `#${d.id_pedido}` : '—'),
-            rutaNombre: controlRuta.ruta?.nombre_ruta || d.nombre_ruta || '—',
+            rutaNombre: '—',
             repartidor: d.repartidor?.nombre || '',
             vehiculo: d.vehiculo?.placa || '',
             horaSalida: d.fecha_hora_despacho ? formatDateTime(d.fecha_hora_despacho) : '—',
             horaLlegada: d.fecha_entrega ? formatDateTime(d.fecha_entrega) : '—',
-            estado: d.estado?.nombre_estado || d.estado || 'Finalizado',
+            estado: d.estado_despacho || d.estado?.nombre_estado || d.estado || 'Finalizado',
             fecha: d.fecha_despacho || d.created_at,
             _data: d,
             _tipo: 'despacho',
@@ -560,7 +714,7 @@ async function showRutaMapa(idx) {
 
     const paradasContainer = document.getElementById('historial-ruta-paradas');
     if (paradasContainer) {
-        if (item._tipo === 'control') {
+        if (item._tipo === 'hoja_ruta') {
             paradasContainer.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando paradas...</div>';
         } else {
             paradasContainer.innerHTML = '<p class="text-muted">Sin datos de ruta para este despacho.</p>';
@@ -584,27 +738,29 @@ async function showRutaMapa(idx) {
 
     setTimeout(() => historialMapa.invalidateSize(), 200);
 
-    if (item._tipo === 'control') {
-        await loadRutaParadasMapa(item._data.id_control_ruta);
+    if (item._tipo === 'hoja_ruta') {
+        await loadRutaParadasMapa(item._data.id_hoja_ruta);
     }
 }
 
-async function loadRutaParadasMapa(controlId) {
+async function loadRutaParadasMapa(hojaRutaId) {
     try {
-        const d = await apiFetch(`/controles-ruta/${controlId}`);
-        const control = d.control_ruta || d.data || d;
-        const paradas = control.paradas || control.despachos || [];
+        const d = await apiFetch(`/hojas-ruta/${hojaRutaId}`);
+        const hojaRuta = d.data || d;
+        const detalles = hojaRuta.detalles || [];
 
         const paradasContainer = document.getElementById('historial-ruta-paradas');
 
         const coords = [];
-        paradas.forEach((p, idx) => {
-            const lat = parseFloat(p.latitud || p.farmacia?.latitud);
-            const lng = parseFloat(p.longitud || p.farmacia?.longitud);
+        detalles.forEach((det, idx) => {
+            const farmacia = det.pedido?.farmacia || {};
+            const despacho = det.despachos?.[0] || {};
+            const lat = parseFloat(farmacia.latitud);
+            const lng = parseFloat(farmacia.longitud);
             if (isNaN(lat) || isNaN(lng)) return;
 
             coords.push([lat, lng]);
-            const estado = normalizeHistorial(p.estado?.nombre_estado || p.estado || '');
+            const estado = normalizeHistorial(despacho.estado_despacho || det.estado || '');
             const color = estado.includes('entreg') ? '#10b981'
                 : estado.includes('fall') || estado.includes('cancel') ? '#ef4444'
                 : '#64748b';
@@ -616,7 +772,7 @@ async function loadRutaParadasMapa(controlId) {
                 weight: 2,
                 fillOpacity: 0.9,
             }).addTo(historialMapa);
-            marker.bindPopup(`<b>${escapeHtml(p.farmacia?.nombre || p.nombre_farmacia || 'Parada')}</b><br>Estado: ${escapeHtml(estado || 'Pendiente')}`);
+            marker.bindPopup(`<b>${escapeHtml(farmacia.nombre || 'Parada')}</b><br>Estado: ${escapeHtml(estado || 'Pendiente')}`);
             historialMapaMarkers.push(marker);
         });
 
@@ -633,16 +789,18 @@ async function loadRutaParadasMapa(controlId) {
         }
 
         if (paradasContainer) {
-            if (!paradas.length) {
+            if (!detalles.length) {
                 paradasContainer.innerHTML = '<p class="text-muted">Sin paradas registradas para esta ruta.</p>';
             } else {
-                paradasContainer.innerHTML = paradas.map((p, idx) => {
-                    const est = normalizeHistorial(p.estado?.nombre_estado || p.estado || 'Pendiente');
+                paradasContainer.innerHTML = detalles.map((det, idx) => {
+                    const farmacia = det.pedido?.farmacia || {};
+                    const despacho = det.despachos?.[0] || {};
+                    const est = normalizeHistorial(despacho.estado_despacho || det.estado || 'Pendiente');
                     const icon = est.includes('entreg') ? 'fa-check-circle' : est.includes('fall') || est.includes('cancel') ? 'fa-times-circle' : 'fa-circle';
                     const color = est.includes('entreg') ? '#10b981' : est.includes('fall') || est.includes('cancel') ? '#ef4444' : '#64748b';
                     return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
                         <i class="fas ${icon}" style="color:${color};width:16px;"></i>
-                        <span>${idx + 1}. ${escapeHtml(p.farmacia?.nombre || p.nombre_farmacia || 'Parada')}</span>
+                        <span>${idx + 1}. ${escapeHtml(farmacia.nombre || 'Parada')}</span>
                         <span class="text-muted" style="margin-left:auto;">${escapeHtml(est)}</span>
                     </div>`;
                 }).join('');
@@ -725,12 +883,12 @@ async function openDespachoDrawer(despachoId) {
                                 <span>Sin registro de llegada</span>
                             </div>
                         </div>`}
-                        ${despacho.control_ruta?.ruta?.nombre_ruta ? `
+                        ${despacho.hojaRutaDetalle?.id_detalle ? `
                         <div class="timeline-item">
                             <div class="timeline-marker info"></div>
                             <div class="timeline-content">
-                                <strong>Ruta asignada</strong>
-                                <span>${escapeHtml(despacho.control_ruta.ruta.nombre_ruta)}</span>
+                                <strong>Detalle de ruta</strong>
+                                <span>#${despacho.hojaRutaDetalle.id_detalle}</span>
                             </div>
                         </div>` : ''}
                     </div>
@@ -751,9 +909,9 @@ async function openDespachoDrawer(despachoId) {
                                 <tbody>
                                     ${incidencias.map(inc => `
                                         <tr>
-                                            <td>${escapeHtml(inc.tipo?.nombre_tipo || inc.nombre_tipo || '—')}</td>
+                                            <td>${escapeHtml(inc.tipo_incidencia || inc.tipo?.nombre_tipo || inc.nombre_tipo || '—')}</td>
                                             <td>${escapeHtml(inc.descripcion || '—')}</td>
-                                            <td>${formatDate(inc.fecha_incidencia || inc.created_at)}</td>
+                                            <td>${formatDate(inc.created_at)}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -777,10 +935,10 @@ async function openDespachoDrawer(despachoId) {
                                 <tbody>
                                     ${evidencias.map(ev => {
                                         const url = ev.archivo
-                                            ? (ev.archivo.startsWith('http') ? ev.archivo : `http://127.0.0.1:8000/storage/${ev.archivo}`)
+                                            ? (ev.archivo.startsWith('http') ? ev.archivo : `${window.location.origin}/storage/${ev.archivo}`)
                                             : null;
                                         return `<tr>
-                                            <td>${escapeHtml(ev.tipoEvidencia?.nombre_tipo || ev.tipo?.nombre_tipo || ev.nombre_tipo || '—')}</td>
+                                            <td>${escapeHtml(ev.tipo_evidencia || ev.tipoEvidencia?.nombre_tipo || ev.tipo?.nombre_tipo || ev.nombre_tipo || '—')}</td>
                                             <td>${url
                                                 ? `<a href="${url}" target="_blank" class="btn btn-sm btn-outline"><i class="fas fa-eye"></i> Ver</a>`
                                                 : '—'}</td>
@@ -805,28 +963,6 @@ async function openDespachoDrawer(despachoId) {
             </div>
         `;
     }
-}
-
-/* ══════════════════════════════════════════════════════════════
-   TAB C — HISTORIAL DE CAMBIOS (LOGS)
-   ══════════════════════════════════════════════════════════════ */
-
-function loadLogsTab(container) {
-    container.innerHTML = `
-        <section class="ops-panel">
-            <div class="card-header">
-                <h3><i class="fas fa-list-timeline"></i> Historial de cambios de estado</h3>
-            </div>
-            <div class="card-body">
-                <div class="empty-state">
-                    <i class="fas fa-clock-rotate-left"></i>
-                    <h4>Registro de auditoria</h4>
-                    <p>Endpoint de logs de cambios de estado no disponible. Esta seccion mostrara automaticamente quien cambio cada estado y cuando, una vez que el backend exponga el historial de cambios.</p>
-                    <p class="text-muted" style="margin-top:8px;font-size:12px;">Los datos ya se estan generando en cada cambio de estado via POST /pedidos/{id}/cambiar-estado. Solo falta exponerlos como endpoint de consulta.</p>
-                </div>
-            </div>
-        </section>
-    `;
 }
 
 /* ══════════════════════════════════════════════════════════════

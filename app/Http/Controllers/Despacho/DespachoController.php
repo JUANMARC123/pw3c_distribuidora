@@ -90,6 +90,15 @@ class DespachoController extends ApiController
             'estado_despacho' => 'required|in:pendiente,entregado,incidencia',
         ]);
 
+        // ─── REGLA BDD: docs/specs/despachos.md -> Escenario D1 ────────
+        // Protegido por: tests/Feature/Despacho/ValidarEvidenciaEntregaTest.php
+        if ($validated['estado_despacho'] === 'entregado' && $despacho->evidencias()->count() === 0) {
+            return response()->json([
+                'error' => 'Debe subir al menos una foto como evidencia antes de finalizar la entrega.'
+            ], 422);
+        }
+        // ───────────────────────────────────────────────────────────────
+
         $despacho->update(['estado_despacho' => $validated['estado_despacho']]);
 
         return $this->jsonResponse($despacho, 'Estado del despacho actualizado.');

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * BDD: docs/specs/despachos.md -> Escenario D5 (Ciclo completo via eventos, incidencia, devolucion)
+ * @see \App\Http\Controllers\Logistica\CentroLogisticoController
+ * @see \App\Listeners\ActualizarEstadoDespachoListener
+ */
+
 use App\Models\Despacho;
 use App\Models\Farmacia;
 use App\Models\Pedido;

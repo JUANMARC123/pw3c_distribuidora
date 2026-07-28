@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * BDD: docs/specs/despachos.md -> Escenario D3 (Transiciones de estado, validaciones, 404)
+ * @see \App\Http\Controllers\Despacho\DespachoController::cambiarEstado
+ */
+
 use App\Models\Despacho;
 
 uses()->group('despachos', 'estados');
@@ -9,6 +14,10 @@ beforeEach(fn () => actingAsAdmin());
 it('cambia estado de pendiente a entregado', function () {
     // Preparar
     $despacho = Despacho::factory()->create(['estado_despacho' => 'pendiente']);
+    \App\Models\EvidenciaEntrega::factory()->create([
+        'id_despacho' => $despacho->id_despacho,
+        'tipo_evidencia' => 'foto',
+    ]);
 
     // Actuar
     $response = $this->postJson("/api/despachos/{$despacho->id_despacho}/cambiar-estado", [

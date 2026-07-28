@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * BDD: docs/specs/ (test base de que la app responde)
+ */
+
 test('the application returns a successful response', function () {
     // Preparar
 

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * BDD: docs/specs/pedidos.md -> Escenarios P1, P2, P3 (CRUD, detalles, cambio de estado)
+ * @see \App\Http\Controllers\Pedido\PedidoController
+ */
+
 use App\Models\DetallePedido;
 use App\Models\Farmacia;
 use App\Models\Pedido;

@@ -15,8 +15,7 @@ class FarmaciaController extends ApiController
         if ($search = $request->search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('telefono', 'like', "%{$search}%");
+                    ->orWhere('direccion', 'like', "%{$search}%");
             });
         }
 
@@ -28,8 +27,6 @@ class FarmaciaController extends ApiController
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
             'direccion' => 'required|string',
-            'telefono' => 'required|string|max:20',
-            'email' => 'required|email|max:180|unique:farmacias,email',
             'latitud' => 'required|numeric',
             'longitud' => 'required|numeric',
             'geocerca' => 'nullable|numeric|min:0',
@@ -53,8 +50,6 @@ class FarmaciaController extends ApiController
         $validated = $request->validate([
             'nombre' => 'sometimes|string|max:255',
             'direccion' => 'sometimes|string',
-            'telefono' => 'sometimes|string|max:20',
-            'email' => "sometimes|email|max:180|unique:farmacias,email,{$id},id_farmacia",
             'latitud' => 'sometimes|numeric',
             'longitud' => 'sometimes|numeric',
             'geocerca' => 'nullable|numeric|min:0',

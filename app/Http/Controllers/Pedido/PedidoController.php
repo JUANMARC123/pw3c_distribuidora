@@ -74,7 +74,7 @@ class PedidoController extends ApiController
         $validated = $request->validate([
             'id_farmacia' => 'sometimes|integer|exists:farmacias,id_farmacia',
             'observaciones' => 'nullable|string',
-            'estado' => 'sometimes|in:pendiente,aprobado,entregado,cancelado',
+            'estado' => 'sometimes|in:pendiente,aprobado,preparacion,en_ruta,entregado,cancelado',
             'metodo_pago' => 'nullable|in:efectivo,qr,transferencia,credito',
             'subtotal' => 'nullable|numeric|min:0',
             'descuento' => 'nullable|numeric|min:0',
@@ -104,7 +104,7 @@ class PedidoController extends ApiController
         $pedido = Pedido::findOrFail($id);
 
         $validated = $request->validate([
-            'estado' => 'required|in:pendiente,aprobado,entregado,cancelado',
+            'estado' => 'required|in:pendiente,aprobado,preparacion,en_ruta,entregado,cancelado',
         ]);
 
         $pedido->update(['estado' => $validated['estado']]);

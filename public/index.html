@@ -256,10 +256,10 @@
             }
 
             log('🕐', `Diagnóstico iniciado: ${checkedAt}`);
-            log('', `Servidor: http://127.0.0.1:8000`);
+            log('', `Servidor: ${window.location.origin}`);
 
             try {
-                await fetch('http://127.0.0.1:8000/', { method: 'GET' });
+                await fetch(window.location.origin + '/', { method: 'GET' });
                 log('✅', 'Laravel: responde OK');
             } catch (e) {
                 if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
@@ -272,7 +272,7 @@
             }
 
             try {
-                const res = await fetch('http://127.0.0.1:8000/api/auth/login', {
+                const res = await fetch(window.location.origin + '/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({ email: 'test@test.com', password: 'test' })

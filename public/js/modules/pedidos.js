@@ -9,6 +9,15 @@ let entregaPedidoId = null;
 let entregaItems = [];
 let kanbanViewMode = 'kanban';
 
+const ESTADOS_PEDIDO = [
+    { key: 'pendiente', label: 'Pendiente' },
+    { key: 'aprobado', label: 'Aprobado' },
+    { key: 'preparacion', label: 'En Preparacion' },
+    { key: 'en_ruta', label: 'En Ruta' },
+    { key: 'entregado', label: 'Entregado' },
+    { key: 'cancelado', label: 'Cancelado' },
+];
+
 const KANBAN_COLUMNS = [
     { key: 'pendiente', title: 'Pendiente', icon: 'fa-clock' },
     { key: 'preparacion', title: 'En Preparacion', icon: 'fa-box-open' },
@@ -41,18 +50,7 @@ async function loadFarmacias() {
 }
 
 async function loadEstados() {
-    try {
-        const d = await apiFetch('/catalogos/estados-pedido');
-        estadosPedido = Array.isArray(d) ? d : (d.data || []);
-    } catch (e) {
-        estadosPedido = [
-            { id_estado_pedido: 1, nombre_estado: 'Pendiente' },
-            { id_estado_pedido: 2, nombre_estado: 'En preparacion' },
-            { id_estado_pedido: 3, nombre_estado: 'En ruta' },
-            { id_estado_pedido: 4, nombre_estado: 'Entregado' },
-            { id_estado_pedido: 5, nombre_estado: 'Cancelado' },
-        ];
-    }
+    estadosPedido = ESTADOS_PEDIDO;
 }
 
 async function loadProductos() {
@@ -91,7 +89,7 @@ function renderPedidosContent(containerSelector = '#page-content') {
             </select>
             <select class="form-control" id="filter-estado" onchange="renderPedidosView()" style="max-width:210px;">
                 <option value="">Todos los estados</option>
-                ${estadosPedido.map(e => `<option value="${e.id_estado_pedido}">${escapeHtml(e.nombre_estado)}</option>`).join('')}
+                ${ESTADOS_PEDIDO.filter(e => e.key !== 'aprobado').map(e => `<option value="${e.key}">${escapeHtml(e.label)}</option>`).join('')}
             </select>
             <div class="pedidos-view-toggle">
                 <button class="toggle-btn active" data-mode="kanban" onclick="togglePedidosView('kanban')"><i class="fas fa-columns"></i> Kanban</button>
@@ -274,7 +272,7 @@ function renderEstadoModal() {
                     <div class="form-group">
                         <label>Estado</label>
                         <select id="s-estado" class="form-control">
-                            ${estadosPedido.map(e => `<option value="${e.id_estado_pedido}">${escapeHtml(e.nombre_estado)}</option>`).join('')}
+                            ${ESTADOS_PEDIDO.filter(e => e.key !== 'aprobado').map(e => `<option value="${e.key}">${escapeHtml(e.label)}</option>`).join('')}
                         </select>
                     </div>
                 </div>
@@ -319,13 +317,16 @@ async function refreshPedidos(silent = false) {
 
 function renderPedidosView() {
     const filtered = getFilteredPedidos();
+    const kanban = document.getElementById('pedidos-kanban');
+    const tableSection = document.getElementById('pedidos-table-section');
+    if (!kanban && !tableSection) return;
     if (kanbanViewMode === 'tabla') {
-        document.getElementById('pedidos-kanban').style.display = 'none';
-        document.getElementById('pedidos-table-section').style.display = '';
+        if (kanban) kanban.style.display = 'none';
+        if (tableSection) tableSection.style.display = '';
         renderPedidosList(filtered);
     } else {
-        document.getElementById('pedidos-kanban').style.display = '';
-        document.getElementById('pedidos-table-section').style.display = 'none';
+        if (kanban) kanban.style.display = '';
+        if (tableSection) tableSection.style.display = 'none';
         renderKanban(filtered);
     }
 }
@@ -341,7 +342,7 @@ function getFilteredPedidos() {
         const text = normalize(`${p.id_pedido} ${farmacia} ${productos} ${getEstadoName(p)}`);
         if (search && !text.includes(search)) return false;
         if (farmaciaId && String(p.id_farmacia || p.farmacia?.id_farmacia || '') !== String(farmaciaId)) return false;
-        if (estadoId && String(p.id_estado_pedido || p.estado?.id_estado_pedido || '') !== String(estadoId)) return false;
+        if (estadoId && normalize(getEstadoName(p)) !== normalize(estadoId)) return false;
         return true;
     });
 }
@@ -1259,7 +1260,7 @@ async function edit(id) {
             <div class="form-group" style="min-width:180px;">
                 <label>Estado</label>
                 <select id="f-estado" class="form-control">
-                    ${estadosPedido.map(e => `<option value="${e.id_estado_pedido}" ${String(e.id_estado_pedido) === String(p.id_estado_pedido || p.estado?.id_estado_pedido) ? 'selected' : ''}>${escapeHtml(e.nombre_estado)}</option>`).join('')}
+                    ${ESTADOS_PEDIDO.filter(e => e.key !== 'aprobado').map(e => `<option value="${e.key}" ${normalize(getEstadoName(p)) === normalize(e.key) ? 'selected' : ''}>${escapeHtml(e.label)}</option>`).join('')}
                 </select>
             </div>
         `;
@@ -1286,7 +1287,7 @@ async function edit(id) {
 async function save() {
     const id_farmacia = parseInt(document.getElementById('f-farmacia').value);
     const estadoEl = document.getElementById('f-estado');
-    const id_estado_pedido = estadoEl ? parseInt(estadoEl.value) : 1;
+    const estado = estadoEl ? estadoEl.value : 'pendiente';
     const observaciones = document.getElementById('f-observaciones').value.trim();
 
     if (!id_farmacia) return Swal.fire('Validacion', 'Seleccione una farmacia', 'warning');
@@ -1297,7 +1298,7 @@ async function save() {
     const currentUser = getUser();
     const body = {
         id_farmacia,
-        id_estado_pedido,
+        estado,
         observaciones,
         subtotal: calcDetalleTotal(),
         descuento: 0,
@@ -1365,7 +1366,7 @@ async function createCatalogProductFromDetected(item) {
             body: {
                 nombre,
                 precio_unitario: parseMoney(item.precio_unitario),
-                unidad_medida: 'UNIDAD',
+                unidad_medida: 'CAJA',
                 estado: true,
             }
         });
@@ -1449,10 +1450,10 @@ function closeEstadoModal() {
 }
 
 async function changeEstado() {
-    const id_estado_pedido = parseInt(document.getElementById('s-estado').value);
-    if (!id_estado_pedido) return Swal.fire('Validacion', 'Seleccione un estado', 'warning');
+    const estado = document.getElementById('s-estado').value;
+    if (!estado) return Swal.fire('Validacion', 'Seleccione un estado', 'warning');
     try {
-        await apiFetch(`/pedidos/${estadoPedidoId}/cambiar-estado`, { method: 'POST', body: { id_estado_pedido } });
+        await apiFetch(`/pedidos/${estadoPedidoId}/cambiar-estado`, { method: 'POST', body: { estado } });
         Swal.fire('Actualizado', 'Estado cambiado correctamente', 'success');
         closeEstadoModal();
         await refreshPedidos(true);
@@ -1650,7 +1651,9 @@ function similarityScore(a, b) {
 }
 
 function getEstadoName(p) {
-    return p.estado?.nombre_estado || p.nombre_estado || p.estado || 'Pendiente';
+    const raw = p.estado?.nombre_estado || p.nombre_estado || p.estado || 'pendiente';
+    const map = { pendiente: 'Pendiente', aprobado: 'Aprobado', preparacion: 'En Preparacion', en_ruta: 'En Ruta', entregado: 'Entregado', cancelado: 'Cancelado' };
+    return map[raw.toLowerCase()] || raw;
 }
 
 function getColumnKey(p) {
@@ -1729,19 +1732,11 @@ function initPedidosSortable() {
 }
 
 async function handlePedidoDrop(pedidoId, newStatusKey) {
-    const statusMap = {
-        pendiente: 1,
-        preparacion: 2,
-        en_ruta: 3,
-        entregado: 4,
-        cancelado: 5,
-    };
-    const id_estado_pedido = statusMap[newStatusKey];
-    if (!id_estado_pedido) return;
+    if (!newStatusKey) return;
     try {
         await apiFetch(`/pedidos/${pedidoId}/cambiar-estado`, {
             method: 'POST',
-            body: { id_estado_pedido }
+            body: { estado: newStatusKey }
         });
         await refreshPedidos(true);
     } catch (e) {

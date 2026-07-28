@@ -48,6 +48,19 @@ async function loadRutasActivas() {
     if (trackingActiveId) selectTrackingRuta(trackingActiveId);
 }
 
+async function cargarRutaCompleta(id) {
+    try {
+        const d = await apiFetch(`/hojas-ruta/${id}`);
+        const ruta = d?.data || d;
+        const idx = rutasActivas.findIndex(r => getRutaId(r) === id);
+        if (idx >= 0) rutasActivas[idx] = ruta;
+        return ruta;
+    } catch (e) {
+        console.error('Error loading ruta completa:', e);
+        return null;
+    }
+}
+
 function renderTrackingSummary() {
     const container = document.getElementById('tracking-summary');
     if (!container) return;
@@ -77,13 +90,13 @@ function renderTrackingList() {
     container.innerHTML = rutasActivas.map(r => {
         const id = getRutaId(r);
         const rep = r.repartidor || {};
-        const veh = r.vehiculo || { marca: r.marca, modelo: r.modelo, placa: r.placa };
+        const veh = r.vehiculo || {};
         const progreso = getRutaProgreso(r);
         const paradas = getRutaParadas(r);
         const completadas = getRutaCompletadas(r);
         const isActive = trackingActiveId === id;
         const horaSalida = r.hora_salida ? r.hora_salida.substring(0, 5) : '';
-        const estado = trackSafe(r.estado?.nombre_estado || r.estado || 'En curso');
+        const estado = trackSafe(r.estado_ruta || r.estado?.nombre_estado || r.estado || 'En curso');
         return `
             <article class="tracking-card ${isActive ? 'active' : ''}" onclick="selectTrackingRuta(${id})" data-ruta-id="${id}">
                 <div class="tracking-card-head">
@@ -110,13 +123,14 @@ function renderTrackingList() {
     }).join('');
 }
 
-function selectTrackingRuta(id) {
+async function selectTrackingRuta(id) {
     trackingActiveId = parseInt(id);
     trackingUserInteracted = false;
     document.querySelectorAll('.tracking-card').forEach(el => {
         el.classList.toggle('active', parseInt(el.dataset.rutaId) === trackingActiveId);
     });
-    const ruta = rutasActivas.find(r => getRutaId(r) === trackingActiveId);
+    const rutaCompleta = await cargarRutaCompleta(trackingActiveId);
+    const ruta = rutaCompleta || rutasActivas.find(r => getRutaId(r) === trackingActiveId);
     renderTrackingDetail(ruta);
     Object.keys(gpsTrailDots).forEach(k => clearGPSTrail(k));
     updateTrackingMap(ruta);
@@ -136,7 +150,7 @@ function renderTrackingDetail(ruta) {
     var pendientes = [];
     var completadas = [];
     paradas.forEach(function (p) {
-        var est = (p.estado?.nombre_estado || p.estado || '').toLowerCase();
+        var est = stopEstado(p).toLowerCase();
         if (est.includes('entreg') || est.includes('fall') || est.includes('devol')) {
             completadas.push(p);
         } else {
@@ -157,6 +171,19 @@ function renderTrackingDetail(ruta) {
           '</div>'
         : '';
 
+    var finalizarBtnHtml = '';
+    var todasCompletadas = paradas.length > 0 && paradas.every(function (p) {
+        var est = stopEstado(p).toLowerCase();
+        return est.includes('entreg') || est.includes('fall') || est.includes('devol');
+    });
+    if (todasCompletadas) {
+        finalizarBtnHtml = '<div class="route-events" style="margin-top:16px;">' +
+            '<button class="btn btn-success" style="width:100%;padding:12px;font-size:15px;" onclick="regresoAlmacen(' + getRutaId(ruta) + ')">' +
+                '<i class="fas fa-warehouse"></i> Finalizar Ruta — Regreso al almacén' +
+            '</button>' +
+        '</div>';
+    }
+
     container.innerHTML = '\
         <div class="tracking-detail-header">\
             <div>\
@@ -164,7 +191,7 @@ function renderTrackingDetail(ruta) {
                 <p>' + trackSafe(getRepartidorNameTracking(ruta.repartidor || {})) + '</p>\
                 <p class="tracking-hora-salida"><i class="fas fa-clock"></i> Salida: <strong>' + horaSalida + '</strong></p>\
             </div>\
-            ' + getStatusBadge(ruta.estado?.nombre_estado || ruta.estado || 'En curso') + '\
+            ' + getStatusBadge(ruta.estado_ruta || ruta.estado?.nombre_estado || ruta.estado || 'En curso') + '\
         </div>\
         <div class="route-progress-large">\
             <div class="route-progress-bar"><span style="width:' + getRutaProgreso(ruta) + '%"></span></div>\
@@ -173,10 +200,7 @@ function renderTrackingDetail(ruta) {
         <div class="tracking-stops">\
             ' + pendientesHtml + '\
         </div>\
-        ' + completadasHtml + '\
-        <div class="route-events">\
-            <div class="route-event muted">Eventos en vivo disponibles cuando Firebase publique cambios de la ruta.</div>\
-        </div>\
+        ' + completadasHtml + finalizarBtnHtml + '\
     ';
 }
 
@@ -190,10 +214,10 @@ function toggleCompletadas() {
 }
 
 function renderTrackingStop(stop, idx, ruta, isCompletada) {
-    var estado = stop.estado?.nombre_estado || stop.estado || 'Pendiente';
-    var farmacia = stop.farmacia || stop.pedido?.farmacia?.nombre || stop.nombre_farmacia || 'Sin farmacia';
-    var pedido = stop.id_pedido || stop.pedido_id || stop.pedido?.id_pedido || '';
-    var llegada = stop.hora_llegada;
+    var estado = stopEstado(stop);
+    var farmacia = stopFarmacia(stop);
+    var pedido = stopPedidoId(stop) || '';
+    var llegada = stopLlegada(stop);
     var estaCompletado = isCompletada || normalizeTrack(estado).includes('entreg') || normalizeTrack(estado).includes('fall') || normalizeTrack(estado).includes('devol');
 
     var actionsHtml = '';
@@ -235,12 +259,14 @@ async function registrarLlegada(rutaId, stopIdx) {
     if (!ruta) return;
     const paradas = getRutaParadas(ruta);
     const stop = paradas[stopIdx];
-    if (!stop || !stop.id_parada) return;
+    if (!stop) return;
+    const idDet = stopId(stop);
+    if (!idDet) return;
 
     try {
-        await apiFetch(`/logistica/rutas-activas/${rutaId}/registrar-llegada-parada`, {
+        await apiFetch(`/hojas-ruta/${rutaId}/registrar-llegada`, {
             method: 'POST',
-            body: { id_parada: stop.id_parada },
+            body: { id_detalle: idDet },
         });
         stop.hora_llegada = new Date().toTimeString().substring(0, 8);
         renderTrackingDetail(ruta);
@@ -263,11 +289,11 @@ function openStopModal(stopIdx) {
     currentRutaForStop = ruta;
     currentStopIdx = stopIdx;
 
-    const farmacia = stop.farmacia || stop.pedido?.farmacia?.nombre || stop.nombre_farmacia || 'Farmacia';
-    const pedido = stop.id_pedido || stop.pedido_id || '';
-    const llegada = stop.hora_llegada;
+    const farmacia = stopFarmacia(stop);
+    const pedido = stopPedidoId(stop) || '';
+    const llegada = stopLlegada(stop);
     const horaStr = llegada ? (typeof llegada === 'string' ? llegada.substring(0, 5) : llegada) : '—';
-    const estado = stop.estado?.nombre_estado || stop.estado || 'Pendiente';
+    const estado = stopEstado(stop);
     const estaCompletado = normalizeTrack(estado).includes('entreg') || normalizeTrack(estado).includes('fall') || normalizeTrack(estado).includes('devol');
 
     const overlay = document.getElementById('stop-modal-overlay') || createStopModalElements();
@@ -354,7 +380,7 @@ function createStopModalElements() {
 async function loadStopIncidencias() {
     const container = document.getElementById('stop-incidencias-list');
     if (!container || !currentStop) return;
-    const idDespacho = currentStop.id_despacho;
+    const idDespacho = stopDespachoId(currentStop);
     if (!idDespacho) { container.innerHTML = '<p class="text-muted">Sin incidencias.</p>'; return; }
 
     try {
@@ -365,7 +391,7 @@ async function loadStopIncidencias() {
         } else {
             container.innerHTML = data.map(inc => `
                 <div class="incidencia-item">
-                    <span class="badge badge-warning">${trackSafe(inc.tipo?.nombre_tipo || inc.nombre_tipo || '—')}</span>
+                    <span class="badge badge-warning">${trackSafe(inc.tipo_incidencia || inc.tipo?.nombre_tipo || inc.nombre_tipo || '—')}</span>
                     <span>${trackSafe(inc.descripcion || '')}</span>
                 </div>
             `).join('');
@@ -384,10 +410,11 @@ async function agregarIncidencia() {
             <div class="form-group">
                 <label>Tipo de incidencia</label>
                 <select id="swal-tipo-inc" class="form-control">
-                    <option value="1">Producto dañado</option>
-                    <option value="2">Retraso</option>
-                    <option value="3">Dirección incorrecta</option>
-                    <option value="4">Cliente ausente</option>
+                    <option value="">Seleccione...</option>
+                    <option value="Producto dañado">Producto dañado</option>
+                    <option value="Retraso">Retraso</option>
+                    <option value="Dirección incorrecta">Dirección incorrecta</option>
+                    <option value="Cliente ausente">Cliente ausente</option>
                 </select>
             </div>
             <div class="form-group">
@@ -400,17 +427,18 @@ async function agregarIncidencia() {
         confirmButtonText: 'Guardar',
         cancelButtonText: 'Cancelar',
         preConfirm: () => {
-            const tipo = parseInt(document.getElementById('swal-tipo-inc').value);
+            const tipo = document.getElementById('swal-tipo-inc').value;
             const descripcion = document.getElementById('swal-desc-inc').value.trim();
+            if (!tipo) { Swal.showValidationMessage('Seleccione un tipo de incidencia'); return false; }
             if (!descripcion) { Swal.showValidationMessage('La descripción es obligatoria'); return false; }
-            return { id_tipo_incidencia: tipo, descripcion };
+            return { tipo, descripcion };
         }
     });
 
     if (!formData) return;
 
     try {
-        await apiFetch(`/despachos/${currentStop.id_despacho}/incidencias`, {
+        await apiFetch(`/despachos/${stopDespachoId(currentStop)}/incidencias`, {
             method: 'POST',
             body: formData,
         });
@@ -426,7 +454,7 @@ async function agregarIncidencia() {
 async function loadStopEvidencias() {
     const container = document.getElementById('stop-evidencias-list');
     if (!container || !currentStop) return;
-    const idDespacho = currentStop.id_despacho;
+    const idDespacho = stopDespachoId(currentStop);
     if (!idDespacho) { container.innerHTML = '<p class="text-muted">Sin evidencias.</p>'; return; }
 
     try {
@@ -437,11 +465,11 @@ async function loadStopEvidencias() {
         } else {
             container.innerHTML = data.map(ev => {
                 const url = ev.archivo
-                    ? (ev.archivo.startsWith('http') ? ev.archivo : `http://127.0.0.1:8000/storage/${ev.archivo}`)
+                    ? (ev.archivo.startsWith('http') ? ev.archivo : `${window.location.origin}/storage/${ev.archivo}`)
                     : null;
                 return `
                     <div class="evidencia-item">
-                        <span class="badge badge-info">${trackSafe(ev.tipoEvidencia?.nombre_tipo || ev.tipo?.nombre_tipo || ev.nombre_tipo || '—')}</span>
+                        <span class="badge badge-info">${trackSafe(ev.tipo_evidencia || ev.tipoEvidencia?.nombre_tipo || ev.tipo?.nombre_tipo || ev.nombre_tipo || '—')}</span>
                         ${url ? `<a href="${url}" target="_blank" class="btn btn-sm btn-outline"><i class="fas fa-eye"></i> Ver</a>` : '<span class="text-muted">Sin archivo</span>'}
                     </div>
                 `;
@@ -461,9 +489,10 @@ async function agregarEvidencia() {
             <div class="form-group">
                 <label>Tipo de evidencia</label>
                 <select id="swal-tipo-ev" class="form-control">
-                    <option value="1">Foto</option>
-                    <option value="2">Firma</option>
-                    <option value="3">PDF</option>
+                    <option value="">Seleccione...</option>
+                    <option value="Foto">Foto</option>
+                    <option value="Firma">Firma</option>
+                    <option value="PDF">PDF</option>
                 </select>
             </div>
             <div class="form-group">
@@ -476,11 +505,12 @@ async function agregarEvidencia() {
         confirmButtonText: 'Subir',
         cancelButtonText: 'Cancelar',
         preConfirm: () => {
-            const tipo = parseInt(document.getElementById('swal-tipo-ev').value);
+            const tipo = document.getElementById('swal-tipo-ev').value;
             const archivo = document.getElementById('swal-archivo-ev').files[0];
+            if (!tipo) { Swal.showValidationMessage('Seleccione un tipo'); return false; }
             if (!archivo) { Swal.showValidationMessage('Seleccione un archivo'); return false; }
             const fd = new FormData();
-            fd.append('id_tipo_evidencia', tipo);
+            fd.append('tipo', tipo);
             fd.append('archivo', archivo);
             return fd;
         }
@@ -489,7 +519,7 @@ async function agregarEvidencia() {
     if (!formData) return;
 
     try {
-        await apiFetch(`/despachos/${currentStop.id_despacho}/evidencias`, {
+        await apiFetch(`/despachos/${stopDespachoId(currentStop)}/evidencias`, {
             method: 'POST',
             body: formData,
         });
@@ -505,18 +535,18 @@ async function agregarEvidencia() {
 async function marcarEntregado() {
     if (!currentStop || !currentRutaForStop) return;
     const rutaId = getRutaId(currentRutaForStop);
-    const idDespacho = currentStop.id_despacho;
-    const idPedido = currentStop.id_pedido || currentStop.pedido_id;
-    const idParada = currentStop.id_parada;
+    const idDespacho = stopDespachoId(currentStop);
+    const idPedido = stopPedidoId(currentStop);
+    const idDet = stopId(currentStop);
 
-    if (!idParada || !idDespacho || !idPedido) {
+    if (!idDet || !idDespacho || !idPedido) {
         return Swal.fire('Error', 'Faltan datos de la parada', 'error');
     }
 
     try {
-        await apiFetch(`/logistica/rutas-activas/${rutaId}/entrega-completada`, {
+        await apiFetch(`/hojas-ruta/${rutaId}/entrega-completada`, {
             method: 'POST',
-            body: { id_parada: idParada, id_despacho: idDespacho, id_pedido: idPedido },
+            body: { id_detalle: idDet, id_despacho: idDespacho, id_pedido: idPedido },
         });
         Swal.fire('Completada', 'Entrega marcada como completada', 'success');
         closeStopModal();
@@ -529,11 +559,11 @@ async function marcarEntregado() {
 async function marcarFallido() {
     if (!currentStop || !currentRutaForStop) return;
     const rutaId = getRutaId(currentRutaForStop);
-    const idDespacho = currentStop.id_despacho;
-    const idPedido = currentStop.id_pedido || currentStop.pedido_id;
-    const idParada = currentStop.id_parada;
+    const idDespacho = stopDespachoId(currentStop);
+    const idPedido = stopPedidoId(currentStop);
+    const idDet = stopId(currentStop);
 
-    if (!idParada || !idDespacho || !idPedido) {
+    if (!idDet || !idDespacho || !idPedido) {
         return Swal.fire('Error', 'Faltan datos de la parada', 'error');
     }
 
@@ -548,9 +578,9 @@ async function marcarFallido() {
     });
 
     try {
-        await apiFetch(`/logistica/rutas-activas/${rutaId}/entrega-fallida`, {
+        await apiFetch(`/hojas-ruta/${rutaId}/entrega-fallida`, {
             method: 'POST',
-            body: { id_parada: idParada, id_despacho: idDespacho, id_pedido: idPedido, motivo: motivo || '' },
+            body: { id_detalle: idDet, id_despacho: idDespacho, id_pedido: idPedido, motivo: motivo || '' },
         });
         Swal.fire('Registrada', 'Entrega marcada como fallida', 'success');
         closeStopModal();
@@ -563,11 +593,11 @@ async function marcarFallido() {
 async function marcarDevolucion() {
     if (!currentStop || !currentRutaForStop) return;
     const rutaId = getRutaId(currentRutaForStop);
-    const idDespacho = currentStop.id_despacho;
-    const idPedido = currentStop.id_pedido || currentStop.pedido_id;
-    const idParada = currentStop.id_parada;
+    const idDespacho = stopDespachoId(currentStop);
+    const idPedido = stopPedidoId(currentStop);
+    const idDet = stopId(currentStop);
 
-    if (!idParada || !idDespacho || !idPedido) {
+    if (!idDet || !idDespacho || !idPedido) {
         return Swal.fire('Error', 'Faltan datos de la parada', 'error');
     }
 
@@ -584,15 +614,53 @@ async function marcarDevolucion() {
     if (!r.isConfirmed) return;
 
     try {
-        await apiFetch(`/logistica/rutas-activas/${rutaId}/devolucion`, {
+        await apiFetch(`/hojas-ruta/${rutaId}/devolucion`, {
             method: 'POST',
-            body: { id_parada: idParada, id_despacho: idDespacho, id_pedido: idPedido },
+            body: { id_detalle: idDet, id_despacho: idDespacho, id_pedido: idPedido },
         });
         Swal.fire('Registrada', 'Devolución registrada correctamente', 'success');
         closeStopModal();
         await refreshRutaDetail();
     } catch (e) {
         Swal.fire('Error', e.message || 'Error al registrar devolución', 'error');
+    }
+}
+
+async function regresoAlmacen(rutaId) {
+    const ruta = rutasActivas.find(r => getRutaId(r) === rutaId);
+    if (!ruta) return;
+
+    const result = await Swal.fire({
+        title: '¿Finalizar ruta?',
+        text: 'Se registrará el regreso al almacén y se completará la ruta.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, finalizar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#10b981',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+        await apiFetch(`/hojas-ruta/${rutaId}/regreso-almacen`, { method: 'POST' });
+        Swal.fire({
+            title: 'Ruta completada',
+            text: 'Regreso al almacén registrado exitosamente.',
+            icon: 'success',
+            timer: 3000,
+            showConfirmButton: false,
+        });
+        const idx = rutasActivas.indexOf(ruta);
+        if (idx > -1) rutasActivas.splice(idx, 1);
+        renderTrackingList();
+        if (trackingActiveId === rutaId) {
+            trackingActiveId = rutasActivas.length > 0 ? getRutaId(rutasActivas[0]) : null;
+            renderTrackingDetail(rutasActivas[0] || null);
+            if (rutasActivas.length > 0) selectTrackingRuta(trackingActiveId);
+        }
+    } catch (e) {
+        Swal.fire('Error', 'No se pudo registrar el regreso: ' + (e.message || ''), 'error');
     }
 }
 
@@ -619,8 +687,8 @@ function checkProximityToStops(ruta, repartidorCoords) {
     var paradas = getRutaParadas(ruta);
     var rutaId = getRutaId(ruta);
     paradas.forEach(function (stop, idx) {
-        if (stop.hora_llegada) return;
-        var est = (stop.estado?.nombre_estado || stop.estado || '').toLowerCase();
+        if (stopLlegada(stop)) return;
+        var est = stopEstado(stop).toLowerCase();
         if (est.includes('entreg') || est.includes('fall') || est.includes('devol')) return;
         var stopCoords = getStopCoords(stop);
         if (!stopCoords) return;
@@ -632,15 +700,16 @@ function checkProximityToStops(ruta, repartidorCoords) {
 }
 
 async function autoRegistrarLlegada(rutaId, stopIdx, stop) {
-    if (!stop.id_parada) return;
-    var idDespacho = stop.id_despacho;
-    var idPedido = stop.id_pedido || stop.pedido_id;
+    const idDet = stopId(stop);
+    if (!idDet) return;
+    const idDespacho = stopDespachoId(stop);
+    const idPedido = stopPedidoId(stop);
     if (!idDespacho || !idPedido) return;
 
     try {
-        var resp = await apiFetch('/logistica/rutas-activas/' + rutaId + '/auto-completar-parada', {
+        const resp = await apiFetch('/hojas-ruta/' + rutaId + '/registrar-llegada', {
             method: 'POST',
-            body: { id_parada: stop.id_parada, id_despacho: idDespacho, id_pedido: idPedido },
+            body: { id_detalle: idDet },
         });
         var ruta = rutasActivas.find(function (r) { return getRutaId(r) === rutaId; });
         if (!ruta) return;
@@ -740,7 +809,7 @@ function updateTrackingMap(ruta, forceFitBounds = true) {
     var todasCompletadas = true;
     var paradas = getRutaParadas(ruta);
     paradas.forEach(function (stop) {
-        var est = (stop.estado?.nombre_estado || stop.estado || '').toLowerCase();
+        var est = stopEstado(stop).toLowerCase();
         if (!est.includes('entreg') && !est.includes('fall') && !est.includes('devol')) {
             todasCompletadas = false;
         }
@@ -782,8 +851,8 @@ function updateTrackingMap(ruta, forceFitBounds = true) {
         if (!stopCoords) return;
         coords.push(stopCoords);
         bounds.extend(stopCoords);
-        var estado = normalizeTrack(stop.estado?.nombre_estado || stop.estado || '');
-        var llegada = stop.hora_llegada;
+        var estado = normalizeTrack(stopEstado(stop));
+        var llegada = stopLlegada(stop);
         var color;
         if (estado.includes('entreg')) {
             color = '#10b981';
@@ -795,9 +864,9 @@ function updateTrackingMap(ruta, forceFitBounds = true) {
             color = '#64748b';
         }
         var popup = '\
-            <b>' + trackSafe(stop.farmacia || stop.pedido?.farmacia?.nombre || 'Parada') + '</b><br>\
-            Estado: ' + trackSafe(stop.estado?.nombre_estado || stop.estado || 'Pendiente') + '<br>\
-            Pedido #' + trackSafe(stop.id_pedido || stop.pedido_id || '') + '\
+            <b>' + trackSafe(stopFarmacia(stop)) + '</b><br>\
+            Estado: ' + trackSafe(stopEstado(stop)) + '<br>\
+            Pedido #' + trackSafe(stopPedidoId(stop) || '') + '\
         ';
         trackingMarkers['parada_' + idx] = createTrackingMarker(String(idx + 1), stopCoords, color, popup);
     });
@@ -989,12 +1058,20 @@ function listenFirebaseTracking() {
 }
 
 function getRutaId(r) {
-    return parseInt(r?.id_control_ruta || r?.control_ruta_id || r?.id_ruta || r?.id || 0);
+    return parseInt(r?.id_hoja_ruta || r?.id_control_ruta || r?.control_ruta_id || r?.id_ruta || r?.id || 0);
 }
 
 function getRutaParadas(r) {
-    return r?.despachos || r?.paradas || r?.entregas || [];
+    return r?.detalles || r?.despachos || r?.paradas || r?.entregas || [];
 }
+
+function stopId(s) { return s?.id_detalle || s?.id_parada || s?.id; }
+function stopDespacho(s) { return s?.despachos?.[0] || s; }
+function stopDespachoId(s) { return stopDespacho(s)?.id_despacho || s?.id_despacho; }
+function stopEstado(s) { return stopDespacho(s)?.estado_despacho || s?.estado?.nombre_estado || s?.estado || 'pendiente'; }
+function stopFarmacia(s) { return s?.pedido?.farmacia?.nombre || s?.farmacia || s?.nombre_farmacia || 'Sin farmacia'; }
+function stopPedidoId(s) { return s?.id_pedido || s?.pedido?.id_pedido || s?.pedido_id; }
+function stopLlegada(s) { return s?.hora_llegada; }
 
 function getRutaProgreso(r) {
     const explicit = parseFloat(r?.progreso);
@@ -1007,7 +1084,7 @@ function getRutaProgreso(r) {
 function getRutaCompletadas(r) {
     const explicit = parseInt(r?.completadas);
     if (Number.isFinite(explicit)) return explicit;
-    return getRutaParadas(r).filter(p => normalizeTrack(p.estado?.nombre_estado || p.estado).includes('entreg')).length;
+    return getRutaParadas(r).filter(p => normalizeTrack(stopEstado(p)).includes('entreg')).length;
 }
 
 function getStopCoords(stop) {
@@ -1020,10 +1097,11 @@ function getStopCoords(stop) {
 function getRepartidorNameTracking(rep) { return getRepartidorName(rep); }
 
 function formatVehiculoTracking(veh) {
-    const marca = veh?.marca?.nombre_marca || veh?.marca || '';
-    const modelo = veh?.modelo?.nombre_modelo || veh?.modelo || '';
+    const marca = veh?.marca || '';
+    const modelo = veh?.modelo || '';
     const placa = veh?.placa ? `(${veh.placa})` : '';
-    return `${marca} ${modelo} ${placa}`.trim() || 'Sin vehiculo';
+    const str = `${marca} ${modelo} ${placa}`.trim();
+    return str || 'Sin vehiculo';
 }
 
 function normalizeTrack(value) { return normalize(value); }

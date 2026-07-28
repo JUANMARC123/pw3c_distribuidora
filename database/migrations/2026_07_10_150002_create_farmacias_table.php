@@ -12,8 +12,6 @@ return new class extends Migration
             $table->bigIncrements('id_farmacia');
             $table->string('nombre');
             $table->text('direccion');
-            $table->string('telefono');
-            $table->string('email')->unique();
             $table->decimal('latitud', 10, 7);
             $table->decimal('longitud', 10, 7);
             $table->decimal('geocerca', 10, 2)->default(0);

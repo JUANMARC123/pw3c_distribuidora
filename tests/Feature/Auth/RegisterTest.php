@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * BDD: docs/specs/auth.md -> Escenario A1 (Registro con rol por defecto)
+ * @see \App\Http\Controllers\AuthController::register
+ */
+
 uses()->group('auth', 'register');
 
 it('registra un nuevo usuario', function () {
