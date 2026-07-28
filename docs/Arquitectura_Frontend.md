@@ -282,7 +282,7 @@ Todas las siguientes páginas siguen el mismo patrón: sidebar, header, content 
 
 ```js
 // Configuración base
-const GPS_MAPBOX_TOKEN = "REEMPLAZADO_MAPBOX_TOKEN_1";
+const GPS_MAPBOX_TOKEN = "<TU_MAPBOX_TOKEN>";  // Definir en public/js/config.local.js
 
 new mapboxgl.Map({
     container: 'planificador-map',  // o 'tracking-map'

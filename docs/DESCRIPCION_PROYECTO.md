@@ -1082,7 +1082,7 @@ SANCTUM_TOKEN_EXPIRATION=480
 
 ### App Android (gradle.properties)
 ```properties
-MAPBOX_DOWNLOADS_TOKEN="REEMPLAZADO_MAPBOX_TOKEN_2"
+MAPBOX_DOWNLOADS_TOKEN="<TU_MAPBOX_TOKEN>"
 ```
 
 ### Firebase Realtime Database Structure

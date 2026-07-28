@@ -1,3 +1,5 @@
+const GPS_MAPBOX_TOKEN = typeof GPS_MAPBOX_TOKEN !== 'undefined' ? GPS_MAPBOX_TOKEN : null;
+
 const API_URL = window.location.origin + '/api';
 
 const ROOT_PATH = (() => {

@@ -1,4 +1,5 @@
 /node_modules
+/public/js/config.local.js
 /public/hot
 /public/storage
 /storage/*.key
@@ -13,3 +14,5 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+
+/mapboxfirebase

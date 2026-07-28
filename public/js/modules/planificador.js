@@ -1,5 +1,3 @@
-const GPS_MAPBOX_TOKEN = "REEMPLAZADO_MAPBOX_TOKEN_1";
-
 var GPS_FIREBASE_CONFIG = typeof GPS_FIREBASE_CONFIG !== 'undefined' ? GPS_FIREBASE_CONFIG : {
     apiKey: "AIzaSyDLpt_G8VOvmePuAYEQyffhU1Qb9braKSw",
     authDomain: "mapboxfirebase-a79b5.firebaseapp.com",
