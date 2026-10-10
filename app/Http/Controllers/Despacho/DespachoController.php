@@ -10,7 +10,14 @@ class DespachoController extends ApiController
 {
     public function index(Request $request)
     {
-        $query = Despacho::with('pedido.farmacia', 'pedido.usuario', 'hojaRutaDetalle.hojaRuta');
+        $query = Despacho::with([
+            'pedido.farmacia',
+            'pedido.usuario',
+            'hojaRutaDetalle.hojaRuta.repartidor.usuario',
+            'hojaRutaDetalle.hojaRuta.vehiculo',
+            'hojaRutaDetalle.hojaRuta.detalles.pedido.farmacia',
+            'hojaRutaDetalle.hojaRuta.detalles.despachos',
+        ]);
 
         if ($request->filled('estado_despacho')) {
             $query->where('estado_despacho', $request->estado_despacho);
@@ -28,6 +35,7 @@ class DespachoController extends ApiController
         $validated = $request->validate([
             'id_pedido' => 'required|integer|unique:despachos,id_pedido|exists:pedidos,id_pedido',
             'id_detalle_hoja_ruta' => 'required|integer|exists:hoja_ruta_detalles,id_detalle',
+            'metodo_pago' => 'nullable|in:efectivo,qr,transferencia,credito',
         ]);
 
         $validated['estado_despacho'] = 'pendiente';
@@ -47,11 +55,13 @@ class DespachoController extends ApiController
         $despacho = Despacho::with([
             'pedido.farmacia',
             'pedido.usuario',
-            'pedido.detalles.producto',
             'hojaRutaDetalle.hojaRuta.repartidor.usuario',
             'hojaRutaDetalle.hojaRuta.vehiculo',
+            'hojaRutaDetalle.hojaRuta.detalles.pedido.farmacia',
+            'hojaRutaDetalle.hojaRuta.detalles.despachos',
+            'hojaRutaDetalle.hojaRuta.caja.repartidor.usuario',
+            'hojaRutaDetalle.hojaRuta.caja.gastos',
             'evidencias',
-            'incidencias',
         ])->findOrFail($id);
 
         return $this->jsonResponse($despacho);
@@ -64,6 +74,7 @@ class DespachoController extends ApiController
         $validated = $request->validate([
             'estado_despacho' => 'sometimes|in:pendiente,entregado,incidencia',
             'monto_recibido' => 'nullable|numeric|min:0',
+            'metodo_pago' => 'nullable|in:efectivo,qr,transferencia,credito',
         ]);
 
         $despacho->update($validated);

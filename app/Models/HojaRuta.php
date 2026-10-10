@@ -18,6 +18,9 @@ class HojaRuta extends Model
         'hora_llegada',
         'id_repartidor',
         'id_vehiculo',
+        'id_caja',
+        'cobrado_efectivo',
+        'cobrado_qr',
         'estado_ruta',
     ];
 
@@ -25,6 +28,8 @@ class HojaRuta extends Model
         'fecha' => 'date',
         'hora_salida' => 'string',
         'hora_llegada' => 'string',
+        'cobrado_efectivo' => 'decimal:2',
+        'cobrado_qr' => 'decimal:2',
         'estado_ruta' => 'string',
     ];
 
@@ -45,6 +50,35 @@ class HojaRuta extends Model
 
     public function caja()
     {
-        return $this->hasOne(CajaRepartidor::class, 'id_hoja_ruta');
+        return $this->belongsTo(CajaRepartidor::class, 'id_caja');
+    }
+
+    /**
+     * Asegura que la hoja de ruta esté vinculada a una caja abierta
+     * del mismo repartidor y fecha. Si no existe caja, la crea automáticamente.
+     */
+    public function asegurarVinculoCaja(): void
+    {
+        if ($this->id_caja) {
+            return;
+        }
+
+        $cajaAbierta = CajaRepartidor::where('id_repartidor', $this->id_repartidor)
+            ->where('fecha', $this->fecha->format('Y-m-d'))
+            ->where('estado_caja', 'abierta')
+            ->first();
+
+        if (!$cajaAbierta) {
+            $cajaAbierta = CajaRepartidor::create([
+                'id_repartidor' => $this->id_repartidor,
+                'fecha' => $this->fecha->format('Y-m-d'),
+                'monto_inicial' => 0,
+                'ingresos' => 0,
+                'monto_final' => null,
+                'estado_caja' => 'abierta',
+            ]);
+        }
+
+        $this->update(['id_caja' => $cajaAbierta->id_caja]);
     }
 }

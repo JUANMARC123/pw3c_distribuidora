@@ -1,6 +1,6 @@
 let productosTable, editingId = null;
 
-const UNIDADES = ['CAJA', 'BLISTER', 'TUBO', 'FRASCO', 'AMPOLLA', 'KG'];
+const UNIDADES = ['UNIDAD', 'CAJA', 'BLISTER', 'TUBO', 'FRASCO', 'AMPOLLA', 'KG', 'LITRO', 'ML', 'MG', 'G', 'ROLLO', 'PAR', 'PAQUETE'];
 
 document.addEventListener('DOMContentLoaded', async function () {
     if (!checkAuth()) return;

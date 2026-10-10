@@ -16,7 +16,6 @@ class Pedido extends Model
         'id_farmacia',
         'id_usuario',
         'estado',
-        'metodo_pago',
         'fecha_pedido',
         'observaciones',
         'subtotal',
@@ -28,7 +27,6 @@ class Pedido extends Model
     protected $casts = [
         'fecha_pedido' => 'datetime',
         'estado' => 'string',
-        'metodo_pago' => 'string',
         'subtotal' => 'decimal:2',
         'descuento' => 'decimal:2',
         'total' => 'decimal:2',
@@ -44,11 +42,6 @@ class Pedido extends Model
         return $this->belongsTo(Usuario::class, 'id_usuario');
     }
 
-    public function detalles()
-    {
-        return $this->hasMany(DetallePedido::class, 'id_pedido');
-    }
-
     public function despacho()
     {
         return $this->hasOne(Despacho::class, 'id_pedido');
@@ -57,5 +50,10 @@ class Pedido extends Model
     public function hojaRutaDetalles()
     {
         return $this->hasMany(HojaRutaDetalle::class, 'id_pedido');
+    }
+
+    public function detalles()
+    {
+        return $this->hasMany(DetallePedido::class, 'id_pedido');
     }
 }

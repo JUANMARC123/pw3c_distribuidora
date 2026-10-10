@@ -12,10 +12,7 @@ use App\Http\Controllers\Repartidor\RepartidorVehiculoController;
 use App\Http\Controllers\Vehiculo\VehiculoController;
 use App\Http\Controllers\Logistica\HojaRutaController;
 use App\Http\Controllers\Despacho\DespachoController;
-use App\Http\Controllers\Despacho\IncidenciaController;
 use App\Http\Controllers\Despacho\EvidenciaController;
-use App\Http\Controllers\Producto\ProductoController;
-use App\Http\Controllers\Pedido\DetallePedidoController;
 use App\Http\Controllers\Caja\CajaController;
 use App\Http\Controllers\Reportes\ReporteController;
 
@@ -91,25 +88,9 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('permission:Farmacias-gestionar-contactos');
 
     // ═══════════════════════════════════════════════════════════════
-    // PRODUCTOS
-    // ═══════════════════════════════════════════════════════════════
-    Route::get('/productos', [ProductoController::class, 'index'])
-        ->middleware('permission:Productos-listar');
-    Route::post('/productos', [ProductoController::class, 'store'])
-        ->middleware('permission:Productos-crear');
-    Route::get('/productos/{producto}', [ProductoController::class, 'show'])
-        ->middleware('permission:Productos-listar');
-    Route::put('/productos/{producto}', [ProductoController::class, 'update'])
-        ->middleware('permission:Productos-editar');
-    Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])
-        ->middleware('permission:Productos-eliminar');
-
-    // ═══════════════════════════════════════════════════════════════
     // PEDIDOS
     // ═══════════════════════════════════════════════════════════════
     // Rutas fijas (declaradas ANTES de {pedido} para evitar conflictos)
-    Route::post('/pedidos/extraer-pdf', [PedidoController::class, 'extraerPdf'])
-        ->middleware('permission:Pedidos-crear');
     Route::post('/pedidos/{pedido}/cambiar-estado', [PedidoController::class, 'cambiarEstado'])
         ->middleware('permission:Pedidos-cambiar-estado');
     Route::post('/pedidos/{pedido}/subir-archivo', [PedidoController::class, 'subirArchivo'])
@@ -128,18 +109,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('permission:Pedidos-editar');
     Route::delete('/pedidos/{pedido}', [PedidoController::class, 'destroy'])
         ->middleware('permission:Pedidos-eliminar');
-
-    // Detalles de pedido
-    Route::get('/pedidos/{pedido}/detalles', [DetallePedidoController::class, 'index'])
-        ->middleware('permission:Pedidos-listar');
-    Route::post('/pedidos/{pedido}/detalles', [DetallePedidoController::class, 'store'])
-        ->middleware('permission:Pedidos-editar');
-    Route::put('/pedidos/{pedido}/detalles/{detalle}', [DetallePedidoController::class, 'update'])
-        ->middleware('permission:Pedidos-editar');
-    Route::delete('/pedidos/{pedido}/detalles/{detalle}', [DetallePedidoController::class, 'destroy'])
-        ->middleware('permission:Pedidos-editar');
-    Route::put('/pedidos/{pedido}/detalles/{detalle}/entrega', [DetallePedidoController::class, 'actualizarEntrega'])
-        ->middleware('permission:Pedidos-cambiar-estado');
 
     // ═══════════════════════════════════════════════════════════════
     // REPARTIDORES
@@ -193,6 +162,8 @@ Route::middleware('auth:sanctum')->group(function () {
             ->middleware('permission:Rutas-listar');
         Route::get('repartidores-disponibles', [HojaRutaController::class, 'repartidoresDisponibles'])
             ->middleware('permission:Rutas-listar');
+        Route::get('hojas-ruta-disponibles', [HojaRutaController::class, 'hojasRutaDisponibles'])
+            ->middleware('permission:Rutas-listar');
     });
 
     // Acciones sobre hojas de ruta (ejecutadas por repartidor en ruta)
@@ -204,8 +175,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('permission:Despachos-cambiar-estado');
     Route::post('/hojas-ruta/{id}/entrega-fallida', [HojaRutaController::class, 'marcarEntregaFallida'])
         ->middleware('permission:Despachos-cambiar-estado');
-    Route::post('/hojas-ruta/{id}/devolucion', [HojaRutaController::class, 'marcarDevolucion'])
-        ->middleware('permission:Despachos-cambiar-estado');
     Route::post('/hojas-ruta/{id}/regreso-almacen', [HojaRutaController::class, 'regresoAlmacen'])
         ->middleware('permission:Rutas-editar');
 
@@ -215,6 +184,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/hojas-ruta', [HojaRutaController::class, 'store'])
         ->middleware('permission:Rutas-crear');
     Route::get('/hojas-ruta/{hoja_ruta}', [HojaRutaController::class, 'show'])
+        ->middleware('permission:Rutas-listar');
+    Route::get('/hojas-ruta/{hoja_ruta}/pdf', [HojaRutaController::class, 'pdf'])
         ->middleware('permission:Rutas-listar');
     Route::put('/hojas-ruta/{hoja_ruta}', [HojaRutaController::class, 'update'])
         ->middleware('permission:Rutas-editar');
@@ -238,18 +209,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/despachos/{despacho}', [DespachoController::class, 'destroy'])
         ->middleware('permission:Despachos-eliminar');
 
-    // Incidencias
-    Route::get('/despachos/{despacho}/incidencias', [IncidenciaController::class, 'index'])
-        ->middleware('permission:Despachos-gestionar-incidencias');
-    Route::post('/despachos/{despacho}/incidencias', [IncidenciaController::class, 'store'])
-        ->middleware('permission:Despachos-gestionar-incidencias');
-    Route::get('/despachos/{despacho}/incidencias/{incidencia}', [IncidenciaController::class, 'show'])
-        ->middleware('permission:Despachos-gestionar-incidencias');
-    Route::put('/despachos/{despacho}/incidencias/{incidencia}', [IncidenciaController::class, 'update'])
-        ->middleware('permission:Despachos-gestionar-incidencias');
-    Route::delete('/despachos/{despacho}/incidencias/{incidencia}', [IncidenciaController::class, 'destroy'])
-        ->middleware('permission:Despachos-gestionar-incidencias');
-
     // Evidencias
     Route::get('/despachos/{despacho}/evidencias', [EvidenciaController::class, 'index'])
         ->middleware('permission:Despachos-gestionar-evidencias');
@@ -272,7 +231,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('pedidos-por-dia', [ReporteController::class, 'pedidosPorDia']);
         Route::get('repartidores-por-estado', [ReporteController::class, 'repartidoresPorEstado']);
         Route::get('vehiculos-por-estado', [ReporteController::class, 'vehiculosPorEstado']);
-        Route::get('incidencias-por-tipo', [ReporteController::class, 'incidenciasPorTipo']);
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -285,6 +243,8 @@ Route::middleware('auth:sanctum')->group(function () {
             ->middleware('permission:Caja Diaria-editar');
         Route::post('gasto', [CajaController::class, 'registrarGasto'])
             ->middleware('permission:Caja Diaria-editar');
+        Route::post('vincular-hoja/{id}', [CajaController::class, 'vincularHoja'])
+            ->middleware('permission:Caja Diaria-editar');
         Route::put('cerrar/{id}', [CajaController::class, 'cerrarCaja'])
             ->middleware('permission:Caja Diaria-cerrar');
         Route::get('dia', [CajaController::class, 'cajaDelDia'])
@@ -295,12 +255,16 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // ─── Rutas mobile (app repartidor) ─────────────────────────────────
-Route::prefix('mobile')->name('mobile.')->group(function () {
+Route::prefix('mobile')->name('mobile.')->middleware('json.forcing')->group(function () {
     Route::get('ruta-activa/{firebaseUid}', [\App\Http\Controllers\Mobile\RutaController::class, 'rutaActiva']);
+    Route::get('pedido/{pedidoId}', [\App\Http\Controllers\Mobile\RutaController::class, 'getPedidoDetalle']);
     Route::post('registrar-llegada', [\App\Http\Controllers\Mobile\RutaController::class, 'registrarLlegada']);
-    Route::get('pedido/{pedidoId}', [\App\Http\Controllers\Mobile\RutaController::class, 'detallePedido']);
-    Route::put('detalle-entrega/{detalleId}', [\App\Http\Controllers\Mobile\RutaController::class, 'actualizarDetalleEntrega']);
+    Route::post('entrega', [\App\Http\Controllers\Mobile\RutaController::class, 'registrarEntrega']);
+    Route::post('entrega-fallida', [\App\Http\Controllers\Mobile\RutaController::class, 'entregaFallida']);
     Route::post('evidencias/{despachoId}', [\App\Http\Controllers\Mobile\RutaController::class, 'storeEvidencia']);
-    Route::post('incidencias/{despachoId}', [\App\Http\Controllers\Mobile\RutaController::class, 'storeIncidencia']);
     Route::post('regreso-almacen', [\App\Http\Controllers\Mobile\RutaController::class, 'regresoAlmacen']);
+
+    Route::get('caja/{firebaseUid}', [\App\Http\Controllers\Mobile\CajaController::class, 'cajaActual']);
+    Route::post('caja/{firebaseUid}/gasto', [\App\Http\Controllers\Mobile\CajaController::class, 'registrarGasto']);
+    Route::post('caja/{firebaseUid}/cerrar', [\App\Http\Controllers\Mobile\CajaController::class, 'cerrar']);
 });

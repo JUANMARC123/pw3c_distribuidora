@@ -20,10 +20,9 @@ class Producto extends Model
 
     protected $casts = [
         'precio_unitario' => 'decimal:2',
-        'unidad_medida' => 'string',
     ];
 
-    public function detallePedidos()
+    public function detalles()
     {
         return $this->hasMany(DetallePedido::class, 'id_producto');
     }

@@ -1,6 +1,4 @@
-const GPS_MAPBOX_TOKEN = typeof GPS_MAPBOX_TOKEN !== 'undefined' ? GPS_MAPBOX_TOKEN : null;
-
-const API_URL = window.location.origin + '/api';
+const API_URL = 'http://127.0.0.1:8000/api';
 
 const ROOT_PATH = (() => {
     const path = window.location.pathname;
@@ -72,14 +70,7 @@ async function apiFetch(endpoint, options = {}) {
             throw err;
         }
 
-        if (data && data.meta) {
-            const result = data.data;
-            result.meta = data.meta;
-            result.paginator = data.meta;
-            return result;
-        }
-
-        return data.data !== undefined ? data.data : data;
+        return data;
     } catch (error) {
         if (error.status) throw error;
 
@@ -193,25 +184,34 @@ async function loadUserPermissions() {
 }
 
 function hasPermission(modulo, accion) {
-    const permissionName = `${modulo}-${accion}`;
-    const normalizedName = normalizePermissionName(permissionName);
-    return userPermissions.some(p => {
-        if (typeof p === 'string') {
-            return normalizePermissionName(p) === normalizedName;
-        }
-        if (p && typeof p === 'object') {
-            return normalizePermissionName(p.modulo) === normalizePermissionName(modulo) && p.accion === accion;
-        }
-        return false;
-    });
+    const aliasMap = {
+        logistica: ['Logistica', 'Logística', 'LogÃ­stica', 'LogÃƒÂ­stica'],
+        vehiculos: ['Vehiculos', 'Vehículos', 'VehÃ­culos', 'VehÃƒÂ­culos'],
+        catalogos: ['Catalogos', 'Catálogos', 'CatÃ¡logos', 'CatÃƒÂ¡logos'],
+        caja_diaria: ['Caja Diaria', 'Caja diaria', 'Caja'],
+        control_rutas: ['Control Rutas', 'Controles Ruta', 'Control de Rutas'],
+    };
+    const key = normalizePermissionKey(modulo);
+    const candidates = [modulo, ...(aliasMap[key] || [])].map(normalizePermissionKey);
+    return userPermissions.some(p => candidates.includes(normalizePermissionKey(p.modulo)) && p.accion === accion);
 }
 
-function normalizePermissionName(value) {
-    const raw = String(value || '').trim();
-    return raw
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[-\s]+/g, '-')
-        .toLowerCase();
+function normalizePermissionKey(value) {
+    const raw = String(value || '').trim().toLowerCase();
+    const mapped = raw
+        .replace(/log.+stica/g, 'logistica')
+        .replace(/veh.+culos/g, 'vehiculos')
+        .replace(/cat.+logos/g, 'catalogos')
+        .replace(/\s+/g, '_');
+    return mapped.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function getModulePermissions(modulo) {
+    return userPermissions.filter(p => p.modulo === modulo).map(p => p.accion);
+}
+
+function anyModulePermisos() {
+    return userPermissions.length > 0;
 }
 
 const DOCUMENTOS = [
@@ -252,37 +252,33 @@ function descargarDocumento(archivo, titulo) {
     document.body.removeChild(a);
 }
 
+function getAuthHeaders() {
+    const token = localStorage.getItem('token');
+    const headers = { 'Accept': 'application/json' };
+    if (token && token !== 'undefined' && token !== 'null' && token.length > 20) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
 function getToken() {
     return localStorage.getItem('token');
 }
 
-/* ─────────── Helpers compartidos ─────────── */
-
-function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c]));
+function openModal(id) {
+    const overlay = document.getElementById(id);
+    if (overlay) {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
 }
 
-function normalize(value) {
-    return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-}
-
-function parseMoney(value) {
-    const n = parseFloat(value);
-    return Number.isFinite(n) ? n : 0;
-}
-
-function money(value) {
-    return parseMoney(value).toFixed(2);
-}
-
-function getRepartidorId(r) {
-    return parseInt(r?.id_repartidor || r?.repartidor_id || r?.id || 0);
-}
-
-function getRepartidorName(r) {
-    if (!r) return 'Sin repartidor';
-    const userName = `${r.usuario?.nombre || ''} ${r.usuario?.apellido || ''}`.trim();
-    return r.nombre || userName || r.nombre_completo || 'Sin repartidor';
+function closeModal(id) {
+    const overlay = document.getElementById(id);
+    if (overlay) {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
 }
 
 document.addEventListener('click', function (e) {

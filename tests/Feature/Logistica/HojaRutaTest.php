@@ -42,7 +42,7 @@ it('crea una hoja de ruta con pedidos', function () {
     $pedidoResponse = $this->postJson('/api/pedidos', [
         'id_farmacia' => $farmacia->id_farmacia,
         'id_usuario' => $repartidor->usuario->id_usuario,
-        'estado' => 'aprobado',
+        'estado' => 'pendiente',
         'total' => 200.00,
     ])->assertCreated();
     $pedido = $pedidoResponse->json('data');
@@ -75,7 +75,7 @@ it('inicia una ruta planificada', function () {
     $pedidoResponse = $this->postJson('/api/pedidos', [
         'id_farmacia' => $farmacia->id_farmacia,
         'id_usuario' => $repartidor->usuario->id_usuario,
-        'estado' => 'aprobado',
+        'estado' => 'pendiente',
         'total' => 100.00,
     ])->assertCreated();
 
@@ -111,7 +111,7 @@ it('rechaza iniciar ruta no planificada', function () {
 it('obtiene pedidos pendientes', function () {
     // Preparar
     $farmacia = Farmacia::factory()->create();
-    $pedido = Pedido::factory()->create(['estado' => 'aprobado']);
+    $pedido = Pedido::factory()->create(['estado' => 'pendiente']);
 
     // Actuar
     $response = $this->getJson('/api/logistica/pedidos-pendientes');

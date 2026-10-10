@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Logistica;
 use App\Events\RutaIniciada;
 use App\Events\EntregaCompletada;
 use App\Events\EntregaFallida;
-use App\Events\DevolucionProducto;
 use App\Events\RepartidorRegresa;
 use App\Http\Controllers\ApiController;
 use App\Models\Despacho;
 use App\Models\HojaRuta;
 use App\Models\HojaRutaDetalle;
 use App\Models\Pedido;
+use App\Models\CajaRepartidor;
 use App\Models\Repartidor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +20,7 @@ class HojaRutaController extends ApiController
 {
     public function index(Request $request)
     {
-        $query = HojaRuta::with('repartidor.usuario', 'vehiculo', 'detalles.pedido.farmacia');
+        $query = HojaRuta::with('repartidor.usuario', 'vehiculo', 'detalles.pedido.farmacia', 'detalles.despachos');
 
         if ($request->filled('estado_ruta')) {
             $query->where('estado_ruta', $request->estado_ruta);
@@ -50,11 +50,19 @@ class HojaRutaController extends ApiController
 
         try {
             return DB::transaction(function () use ($request, $validated) {
+                $cajaAbierta = CajaRepartidor::where('id_repartidor', $validated['id_repartidor'])
+                    ->where('fecha', $validated['fecha'])
+                    ->where('estado_caja', 'abierta')
+                    ->first();
+
                 $hojaRuta = HojaRuta::create([
                     'fecha' => $validated['fecha'],
                     'hora_salida' => now()->toTimeString(),
                     'id_repartidor' => $validated['id_repartidor'],
                     'id_vehiculo' => $validated['id_vehiculo'],
+                    'id_caja' => $cajaAbierta?->id_caja,
+                    'cobrado_efectivo' => 0,
+                    'cobrado_qr' => 0,
                     'estado_ruta' => 'planificado',
                 ]);
 
@@ -105,13 +113,28 @@ class HojaRutaController extends ApiController
             'repartidor.usuario',
             'vehiculo',
             'detalles.pedido.farmacia',
-            'detalles.pedido.detalles.producto',
             'detalles.despachos.evidencias',
-            'detalles.despachos.incidencias',
+            'caja.repartidor.usuario',
             'caja.gastos',
         ])->findOrFail($id);
 
         return $this->jsonResponse($hojaRuta);
+    }
+
+    public function pdf($id)
+    {
+        $hojaRuta = HojaRuta::with([
+            'repartidor.usuario',
+            'vehiculo',
+            'detalles.pedido.farmacia',
+            'detalles.despachos.evidencias',
+            'caja.repartidor.usuario',
+            'caja.gastos',
+        ])->findOrFail($id);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.hoja-ruta', ['hojaRuta' => $hojaRuta]);
+
+        return $pdf->stream('hoja-ruta-' . $hojaRuta->id_hoja_ruta . '.pdf');
     }
 
     public function update(Request $request, $id)
@@ -184,11 +207,29 @@ class HojaRutaController extends ApiController
             'id_detalle' => 'required|integer|exists:hoja_ruta_detalles,id_detalle',
             'id_despacho' => 'required|integer|exists:despachos,id_despacho',
             'id_pedido' => 'required|integer|exists:pedidos,id_pedido',
+            'metodo_pago' => 'nullable|in:efectivo,qr,transferencia,credito',
+            'monto_recibido' => 'nullable|numeric|min:0',
         ]);
 
         $detalle = HojaRutaDetalle::findOrFail($request->id_detalle);
+        $despacho = Despacho::findOrFail($request->id_despacho);
+        $pedido = Pedido::findOrFail($request->id_pedido);
+        $hojaRuta = HojaRuta::findOrFail($id);
 
-        event(new EntregaCompletada($detalle, (int) $request->id_despacho, (int) $request->id_pedido));
+        $despacho->update([
+            'estado_despacho' => 'entregado',
+            'metodo_pago' => $request->metodo_pago ?? 'efectivo',
+            'monto_recibido' => $request->monto_recibido,
+        ]);
+        $pedido->update(['estado' => 'entregado']);
+
+        if ($request->metodo_pago === 'efectivo' && $request->monto_recibido > 0) {
+            $hojaRuta->increment('cobrado_efectivo', $request->monto_recibido);
+        } elseif ($request->metodo_pago === 'qr' && $request->monto_recibido > 0) {
+            $hojaRuta->increment('cobrado_qr', $request->monto_recibido);
+        }
+
+        $hojaRuta->asegurarVinculoCaja();
 
         return $this->jsonResponse(null, 'Entrega completada.');
     }
@@ -203,25 +244,13 @@ class HojaRutaController extends ApiController
         ]);
 
         $detalle = HojaRutaDetalle::findOrFail($request->id_detalle);
+        $despacho = Despacho::findOrFail($request->id_despacho);
+        $pedido = Pedido::findOrFail($request->id_pedido);
 
-        event(new EntregaFallida($detalle, (int) $request->id_despacho, (int) $request->id_pedido, $request->motivo ?? ''));
+        $despacho->update(['estado_despacho' => 'incidencia']);
+        $pedido->update(['estado' => 'cancelado']);
 
         return $this->jsonResponse(null, 'Entrega fallida registrada.');
-    }
-
-    public function marcarDevolucion(Request $request, $id)
-    {
-        $request->validate([
-            'id_detalle' => 'required|integer|exists:hoja_ruta_detalles,id_detalle',
-            'id_despacho' => 'required|integer|exists:despachos,id_despacho',
-            'id_pedido' => 'required|integer|exists:pedidos,id_pedido',
-        ]);
-
-        $detalle = HojaRutaDetalle::findOrFail($request->id_detalle);
-
-        event(new DevolucionProducto($detalle, (int) $request->id_despacho, (int) $request->id_pedido));
-
-        return $this->jsonResponse(null, 'Devolución registrada.');
     }
 
     public function regresoAlmacen($id)
@@ -232,6 +261,8 @@ class HojaRutaController extends ApiController
             'estado_ruta' => 'completado',
             'hora_llegada' => now()->toTimeString(),
         ]);
+
+        $hojaRuta->asegurarVinculoCaja();
 
         $asignacion = $hojaRuta->repartidor->asignacionActiva;
         $vehiculoId = $asignacion ? $asignacion->id_vehiculo : 0;
@@ -288,9 +319,9 @@ class HojaRutaController extends ApiController
 
     public function pedidosPendientes()
     {
-        $pedidos = Pedido::with('farmacia', 'detalles.producto')
+        $pedidos = Pedido::with('farmacia')
             ->whereDoesntHave('despacho')
-            ->where('estado', 'aprobado')
+            ->where('estado', 'pendiente')
             ->orderBy('fecha_pedido', 'asc')
             ->get();
 
@@ -319,5 +350,20 @@ class HojaRutaController extends ApiController
             });
 
         return $this->jsonResponse($repartidores);
+    }
+
+    public function hojasRutaDisponibles(Request $request)
+    {
+        $query = HojaRuta::with('repartidor.usuario', 'vehiculo', 'detalles.pedido.farmacia')
+            ->whereIn('estado_ruta', ['planificado', 'en_progreso'])
+            ->whereNull('id_caja');
+
+        if ($request->filled('id_repartidor')) {
+            $query->where('id_repartidor', $request->id_repartidor);
+        }
+
+        $rutas = $query->orderBy('fecha', 'desc')->get();
+
+        return $this->jsonResponse($rutas);
     }
 }

@@ -9,34 +9,20 @@ let entregaPedidoId = null;
 let entregaItems = [];
 let kanbanViewMode = 'kanban';
 
-const ESTADOS_PEDIDO = [
-    { key: 'pendiente', label: 'Pendiente' },
-    { key: 'aprobado', label: 'Aprobado' },
-    { key: 'preparacion', label: 'En Preparacion' },
-    { key: 'en_ruta', label: 'En Ruta' },
-    { key: 'entregado', label: 'Entregado' },
-    { key: 'cancelado', label: 'Cancelado' },
-];
-
 const KANBAN_COLUMNS = [
     { key: 'pendiente', title: 'Pendiente', icon: 'fa-clock' },
-    { key: 'preparacion', title: 'En Preparacion', icon: 'fa-box-open' },
-    { key: 'en_ruta', title: 'En Ruta', icon: 'fa-truck' },
+    { key: 'preparacion', title: 'Preparacion', icon: 'fa-box-open' },
+    { key: 'en_ruta', title: 'En ruta', icon: 'fa-truck' },
+    { key: 'parcial', title: 'Entrega parcial', icon: 'fa-circle-half-stroke' },
     { key: 'entregado', title: 'Entregado', icon: 'fa-check-circle' },
-    { key: 'cancelado', title: 'Cancelado', icon: 'fa-ban' },
 ];
 
-async function initPedidosModule(containerSelector = '#page-content') {
-    await Promise.all([loadFarmacias(), loadEstados(), loadProductos()]);
-    renderPedidosContent(containerSelector);
-    await refreshPedidos();
-}
-
 document.addEventListener('DOMContentLoaded', async function () {
-    if (document.getElementById('logistica-content')) return;
     if (!checkAuth()) return;
     if (!hasPermission('Pedidos', 'acceder')) { window.location.href = '../dashboard.html'; return; }
-    await initPedidosModule();
+    await Promise.all([loadFarmacias(), loadEstados(), loadProductos()]);
+    renderPage();
+    await refreshPedidos();
     handleInitialParams();
 });
 
@@ -50,7 +36,17 @@ async function loadFarmacias() {
 }
 
 async function loadEstados() {
-    estadosPedido = ESTADOS_PEDIDO;
+    try {
+        const d = await apiFetch('/catalogos/estados-pedido');
+        estadosPedido = Array.isArray(d) ? d : (d.data || []);
+    } catch (e) {
+        estadosPedido = [
+            { id_estado_pedido: 1, nombre_estado: 'Pendiente' },
+            { id_estado_pedido: 2, nombre_estado: 'Preparacion' },
+            { id_estado_pedido: 3, nombre_estado: 'En ruta' },
+            { id_estado_pedido: 4, nombre_estado: 'Entregado' },
+        ];
+    }
 }
 
 async function loadProductos() {
@@ -62,10 +58,8 @@ async function loadProductos() {
     }
 }
 
-function renderPedidosContent(containerSelector = '#page-content') {
-    const container = typeof containerSelector === 'string' ? document.querySelector(containerSelector) : containerSelector;
-    if (!container) return;
-    container.innerHTML = `
+function renderPage() {
+    document.getElementById('page-content').innerHTML = `
         <section class="ops-hero">
             <div class="ops-hero-main">
                 <div class="ops-kicker">Operaciones comerciales</div>
@@ -76,7 +70,16 @@ function renderPedidosContent(containerSelector = '#page-content') {
                     <a class="btn btn-outline" href="farmacias.html"><i class="fas fa-hospital"></i> Ver farmacias</a>
                 </div>
             </div>
+            <div class="ops-panel">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-simple"></i> Resumen</h3>
+                    <button class="btn btn-sm btn-outline" onclick="refreshPedidos()"><i class="fas fa-rotate"></i></button>
+                </div>
+                <div class="card-body" id="pedidos-summary"></div>
+            </div>
         </section>
+
+        <div class="pedidos-summary-boxes" id="pedidos-summary-boxes"></div>
 
         <section class="ops-toolbar">
             <div class="ops-search">
@@ -89,7 +92,7 @@ function renderPedidosContent(containerSelector = '#page-content') {
             </select>
             <select class="form-control" id="filter-estado" onchange="renderPedidosView()" style="max-width:210px;">
                 <option value="">Todos los estados</option>
-                ${ESTADOS_PEDIDO.filter(e => e.key !== 'aprobado').map(e => `<option value="${e.key}">${escapeHtml(e.label)}</option>`).join('')}
+                ${estadosPedido.map(e => `<option value="${e.id_estado_pedido}">${escapeHtml(e.nombre_estado)}</option>`).join('')}
             </select>
             <div class="pedidos-view-toggle">
                 <button class="toggle-btn active" data-mode="kanban" onclick="togglePedidosView('kanban')"><i class="fas fa-columns"></i> Kanban</button>
@@ -120,15 +123,6 @@ function renderPedidosContent(containerSelector = '#page-content') {
             document.getElementById('p-precio').value = opt?.dataset?.precio || '';
         });
     }
-    const faInput = document.getElementById('f-farmacia-input');
-    if (faInput) {
-        faInput.addEventListener('blur', function () {
-            const hidden = document.getElementById('f-farmacia');
-            if (!hidden?.value && this.value.trim()) {
-                this.value = '';
-            }
-        });
-    }
 }
 
 function renderPedidoModal() {
@@ -144,14 +138,17 @@ function renderPedidoModal() {
                         <div class="form-row">
                             <div class="form-group" style="flex:2">
                                 <label>Farmacia *</label>
-                                <input type="text" id="f-farmacia-input" class="form-control" list="farmacia-list" autocomplete="off" placeholder="Buscar farmacia..." required oninput="onFarmaciaInput(this)">
-                                <datalist id="farmacia-list">
-                                    ${farmaciasList.map(f => `<option value="${escapeHtml(f.nombre)}" data-id="${f.id_farmacia}"></option>`).join('')}
-                                </datalist>
-                                <input type="hidden" id="f-farmacia" value="">
-                                <div id="historial-contextual" style="margin-top:4px;"></div>
+                                <select id="f-farmacia" class="form-control" required>
+                                    <option value="">Seleccione...</option>
+                                    ${farmaciasList.map(f => `<option value="${f.id_farmacia}">${escapeHtml(f.nombre)}</option>`).join('')}
+                                </select>
                             </div>
-                            <div id="estado-field-container" style="display:none;"></div>
+                            <div class="form-group">
+                                <label>Estado</label>
+                                <select id="f-estado" class="form-control">
+                                    ${estadosPedido.map(e => `<option value="${e.id_estado_pedido}">${escapeHtml(e.nombre_estado)}</option>`).join('')}
+                                </select>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Observaciones</label>
@@ -272,7 +269,7 @@ function renderEstadoModal() {
                     <div class="form-group">
                         <label>Estado</label>
                         <select id="s-estado" class="form-control">
-                            ${ESTADOS_PEDIDO.filter(e => e.key !== 'aprobado').map(e => `<option value="${e.key}">${escapeHtml(e.label)}</option>`).join('')}
+                            ${estadosPedido.map(e => `<option value="${e.id_estado_pedido}">${escapeHtml(e.nombre_estado)}</option>`).join('')}
                         </select>
                     </div>
                 </div>
@@ -317,16 +314,15 @@ async function refreshPedidos(silent = false) {
 
 function renderPedidosView() {
     const filtered = getFilteredPedidos();
-    const kanban = document.getElementById('pedidos-kanban');
-    const tableSection = document.getElementById('pedidos-table-section');
-    if (!kanban && !tableSection) return;
+    renderSummary(filtered);
+    renderKanbanSummary(filtered);
     if (kanbanViewMode === 'tabla') {
-        if (kanban) kanban.style.display = 'none';
-        if (tableSection) tableSection.style.display = '';
+        document.getElementById('pedidos-kanban').style.display = 'none';
+        document.getElementById('pedidos-table-section').style.display = '';
         renderPedidosList(filtered);
     } else {
-        if (kanban) kanban.style.display = '';
-        if (tableSection) tableSection.style.display = 'none';
+        document.getElementById('pedidos-kanban').style.display = '';
+        document.getElementById('pedidos-table-section').style.display = 'none';
         renderKanban(filtered);
     }
 }
@@ -342,9 +338,28 @@ function getFilteredPedidos() {
         const text = normalize(`${p.id_pedido} ${farmacia} ${productos} ${getEstadoName(p)}`);
         if (search && !text.includes(search)) return false;
         if (farmaciaId && String(p.id_farmacia || p.farmacia?.id_farmacia || '') !== String(farmaciaId)) return false;
-        if (estadoId && normalize(getEstadoName(p)) !== normalize(estadoId)) return false;
+        if (estadoId && String(p.id_estado_pedido || p.estado?.id_estado_pedido || '') !== String(estadoId)) return false;
         return true;
     });
+}
+
+function renderSummary(pedidos) {
+    const container = document.getElementById('pedidos-summary');
+    if (!container) return;
+    const total = pedidos.reduce((s, p) => s + parseMoney(p.total), 0);
+    const pendientes = pedidos.filter(p => getColumnKey(p) === 'pendiente').length;
+    const enRuta = pedidos.filter(p => getColumnKey(p) === 'en_ruta').length;
+    const faltantes = pedidos.reduce((s, p) => s + getPedidoFaltante(p), 0);
+
+    container.innerHTML = `
+        <div class="ops-mini-metrics">
+            <div><strong>${pedidos.length}</strong><span>Pedidos filtrados</span></div>
+            <div><strong>${pendientes}</strong><span>Pendientes</span></div>
+            <div><strong>${enRuta}</strong><span>En ruta</span></div>
+            <div><strong>Bs ${money(total)}</strong><span>Total pedido</span></div>
+            <div><strong>Bs ${money(faltantes)}</strong><span>Faltante calculado</span></div>
+        </div>
+    `;
 }
 
 function renderKanban(pedidos) {
@@ -352,6 +367,7 @@ function renderKanban(pedidos) {
     if (!container) return;
     container.innerHTML = KANBAN_COLUMNS.map(col => {
         const items = pedidos.filter(p => getColumnKey(p) === col.key);
+        const isEntregado = col.key === 'entregado';
         return `
             <div class="kanban-column" data-column="${col.key}">
                 <div class="kanban-column-header">
@@ -359,7 +375,7 @@ function renderKanban(pedidos) {
                     <span class="count">${items.length}</span>
                 </div>
                 <div class="kanban-column-body" data-column="${col.key}">
-                    ${items.length ? items.map(renderPedidoCard).join('') : '<div class="empty-state compact">Sin pedidos</div>'}
+                    ${!isEntregado && items.length ? items.map(renderPedidoCard).join('') : '<div class="empty-state compact">Sin pedidos</div>'}
                 </div>
             </div>
         `;
@@ -465,19 +481,9 @@ function openCreateModal(preselectedFarmaciaId = null) {
     document.getElementById('modal-title').textContent = 'Nuevo pedido';
     document.getElementById('main-form').reset();
     document.getElementById('extract-status').textContent = 'Sube el PDF para detectar productos, cantidades y precios. Luego revisa las filas antes de guardar.';
-    document.getElementById('estado-field-container').style.display = 'none';
-    document.getElementById('estado-field-container').innerHTML = '';
-    const faInput = document.getElementById('f-farmacia-input');
-    const faHidden = document.getElementById('f-farmacia');
-    if (faInput) faInput.value = '';
-    if (faHidden) faHidden.value = '';
-    if (preselectedFarmaciaId) {
-        const farmacia = farmaciasList.find(f => String(f.id_farmacia) === String(preselectedFarmaciaId));
-        if (farmacia) {
-            if (faInput) faInput.value = farmacia.nombre;
-            if (faHidden) faHidden.value = farmacia.id_farmacia;
-        }
-    }
+    const firstEstado = estadosPedido[0]?.id_estado_pedido || '';
+    document.getElementById('f-estado').value = firstEstado;
+    if (preselectedFarmaciaId) document.getElementById('f-farmacia').value = String(preselectedFarmaciaId);
     renderDetalle();
     document.getElementById('main-modal').classList.add('active');
 }
@@ -486,15 +492,6 @@ function closeModal() {
     document.getElementById('main-modal').classList.remove('active');
     editingId = null;
     detalleItems = [];
-    const estadoContainer = document.getElementById('estado-field-container');
-    if (estadoContainer) {
-        estadoContainer.style.display = 'none';
-        estadoContainer.innerHTML = '';
-    }
-    const faInput = document.getElementById('f-farmacia-input');
-    const faHidden = document.getElementById('f-farmacia');
-    if (faInput) faInput.value = '';
-    if (faHidden) faHidden.value = '';
 }
 
 function openProductoModal() {
@@ -693,21 +690,7 @@ async function extractPdfProductsWithOcr(file, status) {
     return rows;
 }
 
-function loadScript(src) {
-    return new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = src;
-        s.onload = resolve;
-        s.onerror = () => reject(new Error(`Error al cargar ${src}`));
-        document.head.appendChild(s);
-    });
-}
-
 async function ensureOcrLibraries() {
-    const tasks = [];
-    if (!window.pdfjsLib) tasks.push(loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'));
-    if (!window.Tesseract) tasks.push(loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'));
-    if (tasks.length) await Promise.all(tasks);
     if (!window.pdfjsLib) throw new Error('No se pudo cargar PDF.js para renderizar el PDF.');
     if (!window.Tesseract) throw new Error('No se pudo cargar Tesseract.js para OCR.');
     window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -745,8 +728,7 @@ async function ocrPdfFile(file, status) {
             continue;
         }
 
-        const result = await window.Tesseract.recognize(canvas, {
-            lang: 'eng',
+        const result = await window.Tesseract.recognize(canvas, 'eng', {
             logger: m => {
                 if (m.status === 'recognizing text') {
                     const pct = Math.round((m.progress || 0) * 100);
@@ -791,6 +773,53 @@ function parseVentaProductosText(text) {
     return blocks
         .map(parseVentaProductBlock)
         .filter(Boolean);
+}
+
+function parseVentaProductBlock(block) {
+    const raw = block.replace(/\s+/g, ' ').trim();
+    const withoutIndex = raw.replace(/^\d{1,2}\s+/, '');
+    const cantidadMatch = withoutIndex.match(/(\d+(?:[.,]\d+)?)\s*[-–—]?\s*(?:u[dcl]?|und|unid|unidad|blt|bit|cja|caja)\b/i);
+    const moneyMatches = [...withoutIndex.matchAll(/\d+[.,]\d{2}/g)].map(m => parseMoney(m[0].replace(',', '.')));
+
+    let nombre = withoutIndex;
+    if (cantidadMatch && cantidadMatch.index > 0) {
+        nombre = withoutIndex.slice(0, cantidadMatch.index).trim();
+    }
+    nombre = nombre
+        .replace(/[/\(]?\s*cod\.?\s*\d+.*$/i, '')
+        .replace(/\bCOFAR\s*S\.?A\.?.*$/i, '')
+        .replace(/\bBAGO\s*S\.?A\.?.*$/i, '')
+        .replace(/\bLAFAR\s*S\.?A\.?.*$/i, '')
+        .replace(/[|;:,]+$/g, '')
+        .trim();
+
+    if (!nombre || !cantidadMatch) return null;
+
+    const matchedId = findProductoByName(nombre);
+    const precio = moneyMatches.length >= 2 ? moneyMatches[moneyMatches.length - 2] : 0;
+    const total = moneyMatches.length >= 1 ? moneyMatches[moneyMatches.length - 1] : 0;
+    const cantidad = parseMoney(cantidadMatch[1].replace(',', '.')) || (precio > 0 && total > 0 ? total / precio : 1);
+    const advertencias = [];
+
+    if (!matchedId) advertencias.push('Producto detectado por OCR sin coincidencia exacta en catalogo.');
+    if (!precio) advertencias.push('No se detecto precio unitario en OCR.');
+    if (precio && total && Math.abs((cantidad * precio) - total) > 0.25) {
+        advertencias.push('Total OCR no coincide exactamente con cantidad por precio.');
+    }
+
+    return {
+        id_producto: matchedId,
+        nombre,
+        cantidad_solicitada: cantidad,
+        precio_unitario: precio,
+        confianza: matchedId && precio ? 82 : 62,
+        advertencias,
+        linea_origen: raw,
+    };
+}
+
+function isOcrNoiseLine(line) {
+    return /^(venta de productos|fecha|sucursal|cliente|dir\.|telf\.|cod\. cliente|moneda|n[°o]|descripcion|serie|cantidad|p\/u|total|forma de pago|glosa|almacen|contabilidad|recibi conforme|ct=)/i.test(line);
 }
 
 function parseVentaProductBlock(block) {
@@ -1249,21 +1278,8 @@ async function edit(id) {
         const p = await fetchPedido(id);
         editingId = id;
         document.getElementById('modal-title').textContent = `Editar pedido #${id}`;
-        const farmacia = farmaciasList.find(f => String(f.id_farmacia) === String(p.id_farmacia || p.farmacia?.id_farmacia));
-        const faInput = document.getElementById('f-farmacia-input');
-        const faHidden = document.getElementById('f-farmacia');
-        if (faInput) faInput.value = farmacia ? farmacia.nombre : '';
-        if (faHidden) faHidden.value = p.id_farmacia || p.farmacia?.id_farmacia || '';
-        const estadoContainer = document.getElementById('estado-field-container');
-        estadoContainer.style.display = '';
-        estadoContainer.innerHTML = `
-            <div class="form-group" style="min-width:180px;">
-                <label>Estado</label>
-                <select id="f-estado" class="form-control">
-                    ${ESTADOS_PEDIDO.filter(e => e.key !== 'aprobado').map(e => `<option value="${e.key}" ${normalize(getEstadoName(p)) === normalize(e.key) ? 'selected' : ''}>${escapeHtml(e.label)}</option>`).join('')}
-                </select>
-            </div>
-        `;
+        document.getElementById('f-farmacia').value = p.id_farmacia || p.farmacia?.id_farmacia || '';
+        document.getElementById('f-estado').value = p.id_estado_pedido || p.estado?.id_estado_pedido || '';
         document.getElementById('f-observaciones').value = p.observaciones || '';
         document.getElementById('extract-status').textContent = p.archivo_pedido ? `Archivo actual: ${p.archivo_pedido.split('/').pop()}` : 'Puedes subir un PDF nuevo si corresponde.';
         detalleItems = (p.detalles || []).map(d => ({
@@ -1286,8 +1302,7 @@ async function edit(id) {
 
 async function save() {
     const id_farmacia = parseInt(document.getElementById('f-farmacia').value);
-    const estadoEl = document.getElementById('f-estado');
-    const estado = estadoEl ? estadoEl.value : 'pendiente';
+    const id_estado_pedido = parseInt(document.getElementById('f-estado').value);
     const observaciones = document.getElementById('f-observaciones').value.trim();
 
     if (!id_farmacia) return Swal.fire('Validacion', 'Seleccione una farmacia', 'warning');
@@ -1298,7 +1313,7 @@ async function save() {
     const currentUser = getUser();
     const body = {
         id_farmacia,
-        estado,
+        id_estado_pedido,
         observaciones,
         subtotal: calcDetalleTotal(),
         descuento: 0,
@@ -1366,7 +1381,7 @@ async function createCatalogProductFromDetected(item) {
             body: {
                 nombre,
                 precio_unitario: parseMoney(item.precio_unitario),
-                unidad_medida: 'CAJA',
+                unidad_medida: 'UNIDAD',
                 estado: true,
             }
         });
@@ -1450,10 +1465,10 @@ function closeEstadoModal() {
 }
 
 async function changeEstado() {
-    const estado = document.getElementById('s-estado').value;
-    if (!estado) return Swal.fire('Validacion', 'Seleccione un estado', 'warning');
+    const id_estado_pedido = parseInt(document.getElementById('s-estado').value);
+    if (!id_estado_pedido) return Swal.fire('Validacion', 'Seleccione un estado', 'warning');
     try {
-        await apiFetch(`/pedidos/${estadoPedidoId}/cambiar-estado`, { method: 'POST', body: { estado } });
+        await apiFetch(`/pedidos/${estadoPedidoId}/cambiar-estado`, { method: 'POST', body: { id_estado_pedido } });
         Swal.fire('Actualizado', 'Estado cambiado correctamente', 'success');
         closeEstadoModal();
         await refreshPedidos(true);
@@ -1651,16 +1666,14 @@ function similarityScore(a, b) {
 }
 
 function getEstadoName(p) {
-    const raw = p.estado?.nombre_estado || p.nombre_estado || p.estado || 'pendiente';
-    const map = { pendiente: 'Pendiente', aprobado: 'Aprobado', preparacion: 'En Preparacion', en_ruta: 'En Ruta', entregado: 'Entregado', cancelado: 'Cancelado' };
-    return map[raw.toLowerCase()] || raw;
+    return p.estado?.nombre_estado || p.nombre_estado || p.estado || 'Pendiente';
 }
 
 function getColumnKey(p) {
     const status = normalize(getEstadoName(p));
-    if (status.includes('cancel')) return 'cancelado';
-    if (status.includes('prepar') || status.includes('aprob')) return 'preparacion';
+    if (status.includes('parcial')) return 'parcial';
     if (status.includes('ruta') || status.includes('despach')) return 'en_ruta';
+    if (status.includes('prepar') || status.includes('aprob')) return 'preparacion';
     if (status.includes('entreg') || status.includes('complet')) return 'entregado';
     return 'pendiente';
 }
@@ -1703,6 +1716,23 @@ function escapeHtml(value) {
     }[c]));
 }
 
+/* ─────────── Kanban mejoras: summary, toggle, drag & drop ─────────── */
+
+function renderKanbanSummary(pedidos) {
+    const container = document.getElementById('pedidos-summary-boxes');
+    if (!container) return;
+    container.innerHTML = KANBAN_COLUMNS.map(col => {
+        const count = pedidos.filter(p => getColumnKey(p) === col.key).length;
+        return `
+            <div class="pedidos-summary-box summary-${col.key}">
+                <div class="summary-count">${count}</div>
+                <div class="summary-label"><i class="fas ${col.icon}"></i> ${col.title}</div>
+                <div class="summary-empty">${count === 0 ? 'Sin pedidos' : `${count} pedido${count !== 1 ? 's' : ''}`}</div>
+            </div>
+        `;
+    }).join('');
+}
+
 function togglePedidosView(mode) {
     kanbanViewMode = mode;
     document.querySelectorAll('.pedidos-view-toggle .toggle-btn').forEach(btn => {
@@ -1721,7 +1751,7 @@ function initPedidosSortable() {
         if (!columnKey) return;
         col._sortable = new Sortable(col, {
             group: 'kanban',
-            animation: 0,
+            animation: 200,
             ghostClass: 'sortable-ghost',
             onAdd: function (evt) {
                 const pedidoId = parseInt(evt.item.dataset.pedidoId);
@@ -1732,72 +1762,23 @@ function initPedidosSortable() {
 }
 
 async function handlePedidoDrop(pedidoId, newStatusKey) {
-    if (!newStatusKey) return;
+    const statusMap = {
+        pendiente: 1,
+        preparacion: 2,
+        en_ruta: 3,
+        parcial: 4,
+        entregado: 5,
+    };
+    const id_estado_pedido = statusMap[newStatusKey];
+    if (!id_estado_pedido) return;
     try {
         await apiFetch(`/pedidos/${pedidoId}/cambiar-estado`, {
             method: 'POST',
-            body: { estado: newStatusKey }
+            body: { id_estado_pedido }
         });
         await refreshPedidos(true);
     } catch (e) {
         Swal.fire('Error', e.message || 'No se pudo cambiar el estado', 'error');
         await refreshPedidos(true);
     }
-}
-
-/* ─────────── Autocomplete Farmacia ─────────── */
-
-function onFarmaciaInput(input) {
-    const hidden = document.getElementById('f-farmacia');
-    const val = input.value.trim();
-    const match = farmaciasList.find(f => normalize(f.nombre) === normalize(val));
-    if (match) {
-        hidden.value = match.id_farmacia;
-        onFarmaciaChange();
-    } else {
-        hidden.value = '';
-        const container = document.getElementById('historial-contextual');
-        if (container) container.innerHTML = '';
-    }
-}
-
-function onFarmaciaChange() {
-    const container = document.getElementById('historial-contextual');
-    if (!container) return;
-    const farmaciaId = document.getElementById('f-farmacia')?.value;
-    if (!farmaciaId) {
-        container.innerHTML = '';
-        return;
-    }
-    container.innerHTML = `<button class="btn btn-link" style="padding:0;font-size:12px;" onclick="showHistorialContextual(${farmaciaId})"><i class="fas fa-clock-rotate-left"></i> Ver ultimos 3 pedidos</button>`;
-}
-
-function showHistorialContextual(farmaciaId) {
-    const farmaciaPedidos = pedidosData
-        .filter(p => String(p.id_farmacia || p.farmacia?.id_farmacia) === String(farmaciaId))
-        .sort((a, b) => new Date(b.fecha_pedido || b.created_at) - new Date(a.fecha_pedido || a.created_at))
-        .slice(0, 3);
-
-    if (!farmaciaPedidos.length) {
-        Swal.fire({ icon: 'info', title: 'Sin historial', text: 'Esta farmacia no tiene pedidos registrados.', confirmButtonText: 'Cerrar' });
-        return;
-    }
-
-    Swal.fire({
-        title: 'Ultimos pedidos',
-        html: farmaciaPedidos.map(p => `
-            <div style="border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;text-align:left;">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <strong>Pedido #${p.id_pedido}</strong>
-                    ${getStatusBadge(getEstadoName(p))}
-                </div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
-                    ${formatDateShort(p.fecha_pedido || p.created_at)} &middot; Bs ${money(p.total)}
-                </div>
-                <div style="font-size:12px;">${getDetalleCount(p)} producto(s)</div>
-            </div>
-        `).join(''),
-        confirmButtonText: 'Cerrar',
-        width: 420,
-    });
 }

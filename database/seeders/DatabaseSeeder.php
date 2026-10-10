@@ -14,8 +14,8 @@ class DatabaseSeeder extends Seeder
             RepartidorSeeder::class,
             VehiculoSeeder::class,
             FarmaciaSeeder::class,
-            ProductoSeeder::class,
             PedidoSeeder::class,
+            CajaSeeder::class,
         ]);
     }
 }

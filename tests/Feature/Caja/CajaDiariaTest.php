@@ -23,31 +23,9 @@ beforeEach(function () {
 });
 
 it('abre una caja', function () {
-    // Preparar
-    $farmacia = \App\Models\Farmacia::factory()->create();
-    $pedidoResponse = $this->postJson('/api/pedidos', [
-        'id_farmacia' => $farmacia->id_farmacia,
-        'id_usuario' => $this->user->id_usuario,
-        'estado' => 'aprobado',
-        'total' => 150.00,
-    ])->assertCreated();
-    $pedido = $pedidoResponse->json('data');
-
-    $hojaRutaResponse = $this->postJson('/api/hojas-ruta', [
-        'fecha' => now()->format('Y-m-d'),
-        'id_repartidor' => $this->repartidor->id_repartidor,
-        'id_vehiculo' => $this->vehiculo->id_vehiculo,
-        'pedidos' => [
-            ['id_pedido' => $pedido['id_pedido'], 'orden_visita' => 1],
-        ],
-    ])->assertCreated();
-    $hojaRuta = $hojaRutaResponse->json('data');
-
     // Actuar
     $response = $this->postJson('/api/caja/abrir', [
-        'id_hoja_ruta' => $hojaRuta['id_hoja_ruta'],
         'id_repartidor' => $this->repartidor->id_repartidor,
-        'fecha' => now()->format('Y-m-d'),
         'monto_inicial' => 200.00,
     ]);
 
@@ -56,75 +34,28 @@ it('abre una caja', function () {
 });
 
 it('registra un ingreso en caja abierta', function () {
-    // Preparar
-    $farmacia = \App\Models\Farmacia::factory()->create();
-    $pedidoResponse = $this->postJson('/api/pedidos', [
-        'id_farmacia' => $farmacia->id_farmacia,
-        'id_usuario' => $this->user->id_usuario,
-        'estado' => 'aprobado',
-        'total' => 150.00,
-    ])->assertCreated();
-    $pedido = $pedidoResponse->json('data');
-
-    $hojaRutaResponse = $this->postJson('/api/hojas-ruta', [
-        'fecha' => now()->format('Y-m-d'),
-        'id_repartidor' => $this->repartidor->id_repartidor,
-        'id_vehiculo' => $this->vehiculo->id_vehiculo,
-        'pedidos' => [
-            ['id_pedido' => $pedido['id_pedido'], 'orden_visita' => 1],
-        ],
-    ])->assertCreated();
-    $hojaRuta = $hojaRutaResponse->json('data');
-
     $cajaResponse = $this->postJson('/api/caja/abrir', [
-        'id_hoja_ruta' => $hojaRuta['id_hoja_ruta'],
         'id_repartidor' => $this->repartidor->id_repartidor,
-        'fecha' => now()->format('Y-m-d'),
         'monto_inicial' => 200.00,
     ])->assertCreated();
     $caja = $cajaResponse->json('data');
 
-    // Actuar
     $response = $this->postJson('/api/caja/ingreso', [
         'id_caja' => $caja['id_caja'],
         'monto' => 350.00,
         'descripcion' => 'Cobro pedido #123',
     ]);
 
-    // Verificar
     $response->assertOk();
 });
 
 it('registra un gasto en caja abierta', function () {
-    // Preparar
-    $farmacia = \App\Models\Farmacia::factory()->create();
-    $pedidoResponse = $this->postJson('/api/pedidos', [
-        'id_farmacia' => $farmacia->id_farmacia,
-        'id_usuario' => $this->user->id_usuario,
-        'estado' => 'aprobado',
-        'total' => 150.00,
-    ])->assertCreated();
-    $pedido = $pedidoResponse->json('data');
-
-    $hojaRutaResponse = $this->postJson('/api/hojas-ruta', [
-        'fecha' => now()->format('Y-m-d'),
-        'id_repartidor' => $this->repartidor->id_repartidor,
-        'id_vehiculo' => $this->vehiculo->id_vehiculo,
-        'pedidos' => [
-            ['id_pedido' => $pedido['id_pedido'], 'orden_visita' => 1],
-        ],
-    ])->assertCreated();
-    $hojaRuta = $hojaRutaResponse->json('data');
-
     $cajaResponse = $this->postJson('/api/caja/abrir', [
-        'id_hoja_ruta' => $hojaRuta['id_hoja_ruta'],
         'id_repartidor' => $this->repartidor->id_repartidor,
-        'fecha' => now()->format('Y-m-d'),
         'monto_inicial' => 200.00,
     ])->assertCreated();
     $caja = $cajaResponse->json('data');
 
-    // Actuar
     $response = $this->postJson('/api/caja/gasto', [
         'id_caja' => $caja['id_caja'],
         'tipo_gasto' => 'COMBUSTIBLE',
@@ -132,7 +63,6 @@ it('registra un gasto en caja abierta', function () {
         'descripcion' => 'Gasolina',
     ]);
 
-    // Verificar
     $response->assertOk();
 });
 
@@ -173,4 +103,85 @@ it('obtiene resumen diario', function () {
 
     // Verificar
     $response->assertOk();
+});
+
+it('consulta cajas por periodo mes', function () {
+    // Preparar
+    CajaRepartidor::factory()->create([
+        'id_repartidor' => $this->repartidor->id_repartidor,
+        'fecha' => now()->format('Y-m-10'),
+    ]);
+    CajaRepartidor::factory()->create([
+        'id_repartidor' => $this->repartidor->id_repartidor,
+        'fecha' => now()->subMonths(2)->format('Y-m-10'),
+    ]);
+
+    // Actuar
+    $response = $this->getJson('/api/caja/dia?periodo=mes&fecha=' . now()->format('Y-m-01'));
+
+    // Verificar
+    $response->assertOk()
+        ->assertJsonPath('data.periodo', 'mes')
+        ->assertJsonCount(1, 'data.cajas');
+});
+
+it('consulta cajas por periodo semana', function () {
+    // Preparar
+    $lunes = now()->startOfWeek(\Illuminate\Support\Carbon::MONDAY);
+    CajaRepartidor::factory()->create([
+        'id_repartidor' => $this->repartidor->id_repartidor,
+        'fecha' => $lunes->toDateString(),
+    ]);
+    CajaRepartidor::factory()->create([
+        'id_repartidor' => $this->repartidor->id_repartidor,
+        'fecha' => $lunes->subWeek()->toDateString(),
+    ]);
+
+    // Actuar
+    $response = $this->getJson('/api/caja/dia?periodo=semana&fecha=' . $lunes->copy()->addDay()->toDateString());
+
+    // Verificar
+    $response->assertOk()
+        ->assertJsonPath('data.periodo', 'semana')
+        ->assertJsonCount(1, 'data.cajas');
+});
+
+it('consulta cajas por periodo año', function () {
+    // Preparar
+    CajaRepartidor::factory()->create([
+        'id_repartidor' => $this->repartidor->id_repartidor,
+        'fecha' => now()->format('Y-06-15'),
+    ]);
+    CajaRepartidor::factory()->create([
+        'id_repartidor' => $this->repartidor->id_repartidor,
+        'fecha' => now()->subYear()->format('Y-06-15'),
+    ]);
+
+    // Actuar
+    $response = $this->getJson('/api/caja/dia?periodo=año&fecha=' . now()->format('Y-01-01'));
+
+    // Verificar
+    $response->assertOk()
+        ->assertJsonPath('data.periodo', 'año')
+        ->assertJsonCount(1, 'data.cajas');
+});
+
+it('consulta cajas por periodo todos', function () {
+    // Preparar
+    CajaRepartidor::factory()->create([
+        'id_repartidor' => $this->repartidor->id_repartidor,
+        'fecha' => now()->subYears(3)->format('Y-m-d'),
+    ]);
+    CajaRepartidor::factory()->create([
+        'id_repartidor' => $this->repartidor->id_repartidor,
+        'fecha' => now()->format('Y-m-d'),
+    ]);
+
+    // Actuar
+    $response = $this->getJson('/api/caja/dia?periodo=todos');
+
+    // Verificar
+    $response->assertOk()
+        ->assertJsonPath('data.periodo', 'todos')
+        ->assertJsonCount(2, 'data.cajas');
 });

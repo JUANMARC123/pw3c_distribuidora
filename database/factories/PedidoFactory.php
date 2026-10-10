@@ -18,8 +18,7 @@ class PedidoFactory extends Factory
         return [
             'id_farmacia' => Farmacia::factory(),
             'id_usuario' => Usuario::factory(),
-            'estado' => 'aprobado',
-            'metodo_pago' => $this->faker->randomElement(['efectivo', 'qr', 'transferencia', 'credito']),
+            'estado' => 'pendiente',
             'fecha_pedido' => now()->subDays(rand(0, 30)),
             'observaciones' => $this->faker->optional()->sentence(),
             'subtotal' => $subtotal,

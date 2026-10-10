@@ -7,7 +7,6 @@ const TIPOS_GASTO = ['COMBUSTIBLE', 'ALIMENTACION', 'PEAJE', 'MANTENIMIENTO', 'I
 
 document.addEventListener('DOMContentLoaded', async function () {
     if (!checkAuth()) return;
-    if (!hasPermission('Caja Diaria', 'acceder')) { window.location.href = '../dashboard.html'; return; }
     await loadRepartidores();
     renderPage();
     await renderResumen();
@@ -51,9 +50,9 @@ function renderPage() {
                 <h1 class="ops-title">Caja y arqueo de repartidores</h1>
                 <p class="ops-subtitle">Registra apertura, ingresos, gastos de ruta y cierre de caja por repartidor al final de la jornada.</p>
                 <div class="ops-actions">
-                    ${hasPermission('Caja Diaria', 'crear') ? '<button class="btn btn-primary" onclick="openAbrirCajaModal()"><i class="fas fa-cash-register"></i> Abrir caja</button>' : ''}
-                    ${hasPermission('Caja Diaria', 'editar') ? '<button class="btn btn-success" onclick="openIngresoModal()"><i class="fas fa-plus-circle"></i> Registrar ingreso</button>' : ''}
-                    ${hasPermission('Caja Diaria', 'editar') ? '<button class="btn btn-danger" onclick="abrirGastoModal()"><i class="fas fa-minus-circle"></i> Registrar gasto</button>' : ''}
+                    <button class="btn btn-primary" onclick="openAbrirCajaModal()"><i class="fas fa-cash-register"></i> Abrir caja</button>
+                    <button class="btn btn-success" onclick="openIngresoModal()"><i class="fas fa-plus-circle"></i> Registrar ingreso</button>
+                    <button class="btn btn-danger" onclick="abrirGastoModal()"><i class="fas fa-minus-circle"></i> Registrar gasto</button>
                 </div>
             </div>
             <div class="ops-panel">
@@ -263,9 +262,9 @@ function renderCajaCard(c) {
             </div>
             <div class="cash-actions">
                 ${abierta ? `
-                    ${hasPermission('Caja Diaria', 'editar') ? `<button class="btn btn-sm btn-success" onclick="openIngresoModal(${c.id_caja})"><i class="fas fa-plus"></i> Ingreso</button>` : ''}
-                    ${hasPermission('Caja Diaria', 'editar') ? `<button class="btn btn-sm btn-danger" onclick="abrirGastoModal(${c.id_caja})"><i class="fas fa-minus"></i> Gasto</button>` : ''}
-                    ${hasPermission('Caja Diaria', 'cerrar') ? `<button class="btn btn-sm btn-primary" onclick="cerrarCaja(${c.id_caja})"><i class="fas fa-check"></i> Cerrar</button>` : ''}
+                    <button class="btn btn-sm btn-success" onclick="openIngresoModal(${c.id_caja})"><i class="fas fa-plus"></i> Ingreso</button>
+                    <button class="btn btn-sm btn-danger" onclick="abrirGastoModal(${c.id_caja})"><i class="fas fa-minus"></i> Gasto</button>
+                    <button class="btn btn-sm btn-primary" onclick="cerrarCaja(${c.id_caja})"><i class="fas fa-check"></i> Cerrar</button>
                 ` : '<span class="text-muted">Caja cerrada</span>'}
             </div>
             ${gastos.length ? `
@@ -304,7 +303,7 @@ async function abrirCaja() {
     try {
         await apiFetch('/caja/abrir', {
             method: 'POST',
-            body: { repartidor_id: repartidorId, id_repartidor: repartidorId, monto_inicial: montoInicial, id_hoja_ruta: null }
+            body: { repartidor_id: repartidorId, id_repartidor: repartidorId, monto_inicial: montoInicial }
         });
         Swal.fire('Caja abierta', 'Caja diaria creada para el repartidor.', 'success');
         closeAbrirCajaModal();
@@ -399,9 +398,8 @@ async function cerrarCaja(id) {
     });
     if (!r.isConfirmed) return;
 
-    const montoFinal = caja ? parseMoney(caja.monto_final ?? (parseMoney(caja.monto_inicial) + parseMoney(caja.ingresos) - parseMoney(caja.gastos_totales ?? caja.total_gastos))) : 0;
     try {
-        await apiFetch(`/caja/cerrar/${id}`, { method: 'PUT', body: { monto_final: montoFinal } });
+        await apiFetch(`/caja/cerrar/${id}`, { method: 'PUT' });
         Swal.fire('Cerrada', 'Caja cerrada exitosamente.', 'success');
         await renderResumen();
     } catch (e) {
@@ -428,10 +426,38 @@ function getCajaEstado(c) {
     return c?.estado?.nombre_estado || c?.nombre_estado || c?.estado || 'Abierta';
 }
 
+function getRepartidorId(r) {
+    return parseInt(r?.id_repartidor || r?.repartidor_id || r?.id || 0);
+}
+
+function getRepartidorName(r) {
+    const userName = `${r?.usuario?.nombre || ''} ${r?.usuario?.apellido || ''}`.trim();
+    return r?.nombre || userName || r?.nombre_completo || 'Sin repartidor';
+}
+
 function sumCajas(field) {
     return cajasDia.reduce((s, c) => s + parseMoney(c[field]), 0);
 }
 
-function normalizeCaja(value) { return normalize(value); }
+function parseMoney(value) {
+    const n = parseFloat(value);
+    return Number.isFinite(n) ? n : 0;
+}
 
-function cajaSafe(value) { return escapeHtml(value); }
+function money(value) {
+    return parseMoney(value).toFixed(2);
+}
+
+function normalizeCaja(value) {
+    return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function cajaSafe(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    }[c]));
+}

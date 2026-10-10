@@ -27,7 +27,7 @@ class EvidenciaController extends ApiController
 
         $validated = $request->validate([
             'tipo_evidencia' => 'required|in:firma,foto,sello',
-            'archivo' => 'required|file|mimes:jpg,jpeg,png,gif,pdf|max:2048',
+            'archivo' => 'required|file|mimes:jpg,jpeg,png,gif,pdf,webp,heic,heif|max:10240',
         ]);
 
         $ruta = $request->file('archivo')->store('evidencias', 'public');
@@ -50,7 +50,7 @@ class EvidenciaController extends ApiController
         ]);
 
         if ($request->hasFile('archivo')) {
-            $request->validate(['archivo' => 'file|mimes:jpg,jpeg,png,gif,pdf|max:2048']);
+            $request->validate(['archivo' => 'file|mimes:jpg,jpeg,png,gif,pdf,webp,heic,heif|max:10240']);
             $validated['archivo'] = $request->file('archivo')->store('evidencias', 'public');
         }
 

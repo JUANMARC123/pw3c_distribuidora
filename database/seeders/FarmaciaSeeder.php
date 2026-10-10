@@ -28,6 +28,7 @@ class FarmaciaSeeder extends Seeder
         foreach ($nombres as $nombre) {
             $farmacia = Farmacia::factory()->create([
                 'nombre' => $nombre,
+                'geocerca' => 20,
             ]);
 
             ContactoFarmacia::factory()->count(rand(1, 2))->create([

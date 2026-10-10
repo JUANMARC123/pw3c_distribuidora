@@ -9,12 +9,12 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CajaRepartidorFactory extends Factory
 {
+    
     protected $model = CajaRepartidor::class;
 
     public function definition()
     {
         return [
-            'id_hoja_ruta' => HojaRuta::factory(),
             'id_repartidor' => Repartidor::factory(),
             'fecha' => now()->format('Y-m-d'),
             'ingresos' => 0,

@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Pedido;
 
 use App\Http\Controllers\ApiController;
 use App\Models\Pedido;
-use App\Models\DetallePedido;
-use App\Services\Pedido\PedidoPdfExtractor;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +13,7 @@ class PedidoController extends ApiController
 {
     public function index(Request $request)
     {
-        $query = Pedido::with('farmacia', 'usuario', 'detalles.producto');
+        $query = Pedido::with('farmacia', 'usuario');
 
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
@@ -46,6 +45,10 @@ class PedidoController extends ApiController
             'archivo_pedido' => 'nullable|string',
         ]);
 
+        $validated['subtotal'] = $request->filled('subtotal') ? $request->subtotal : 0;
+        $validated['descuento'] = $request->filled('descuento') ? $request->descuento : 0;
+        $validated['total'] = $request->filled('total') ? $request->total : 0;
+
         $validated['id_usuario'] = $request->user()->id_usuario;
         $validated['estado'] = 'pendiente';
         $validated['fecha_pedido'] = now();
@@ -60,7 +63,6 @@ class PedidoController extends ApiController
         $pedido = Pedido::with([
             'farmacia',
             'usuario',
-            'detalles.producto',
             'despacho.hojaRutaDetalle.hojaRuta',
         ])->findOrFail($id);
 
@@ -74,8 +76,7 @@ class PedidoController extends ApiController
         $validated = $request->validate([
             'id_farmacia' => 'sometimes|integer|exists:farmacias,id_farmacia',
             'observaciones' => 'nullable|string',
-            'estado' => 'sometimes|in:pendiente,aprobado,preparacion,en_ruta,entregado,cancelado',
-            'metodo_pago' => 'nullable|in:efectivo,qr,transferencia,credito',
+            'estado' => 'sometimes|in:pendiente,en_ruta,entregado,cancelado',
             'subtotal' => 'nullable|numeric|min:0',
             'descuento' => 'nullable|numeric|min:0',
             'total' => 'nullable|numeric|min:0',
@@ -91,7 +92,6 @@ class PedidoController extends ApiController
     {
         try {
             $pedido = Pedido::findOrFail($id);
-            $pedido->detalles()->delete();
             $pedido->delete();
             return $this->jsonResponse(null, 'Pedido eliminado exitosamente.');
         } catch (\Exception $e) {
@@ -104,28 +104,12 @@ class PedidoController extends ApiController
         $pedido = Pedido::findOrFail($id);
 
         $validated = $request->validate([
-            'estado' => 'required|in:pendiente,aprobado,preparacion,en_ruta,entregado,cancelado',
+            'estado' => 'required|in:pendiente,en_ruta,entregado,cancelado',
         ]);
 
         $pedido->update(['estado' => $validated['estado']]);
 
         return $this->jsonResponse($pedido, 'Estado del pedido actualizado.');
-    }
-
-    public function extraerPdf(Request $request)
-    {
-        $request->validate([
-            'archivo' => 'required|file|mimes:pdf|max:10240',
-        ]);
-
-        try {
-            $extractor = new PedidoPdfExtractor();
-            $resultado = $extractor->extraer($request->file('archivo'));
-
-            return $this->jsonResponse($resultado, 'PDF procesado exitosamente.');
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error al procesar el PDF: ' . $e->getMessage(), 500);
-        }
     }
 
     public function subirArchivo(Request $request, $id)

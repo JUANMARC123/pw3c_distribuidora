@@ -21,6 +21,9 @@ it('table name', function () {
         $this->assertContains('fecha', $fillable);
         $this->assertContains('id_repartidor', $fillable);
         $this->assertContains('id_vehiculo', $fillable);
+        $this->assertContains('id_caja', $fillable);
+        $this->assertContains('cobrado_efectivo', $fillable);
+        $this->assertContains('cobrado_qr', $fillable);
         $this->assertContains('estado_ruta', $fillable);
     });
 
@@ -39,7 +42,7 @@ it('table name', function () {
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $relation);
     });
 
-    it('has one caja', function () {
+    it('belongs to caja', function () {
         $relation = (new HojaRuta())->caja();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasOne::class, $relation);
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relation);
     });

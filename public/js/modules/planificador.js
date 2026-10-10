@@ -1,13 +1,4 @@
-var GPS_FIREBASE_CONFIG = typeof GPS_FIREBASE_CONFIG !== 'undefined' ? GPS_FIREBASE_CONFIG : {
-    apiKey: "AIzaSyDLpt_G8VOvmePuAYEQyffhU1Qb9braKSw",
-    authDomain: "mapboxfirebase-a79b5.firebaseapp.com",
-    databaseURL: "https://mapboxfirebase-a79b5-default-rtdb.firebaseio.com",
-    projectId: "mapboxfirebase-a79b5",
-    storageBucket: "mapboxfirebase-a79b5.firebasestorage.app",
-    messagingSenderId: "133519102970",
-    appId: "1:133519102970:web:1bf07af71eda04b772ca43",
-    measurementId: "G-SMVVH5FL53"
-};
+const GPS_MAPBOX_TOKEN = window.GPS_MAPBOX_TOKEN || null;
 
 let planificadorMap = null;
 let planificadorMarkers = [];
@@ -15,30 +6,20 @@ let pedidosPendientes = [];
 let repartidoresData = [];
 let assignmentsByRepartidor = {};
 let selectedRepartidorId = null;
-let planificadorUserInteracted = false;
 let sortables = [];
-var firebaseUsuariosData = null;
-let planificadorFirebaseRef = null;
 
 async function initPlanificador() {
     assignmentsByRepartidor = {};
     selectedRepartidorId = null;
     await Promise.all([loadPedidosPendientes(), loadRepartidores()]);
     initPlanificadorMap();
-    initFirebasePlanificador();
     renderPlannerState();
 }
 
 async function loadPedidosPendientes() {
     try {
-        const d = await apiFetch('/pedidos?per_page=200');
-        const all = Array.isArray(d) ? d : (d.data || []);
-        pedidosPendientes = all.filter(p => {
-            const estadoName = (p.estado?.nombre_estado || p.nombre_estado || p.estado || '').toLowerCase();
-            const excluir = estadoName.includes('entreg') || estadoName.includes('cancel') || estadoName.includes('ruta') || estadoName.includes('despach');
-            if (excluir) return false;
-            return estadoName.includes('pend') || estadoName.includes('prepar') || estadoName.includes('aprob');
-        });
+        const d = await apiFetch('/logistica/pedidos-pendientes');
+        pedidosPendientes = Array.isArray(d) ? d : (d.data || []);
     } catch (e) {
         console.error('Error loading pedidos:', e);
         pedidosPendientes = [];
@@ -47,7 +28,7 @@ async function loadPedidosPendientes() {
 
 async function loadRepartidores() {
     try {
-        const d = await apiFetch('/repartidores?per_page=-1');
+        const d = await apiFetch('/logistica/repartidores-disponibles');
         repartidoresData = Array.isArray(d) ? d : (d.data || []);
     } catch (e) {
         console.error('Error loading repartidores:', e);
@@ -60,6 +41,7 @@ function renderPlannerState() {
     renderRepartidores();
     updatePlanificadorSummary();
     updateMapRoute();
+    setTimeout(initSortables, 0);
 }
 
 function renderPedidos() {
@@ -119,23 +101,15 @@ function renderPedidoCard(p, isAssigned = false, repId = null) {
 function renderRepartidores() {
     const container = document.getElementById('repartidores-list');
     if (!container) return;
-
-    const search = normalizeText(document.getElementById('planificador-search-repartidor')?.value || '');
-    const filtered = repartidoresData.filter(r => {
-        if (!search) return true;
-        const text = normalizeText(`${getRepartidorName(r)} ${formatVehiculo(getRepartidorVehiculo(r) || {})}`);
-        return text.includes(search);
-    });
-
     const count = document.getElementById('repartidores-count');
-    if (count) count.textContent = filtered.length;
+    if (count) count.textContent = repartidoresData.length;
 
-    if (!filtered.length) {
+    if (!repartidoresData.length) {
         container.innerHTML = '<div class="empty-state compact">No hay repartidores disponibles.</div>';
         return;
     }
 
-    container.innerHTML = filtered.map(r => {
+    container.innerHTML = repartidoresData.map(r => {
         const id = getRepartidorId(r);
         const vehiculo = getRepartidorVehiculo(r);
         const assignedIds = assignmentsByRepartidor[id] || [];
@@ -143,8 +117,6 @@ function renderRepartidores() {
         const total = pedidos.reduce((s, p) => s + getPedidoTotal(p), 0);
         const initials = getInitials(getRepartidorName(r));
         const isSelected = selectedRepartidorId === id;
-        const fbUser = r.firebase_uid && firebaseUsuariosData ? firebaseUsuariosData[r.firebase_uid] : null;
-        const conectado = estaConectado(fbUser);
         return `
             <article class="repartidor-card ${isSelected ? 'selected' : ''}" data-repartidor-id="${id}" onclick="selectRepartidor(${id})">
                 <div class="repartidor-card-header">
@@ -153,9 +125,6 @@ function renderRepartidores() {
                         <div class="name">${safeText(getRepartidorName(r))}</div>
                         <div class="vehiculo">${vehiculo ? safeText(formatVehiculo(vehiculo)) : '<span class="text-danger">Sin vehiculo asignado</span>'}</div>
                     </div>
-                    ${conectado
-                        ? '<span class="badge badge-success" style="font-size:10px;align-self:start;">🟢 Activo</span>'
-                        : '<span class="badge badge-danger" style="font-size:10px;align-self:start;">🔴 Inactivo</span>'}
                 </div>
                 <div class="repartidor-summary">
                     <span>${assignedIds.length} pedidos</span>
@@ -164,18 +133,12 @@ function renderRepartidores() {
                 <div class="dropzone" data-repartidor-id="${id}">
                     ${pedidos.length ? pedidos.map(p => renderPedidoCard(p, false, id)).join('') : '<div class="dropzone-empty"><i class="fas fa-arrow-down"></i> Soltar pedidos aqui</div>'}
                 </div>
-                <div style="display:flex;gap:4px;padding:8px;">
-                    <button class="btn btn-sm btn-outline" style="flex:1;" onclick="event.stopPropagation(); mostrarHistorialRepartidor(${id})">
-                        <i class="fas fa-clock-rotate-left"></i> Historial del dia
-                    </button>
-                    <button class="btn-iniciar" style="flex:1;" onclick="iniciarRuta(${id}); event.stopPropagation();" ${assignedIds.length ? '' : 'disabled'}>
-                        <i class="fas fa-play"></i> Iniciar ruta
-                    </button>
-                </div>
+                <button class="btn-iniciar" onclick="iniciarRuta(${id}); event.stopPropagation();" ${assignedIds.length ? '' : 'disabled'}>
+                    <i class="fas fa-play"></i> Iniciar ruta
+                </button>
             </article>
         `;
     }).join('');
-    setTimeout(initSortables, 0);
 }
 
 function initPlanificadorMap() {
@@ -194,13 +157,9 @@ function initPlanificadorMap() {
         style: 'mapbox://styles/mapbox/light-v11',
         center: [-67.8217, -16.4897],
         zoom: 12,
-        fadeDuration: 0,
     });
     planificadorMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
-    planificadorMap.on('zoomend', () => { planificadorUserInteracted = true; });
-    planificadorMap.on('dragend', () => { planificadorUserInteracted = true; });
     planificadorMap.on('load', function () {
-        planificadorUserInteracted = false;
         if (!planificadorMap.getSource('route')) {
             planificadorMap.addSource('route', {
                 type: 'geojson',
@@ -230,7 +189,7 @@ function initSortables() {
             group: { name: 'logistica-pedidos', pull: 'clone', put: false },
             sort: false,
             filter: '.assigned-disabled',
-            animation: 0,
+            animation: 150,
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
         }));
@@ -239,7 +198,7 @@ function initSortables() {
     document.querySelectorAll('.dropzone').forEach(dz => {
         sortables.push(new Sortable(dz, {
             group: { name: 'logistica-pedidos', pull: true, put: true },
-            animation: 0,
+            animation: 150,
             ghostClass: 'sortable-ghost',
             onAdd: evt => handleDrop(evt),
             onUpdate: evt => {
@@ -266,19 +225,12 @@ function handleDrop(evt) {
         return;
     }
 
-    const MAX_PEDIDOS_POR_REPARTIDOR = 100;
-    const currentCount = (assignmentsByRepartidor[targetRepartidorId] || []).length;
-    if (currentCount >= MAX_PEDIDOS_POR_REPARTIDOR) {
-        evt.item.remove();
-        Swal.fire('Límite alcanzado', `Máximo ${MAX_PEDIDOS_POR_REPARTIDOR} pedidos por repartidor.`, 'warning');
-        return;
-    }
-
     removePedidoFromAllAssignments(pedidoId);
     if (!assignmentsByRepartidor[targetRepartidorId]) assignmentsByRepartidor[targetRepartidorId] = [];
     assignmentsByRepartidor[targetRepartidorId].push(pedidoId);
+    selectedRepartidorId = targetRepartidorId;
     evt.item.remove();
-    setTimeout(() => renderPlannerState(), 0);
+    renderPlannerState();
 }
 
 function syncRepartidorOrder(repartidorId) {
@@ -304,7 +256,6 @@ function clearAssignments() {
 
 function selectRepartidor(repartidorId) {
     selectedRepartidorId = selectedRepartidorId === repartidorId ? null : repartidorId;
-    planificadorUserInteracted = false;
     renderRepartidores();
     updateMapRoute();
     setTimeout(initSortables, 0);
@@ -335,22 +286,8 @@ function updateMapRoute() {
     planificadorMarkers = [];
 
     const source = planificadorMap.getSource('route');
-    const coords = [];
+    const coords = [[-67.8217, -16.4897]];
     const routePedidos = getRoutePedidosForPreview();
-    let gpsCoord = null;
-
-    if (selectedRepartidorId) {
-        const rep = findRepartidor(selectedRepartidorId);
-        if (rep?.firebase_uid && firebaseUsuariosData?.[rep.firebase_uid]?.ubicacion) {
-            const u = firebaseUsuariosData[rep.firebase_uid].ubicacion;
-            const lat = u.lat ?? u.latitud;
-            const lng = u.lng ?? u.longitud;
-            if (lat != null && lng != null) {
-                gpsCoord = [parseFloat(lng), parseFloat(lat)];
-                coords.push(gpsCoord);
-            }
-        }
-    }
 
     routePedidos.forEach(p => {
         const pedidoCoords = getPedidoCoords(p);
@@ -363,42 +300,34 @@ function updateMapRoute() {
         geometry: { type: 'LineString', coordinates: coords.length > 1 ? coords : [] }
     };
     if (source) source.setData(data);
-    if (!coords.length) return;
+
+    if (coords.length <= 1) return;
 
     coords.forEach((coord, idx) => {
         const el = document.createElement('div');
         el.className = 'mapbox-marker';
-        if (idx === 0 && gpsCoord) {
-            el.textContent = 'GPS';
-            el.style.cssText = `
-                width:32px;height:32px;
-                background:#111827;border-radius:50%;
-                border:3px solid white;
-                box-shadow:0 2px 8px rgba(15,23,42,.3);
-                display:flex;align-items:center;justify-content:center;
-                color:white;font-size:10px;font-weight:700;
-            `;
-        } else {
-            const num = gpsCoord ? idx : idx + 1;
-            el.textContent = String(num);
-            el.style.cssText = `
-                width:26px;height:26px;
-                background:#2563eb;border-radius:50%;
-                border:3px solid white;
-                box-shadow:0 2px 8px rgba(15,23,42,.3);
-                display:flex;align-items:center;justify-content:center;
-                color:white;font-size:12px;font-weight:700;
-            `;
-        }
+        el.textContent = idx === 0 ? 'A' : String(idx);
+        el.style.cssText = `
+            width:${idx === 0 ? '30px' : '26px'};
+            height:${idx === 0 ? '30px' : '26px'};
+            background:${idx === 0 ? '#f59e0b' : '#2563eb'};
+            border-radius:50%;
+            border:3px solid white;
+            box-shadow:0 2px 8px rgba(15,23,42,.3);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:white;
+            font-size:12px;
+            font-weight:700;
+        `;
         const marker = new mapboxgl.Marker({ element: el }).setLngLat(coord).addTo(planificadorMap);
         planificadorMarkers.push(marker);
     });
 
     const bounds = new mapboxgl.LngLatBounds();
     coords.forEach(coord => bounds.extend(coord));
-    if (!planificadorUserInteracted) {
-        planificadorMap.fitBounds(bounds, { padding: 64, maxZoom: 14, animate: false });
-    }
+    planificadorMap.fitBounds(bounds, { padding: 64, maxZoom: 14 });
 }
 
 function updateRoutePreviewLabel() {
@@ -449,7 +378,7 @@ async function iniciarRuta(repartidorId) {
 
     const repartidor = findRepartidor(repartidorId);
     const vehiculo = getRepartidorVehiculo(repartidor);
-    const pedidos = pedidoIds.map((id, idx) => ({ id_pedido: id, orden_visita: idx + 1 }));
+    const pedidos = pedidoIds.map((id, idx) => ({ id_pedido: id, orden: idx + 1 }));
     const pedidosSinCoords = pedidoIds.map(pid => findPedido(pid)).filter(p => p && !getPedidoCoords(p));
 
     if (!vehiculo || !(vehiculo.id_vehiculo || vehiculo.id)) {
@@ -478,28 +407,15 @@ async function iniciarRuta(repartidorId) {
     if (!result.isConfirmed) return;
 
     try {
-        const rutaCreada = await apiFetch('/hojas-ruta', {
+        await apiFetch('/logistica/planificacion/confirmar', {
             method: 'POST',
             body: {
-                id_repartidor: repartidorId,
-                id_vehiculo: vehiculo ? (vehiculo.id_vehiculo || vehiculo.id || null) : null,
-                fecha: new Date().toISOString().slice(0, 10),
+                repartidor_id: repartidorId,
+                vehiculo_id: vehiculo ? (vehiculo.id_vehiculo || vehiculo.id || null) : null,
                 pedidos,
             },
         });
-
-        await apiFetch(`/hojas-ruta/${rutaCreada.id_hoja_ruta}/iniciar`, {
-            method: 'POST',
-        });
-
-        Swal.fire({
-            title: 'Ruta iniciada',
-            html: `<p>Se asignaron ${pedidos.length} pedido(s) a ${getRepartidorName(repartidor)}.</p><p style="font-size:13px;color:var(--text-muted);">Los estados se actualizan automaticamente en el sistema.</p>`,
-            icon: 'success',
-            timer: 3000,
-            showConfirmButton: false,
-        });
-
+        Swal.fire('Ruta iniciada', `Se asignaron ${pedidos.length} pedido(s) a ${getRepartidorName(repartidor)}.`, 'success');
         assignmentsByRepartidor = {};
         selectedRepartidorId = null;
         await Promise.all([loadPedidosPendientes(), loadRepartidores()]);
@@ -554,9 +470,19 @@ function getPedidoCoords(p) {
     return [lng, lat];
 }
 
+function getRepartidorId(r) {
+    return parseInt(r?.id_repartidor || r?.repartidor_id || r?.id || 0);
+}
+
+function getRepartidorName(r) {
+    if (!r) return 'Sin repartidor';
+    const userName = `${r.usuario?.nombre || ''} ${r.usuario?.apellido || ''}`.trim();
+    return r.nombre || userName || r.nombre_completo || 'Sin repartidor';
+}
+
 function getRepartidorVehiculo(r) {
     if (!r) return null;
-    const asignacion = r.asignacion_activa || null;
+    const asignacion = r.asignacion_vehiculo_activa || r.asignacionVehiculoActiva || null;
     if (asignacion?.vehiculo) return asignacion.vehiculo;
     if (r.vehiculo || r.vehiculos?.[0]) return r.vehiculo || r.vehiculos[0];
     if (r.id_vehiculo) {
@@ -582,92 +508,21 @@ function getInitials(name) {
     return String(name || '?').split(' ').filter(Boolean).map(s => s[0]).join('').substring(0, 2).toUpperCase() || '?';
 }
 
-function normalizeText(value) { return normalize(value); }
-
-function safeText(value) { return escapeHtml(value); }
-
-/* ─────────── Firebase / Conexion ─────────── */
-
-function estaConectado(firebaseUser) {
-    if (!firebaseUser?.ubicacion) return false;
-    if (firebaseUser.ubicacion.latitud == null && firebaseUser.ubicacion.lat == null) return false;
-    var horaStr = firebaseUser.ubicacion.hora;
-    if (!horaStr) return true;
-    var partes = horaStr.split(':');
-    if (partes.length !== 3) return true;
-    var ahora = new Date();
-    var fechaUbicacion = new Date();
-    fechaUbicacion.setHours(parseInt(partes[0]), parseInt(partes[1]), parseInt(partes[2]), 0);
-    var diffMs = ahora - fechaUbicacion;
-    if (diffMs < 0) diffMs += 24 * 60 * 60 * 1000;
-    return Math.floor(diffMs / 60000) < 2;
+function normalizeText(value) {
+    return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-function initFirebasePlanificador() {
-    try {
-        if (!window.firebase) return;
-        if (!firebase.apps.length) firebase.initializeApp(GPS_FIREBASE_CONFIG);
-        if (planificadorFirebaseRef) planificadorFirebaseRef.off();
-        const db = firebase.database();
-        planificadorFirebaseRef = db.ref('usuarios');
-        planificadorFirebaseRef.on('value', snapshot => {
-            firebaseUsuariosData = snapshot.val() || {};
-            renderRepartidores();
-        });
-    } catch (e) {
-        console.warn('Firebase init warning:', e);
-    }
+function money(value) {
+    const n = parseFloat(value);
+    return Number.isFinite(n) ? n.toFixed(2) : '0.00';
 }
 
-/* ─────────── Historial contextual del repartidor ─────────── */
-
-async function mostrarHistorialRepartidor(repartidorId) {
-    try {
-        const despachos = await apiFetch('/despachos?per_page=-1').catch(() => []);
-        const despachosArr = Array.isArray(despachos) ? despachos : (despachos.data || []);
-
-        const hoy = new Date().toISOString().slice(0, 10);
-
-        const despachosHoy = despachosArr.filter(d => {
-            const repId = d.id_repartidor || d.repartidor?.id_repartidor;
-            const fecha = (d.fecha_despacho || d.created_at || '').slice(0, 10);
-            return String(repId) === String(repartidorId) && fecha === hoy;
-        });
-
-        const entregados = despachosHoy.filter(d => {
-            const est = (d.estado_despacho || d.estado || d.estado?.nombre_estado || '').toLowerCase();
-            return est.includes('entreg');
-        }).length;
-
-        const incidencias = despachosHoy.reduce((s, d) => {
-            return s + (d.incidencias_count ?? d.incidencias?.length ?? 0);
-        }, 0);
-
-        const rep = repartidoresData.find(r => String(getRepartidorId(r)) === String(repartidorId));
-        const nombre = rep ? getRepartidorName(rep) : 'Repartidor';
-
-        Swal.fire({
-            title: `Historial del dia — ${safeText(nombre)}`,
-            html: `
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;">
-                    <div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;">
-                        <div style="font-size:28px;font-weight:700;color:#10b981;">${despachosHoy.length}</div>
-                        <div style="font-size:12px;color:#64748b;">Despachos del dia</div>
-                    </div>
-                    <div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;">
-                        <div style="font-size:28px;font-weight:700;color:#059669;">${entregados}</div>
-                        <div style="font-size:12px;color:#64748b;">Entregados</div>
-                    </div>
-                    <div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;">
-                        <div style="font-size:28px;font-weight:700;color:#ef4444;">${incidencias}</div>
-                        <div style="font-size:12px;color:#64748b;">Incidencias</div>
-                    </div>
-                </div>
-            `,
-            confirmButtonText: 'Cerrar',
-            width: 460,
-        });
-    } catch (e) {
-        Swal.fire('Error', e.message || 'No se pudo cargar el historial', 'error');
-    }
+function safeText(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    }[c]));
 }

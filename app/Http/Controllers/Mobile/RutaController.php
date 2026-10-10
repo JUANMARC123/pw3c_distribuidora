@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Mobile;
 
 use App\Http\Controllers\ApiController;
 use App\Models\HojaRuta;
-use App\Models\DetallePedido;
 use App\Models\Despacho;
 use App\Models\EvidenciaEntrega;
-use App\Models\Incidencia;
+use App\Models\Pedido;
 use App\Models\Repartidor;
 use App\Models\HojaRutaDetalle;
 use App\Services\FirebaseSyncService;
@@ -54,7 +53,7 @@ class RutaController extends ApiController
                     'id_pedido' => $pedido->id_pedido,
                     'estado' => $pedido->estado,
                     'total' => $pedido->total,
-                    'metodo_pago' => $pedido->metodo_pago,
+                    'metodo_pago' => $despacho?->metodo_pago,
                     'observaciones' => $pedido->observaciones,
                 ],
                 'farmacia' => [
@@ -68,6 +67,7 @@ class RutaController extends ApiController
                 'despacho' => $despacho ? [
                     'id_despacho' => $despacho->id_despacho,
                     'estado_despacho' => $despacho->estado_despacho,
+                    'metodo_pago' => $despacho->metodo_pago,
                     'monto_recibido' => $despacho->monto_recibido,
                 ] : null,
             ];
@@ -79,8 +79,129 @@ class RutaController extends ApiController
                 'fecha' => $hojaRuta->fecha,
                 'hora_salida' => $hojaRuta->hora_salida,
                 'estado_ruta' => $hojaRuta->estado_ruta,
+                'cobrado_efectivo' => (float) $hojaRuta->cobrado_efectivo,
+                'cobrado_qr' => (float) $hojaRuta->cobrado_qr,
+                'total_cobrado' => (float) $hojaRuta->cobrado_efectivo + (float) $hojaRuta->cobrado_qr,
                 'paradas' => $paradas,
             ],
+        ]);
+    }
+
+    public function getPedidoDetalle(int $pedidoId): JsonResponse
+    {
+        $pedido = Pedido::with(['farmacia', 'detalles'])
+            ->find($pedidoId);
+
+        if (!$pedido) {
+            return $this->errorResponse('Pedido no encontrado', 404);
+        }
+
+        return $this->jsonResponse([
+            'pedido' => [
+                'id_pedido' => $pedido->id_pedido,
+                'fecha' => $pedido->fecha,
+                'total' => $pedido->total,
+                'estado' => $pedido->estado,
+                'observaciones' => $pedido->observaciones,
+                'farmacia' => $pedido->farmacia ? [
+                    'id_farmacia' => $pedido->farmacia->id_farmacia,
+                    'nombre' => $pedido->farmacia->nombre,
+                    'direccion' => $pedido->farmacia->direccion,
+                    'latitud' => $pedido->farmacia->latitud,
+                    'longitud' => $pedido->farmacia->longitud,
+                    'geocerca' => $pedido->farmacia->geocerca,
+                ] : null,
+                'detalles' => $pedido->detalles->map(function ($detalle) {
+                    return [
+                        'id_detalle' => $detalle->id_detalle,
+                        'producto' => $detalle->producto->nombre ?? '',
+                        'cantidad_solicitada' => $detalle->cantidad_solicitada,
+                        'cantidad_entregada' => $detalle->cantidad_entregada,
+                        'cantidad_rechazada' => $detalle->cantidad_rechazada,
+                        'motivo_rechazo' => $detalle->motivo_rechazo,
+                        'precio_unitario' => $detalle->precio_unitario,
+                        'subtotal' => $detalle->subtotal,
+                    ];
+                }),
+            ],
+        ]);
+    }
+
+    public function registrarEntrega(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'firebase_uid' => 'required|string',
+            'id_detalle_hoja_ruta' => 'required|integer|exists:hoja_ruta_detalles,id_detalle',
+            'id_pedido' => 'required|integer|exists:pedidos,id_pedido',
+            'id_despacho' => 'nullable|integer|exists:despachos,id_despacho',
+            'metodo_pago' => 'required|in:efectivo,qr,transferencia,credito',
+            'monto_recibido' => 'required|numeric|min:0',
+        ]);
+
+        $repartidor = Repartidor::where('firebase_uid', $validated['firebase_uid'])->first();
+
+        if (!$repartidor) {
+            return $this->errorResponse('Repartidor no encontrado', 404);
+        }
+
+        $detalle = HojaRutaDetalle::with('pedido')
+            ->findOrFail($validated['id_detalle_hoja_ruta']);
+
+        if ($detalle->hojaRuta->id_repartidor !== $repartidor->id_repartidor) {
+            return $this->errorResponse('Esta parada no pertenece a tu ruta', 403);
+        }
+
+        if ((int) $detalle->id_pedido !== (int) $validated['id_pedido']) {
+            return $this->errorResponse('El pedido no corresponde a esta parada', 422);
+        }
+
+        $despacho = Despacho::where('id_detalle_hoja_ruta', $detalle->id_detalle)->first();
+
+        if (!$despacho && !empty($validated['id_despacho'])) {
+            $despacho = Despacho::find($validated['id_despacho']);
+        }
+
+        if (!$despacho) {
+            $despacho = Despacho::create([
+                'id_pedido' => $detalle->id_pedido,
+                'id_detalle_hoja_ruta' => $detalle->id_detalle,
+                'fecha_hora_despacho' => now(),
+                'estado_despacho' => 'pendiente',
+                'monto_recibido' => 0,
+            ]);
+        }
+
+        $despacho->update([
+            'estado_despacho' => 'entregado',
+            'metodo_pago' => $validated['metodo_pago'],
+            'monto_recibido' => $validated['monto_recibido'],
+        ]);
+
+        $detalle->pedido->update(['estado' => 'entregado']);
+
+        $hojaRuta = $detalle->hojaRuta;
+        $monto = (float) $validated['monto_recibido'];
+
+        if ($validated['metodo_pago'] === 'efectivo' && $monto > 0) {
+            $hojaRuta->increment('cobrado_efectivo', $monto);
+        } elseif ($validated['metodo_pago'] === 'qr' && $monto > 0) {
+            $hojaRuta->increment('cobrado_qr', $monto);
+        }
+
+        $hojaRuta->asegurarVinculoCaja();
+
+        $this->firebaseSync->actualizarEstadoParada(
+            $validated['firebase_uid'],
+            $detalle->id_detalle,
+            'entregado'
+        );
+
+        return $this->jsonResponse([
+            'mensaje' => 'Entrega registrada correctamente',
+            'id_despacho' => $despacho->id_despacho,
+            'estado_despacho' => $despacho->estado_despacho,
+            'metodo_pago' => $despacho->metodo_pago,
+            'monto_recibido' => $despacho->monto_recibido,
         ]);
     }
 
@@ -153,6 +274,8 @@ class RutaController extends ApiController
             'hora_llegada' => now()->toTimeString(),
         ]);
 
+        $hojaRuta->asegurarVinculoCaja();
+
         $asignacion = $hojaRuta->repartidor->asignacionActiva;
         $vehiculoId = $asignacion ? $asignacion->id_vehiculo : 0;
 
@@ -165,69 +288,56 @@ class RutaController extends ApiController
         ]);
     }
 
-    public function detallePedido(int $pedidoId): JsonResponse
+    public function entregaFallida(Request $request): JsonResponse
     {
-        $pedido = \App\Models\Pedido::with(['detalles.producto', 'farmacia'])->findOrFail($pedidoId);
-
-        return $this->jsonResponse([
-            'pedido' => [
-                'id_pedido' => $pedido->id_pedido,
-                'estado' => $pedido->estado,
-                'metodo_pago' => $pedido->metodo_pago,
-                'subtotal' => $pedido->subtotal,
-                'descuento' => $pedido->descuento,
-                'total' => $pedido->total,
-                'observaciones' => $pedido->observaciones,
-                'farmacia' => [
-                    'nombre' => $pedido->farmacia->nombre,
-                    'direccion' => $pedido->farmacia->direccion,
-                ],
-                'detalles' => $pedido->detalles->map(function ($detalle) {
-                    return [
-                        'id_detalle' => $detalle->id_detalle,
-                        'producto' => $detalle->producto?->nombre ?? 'Producto',
-                        'cantidad_solicitada' => $detalle->cantidad_solicitada,
-                        'cantidad_entregada' => $detalle->cantidad_entregada,
-                        'cantidad_rechazada' => $detalle->cantidad_rechazada,
-                        'motivo_rechazo' => $detalle->motivo_rechazo,
-                        'precio_unitario' => $detalle->precio_unitario,
-                        'subtotal' => $detalle->subtotal,
-                    ];
-                }),
-            ],
-        ]);
-    }
-
-    public function actualizarDetalleEntrega(Request $request, int $detalleId): JsonResponse
-    {
-        $request->validate([
+        $validated = $request->validate([
             'firebase_uid' => 'required|string',
-            'cantidad_entregada' => 'required|integer|min:0',
-            'cantidad_rechazada' => 'required|integer|min:0',
-            'motivo_rechazo' => 'nullable|string|max:255',
+            'id_detalle_hoja_ruta' => 'required|integer|exists:hoja_ruta_detalles,id_detalle',
+            'id_pedido' => 'required|integer|exists:pedidos,id_pedido',
+            'id_despacho' => 'nullable|integer|exists:despachos,id_despacho',
+            'motivo' => 'nullable|string|max:500',
         ]);
 
-        $detalle = DetallePedido::findOrFail($detalleId);
+        $repartidor = Repartidor::where('firebase_uid', $validated['firebase_uid'])->first();
 
-        $detalle->update([
-            'cantidad_entregada' => $request->cantidad_entregada,
-            'cantidad_rechazada' => $request->cantidad_rechazada,
-            'motivo_rechazo' => $request->motivo_rechazo,
+        if (!$repartidor) {
+            return $this->errorResponse('Repartidor no encontrado', 404);
+        }
+
+        $detalle = HojaRutaDetalle::with('pedido')->findOrFail($validated['id_detalle_hoja_ruta']);
+
+        if ($detalle->hojaRuta->id_repartidor !== $repartidor->id_repartidor) {
+            return $this->errorResponse('Esta parada no pertenece a tu ruta', 403);
+        }
+
+        $despacho = Despacho::where('id_detalle_hoja_ruta', $detalle->id_detalle)->first();
+
+        if (!$despacho && !empty($validated['id_despacho'])) {
+            $despacho = Despacho::find($validated['id_despacho']);
+        }
+
+        if (!$despacho) {
+            $despacho = Despacho::create([
+                'id_pedido' => $detalle->id_pedido,
+                'id_detalle_hoja_ruta' => $detalle->id_detalle,
+                'fecha_hora_despacho' => now(),
+                'estado_despacho' => 'pendiente',
+                'monto_recibido' => 0,
+            ]);
+        }
+
+        $despacho->update([
+            'estado_despacho' => 'incidencia',
+            'metodo_pago' => null,
+            'monto_recibido' => 0,
         ]);
 
-        $detalle->subtotal = $detalle->cantidad_entregada * $detalle->precio_unitario;
-        $detalle->save();
-
-        $pedido = $detalle->pedido;
-        $pedido->subtotal = $pedido->detalles->sum(fn($d) => $d->cantidad_entregada * $d->precio_unitario);
-        $pedido->total = $pedido->subtotal - $pedido->descuento;
-        $pedido->save();
+        $detalle->pedido->update(['estado' => 'cancelado']);
 
         return $this->jsonResponse([
-            'mensaje' => 'Detalle de entrega actualizado',
-            'id_detalle' => $detalle->id_detalle,
-            'cantidad_entregada' => $detalle->cantidad_entregada,
-            'cantidad_rechazada' => $detalle->cantidad_rechazada,
+            'mensaje' => 'Entrega marcada como fallida',
+            'id_despacho' => $despacho->id_despacho,
+            'estado_despacho' => $despacho->estado_despacho,
         ]);
     }
 
@@ -236,7 +346,7 @@ class RutaController extends ApiController
         $request->validate([
             'firebase_uid' => 'required|string',
             'tipo_evidencia' => 'required|string|in:firma,foto,sello',
-            'archivo' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
+            'archivo' => 'required|file|mimes:jpg,jpeg,png,pdf,webp,heic,heif|max:10240',
         ]);
 
         $despacho = Despacho::find($despachoId);
@@ -257,37 +367,5 @@ class RutaController extends ApiController
             'id_evidencia' => $evidencia->id_evidencia,
             'archivo' => Storage::url($path),
         ], 'Evidencia guardada', 201);
-    }
-
-    public function storeIncidencia(Request $request, int $despachoId): JsonResponse
-    {
-        $request->validate([
-            'firebase_uid' => 'required|string',
-            'tipo_incidencia' => 'required|string|in:cliente_ausente,producto_dañado,producto_incompleto,direccion_incorrecta,rechazo_cliente,otro',
-            'descripcion' => 'required|string|max:500',
-            'archivo' => 'nullable|file|mimes:jpg,jpeg,png|max:5120',
-        ]);
-
-        $despacho = Despacho::find($despachoId);
-        if (!$despacho) {
-            return $this->errorResponse('Despacho no encontrado', 404);
-        }
-
-        $path = null;
-        if ($request->hasFile('archivo')) {
-            $path = $request->file('archivo')->store("incidencias/despacho_{$despachoId}", 'public');
-        }
-
-        $incidencia = Incidencia::create([
-            'id_despacho' => $despachoId,
-            'tipo_incidencia' => $request->tipo_incidencia,
-            'descripcion' => $request->descripcion,
-            'archivo' => $path,
-        ]);
-
-        return $this->jsonResponse([
-            'mensaje' => 'Incidencia registrada',
-            'id_incidencia' => $incidencia->id_incidencia,
-        ], 'Incidencia registrada', 201);
     }
 }

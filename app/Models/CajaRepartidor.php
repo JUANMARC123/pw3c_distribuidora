@@ -13,7 +13,6 @@ class CajaRepartidor extends Model
     protected $primaryKey = 'id_caja';
 
     protected $fillable = [
-        'id_hoja_ruta',
         'id_repartidor',
         'fecha',
         'ingresos',
@@ -30,9 +29,9 @@ class CajaRepartidor extends Model
         'estado_caja' => 'string',
     ];
 
-    public function hojaRuta()
+    public function hojasRuta()
     {
-        return $this->belongsTo(HojaRuta::class, 'id_hoja_ruta');
+        return $this->hasMany(HojaRuta::class, 'id_caja');
     }
 
     public function repartidor()
@@ -43,5 +42,10 @@ class CajaRepartidor extends Model
     public function gastos()
     {
         return $this->hasMany(GastoOperativo::class, 'id_caja');
+    }
+
+    public function ingresosDetalle()
+    {
+        return $this->hasMany(CajaIngreso::class, 'id_caja');
     }
 }

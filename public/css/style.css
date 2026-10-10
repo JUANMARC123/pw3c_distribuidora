@@ -21,7 +21,7 @@
     --radius: 8px;
     --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-    --transition: none;
+    --transition: all 0.3s ease;
 }
 
 *, *::before, *::after {
@@ -154,25 +154,24 @@ a:hover {
 }
 
 .nav-section {
-    padding: 16px 20px 4px 24px;
-    font-size: 10px;
+    padding: 8px 20px 4px;
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: rgba(255,255,255,0.35);
-    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.4);
+    font-weight: 600;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 9px 20px 9px 24px;
+    gap: 12px;
+    padding: 10px 20px;
     color: var(--sidebar-text);
-    transition: all 0.2s ease;
+    transition: var(--transition);
     cursor: pointer;
     border-left: 3px solid transparent;
-    font-size: 13px;
-    position: relative;
+    font-size: 14px;
 }
 
 .nav-item:hover {
@@ -182,39 +181,20 @@ a:hover {
 }
 
 .nav-item.active {
-    background: linear-gradient(90deg, rgba(59,130,246,0.18) 0%, rgba(59,130,246,0.04) 100%);
+    background: rgba(59,130,246,0.15);
     color: var(--sidebar-text-active);
     border-left-color: var(--sidebar-active);
 }
 
-.nav-item.active::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 18px;
-    background: var(--sidebar-active);
-    border-radius: 3px 0 0 3px;
-}
-
 .nav-item i {
-    width: 18px;
+    width: 20px;
     text-align: center;
-    font-size: 14px;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-.nav-item.active i,
-.nav-item:hover i {
-    opacity: 1;
+    font-size: 15px;
 }
 
 .sidebar-footer {
-    padding: 12px 16px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
 }
 
 .btn-logout {
@@ -658,6 +638,18 @@ textarea.form-control {
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: var(--shadow-lg);
+    animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 .modal-header {
@@ -744,6 +736,11 @@ textarea.form-control {
     border: 3px solid var(--border);
     border-top-color: var(--primary);
     border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 /* ===== CHARTS ===== */
@@ -884,12 +881,20 @@ textarea.form-control {
 
 /* ===== UTILITIES ===== */
 .text-center { text-align: center; }
+.text-right { text-align: right; }
 .text-muted { color: var(--text-muted); }
+.mt-2 { margin-top: 8px; }
 .mt-4 { margin-top: 16px; }
+.mt-6 { margin-top: 24px; }
 .mb-4 { margin-bottom: 16px; }
 .mb-6 { margin-bottom: 24px; }
 .flex { display: flex; }
+.flex-1 { flex: 1; }
 .gap-2 { gap: 8px; }
+.gap-4 { gap: 16px; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.w-full { width: 100%; }
 
 /* ===== DASHBOARD FIXES ===== */
 .chart-grid-2col {
@@ -911,7 +916,13 @@ textarea.form-control {
     background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
     background-size: 200% 100%;
     border-radius: 6px;
+    animation: skeleton-shimmer 1.4s infinite;
     vertical-align: middle;
+}
+
+@keyframes skeleton-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 .stat-card .info .value {
@@ -923,7 +934,293 @@ textarea.form-control {
     z-index: 9999 !important;
 }
 
+/* GPS Page - Mapbox + Firebase */
+#gps-container {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - var(--header-height) - 24px);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
 
+#gps-mapa {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius);
+}
+
+#gps-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 280px;
+    max-height: calc(100% - 20px);
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.gps-panel-header {
+    text-align: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.gps-panel-header h2 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+#gps-buscador {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#gps-buscador:focus {
+    outline: none;
+    border-color: #3b9ddd;
+}
+
+#gps-lista-usuarios h3,
+#gps-geocercas-panel h3 {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.gps-usuario {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.gps-usuario:hover {
+    background: #e9ecef;
+}
+
+.gps-usuario.activo {
+    border-color: #3b9ddd;
+    background: #e7f5ff;
+}
+
+.gps-usuario-header {
+    margin-bottom: 4px;
+}
+
+.gps-usuario small {
+    color: #888;
+    font-size: 11px;
+}
+
+.gps-coordenadas {
+    font-size: 12px;
+    color: #666;
+    margin: 5px 0;
+}
+
+.gps-sin-datos {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-size: 14px;
+}
+
+#gps-geocercas-panel {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+#gps-info-geocerca {
+    background: #f1f3f5;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #495057;
+    min-height: 50px;
+}
+
+#gps-info-geocerca p {
+    margin: 0;
+}
+
+.gps-botones-geocerca {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.gps-botones-geocerca button {
+    padding: 10px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.gps-botones-geocerca button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#gps-btn-crear {
+    background: #e7f5ff;
+    color: #1971c2;
+}
+
+#gps-btn-crear:hover:not(:disabled) {
+    background: #d0ebff;
+}
+
+#gps-btn-guardar {
+    background: #ebfbee;
+    color: #2f9e44;
+}
+
+#gps-btn-guardar:hover:not(:disabled) {
+    background: #d3f9d8;
+}
+
+#gps-btn-editar {
+    background: #fff9db;
+    color: #f08c00;
+}
+
+#gps-btn-editar:hover:not(:disabled) {
+    background: #fff3bf;
+}
+
+#gps-btn-eliminar {
+    background: #fff5f5;
+    color: #e03131;
+}
+
+#gps-btn-eliminar:hover:not(:disabled) {
+    background: #ffc9c9;
+}
+
+/* Marcador personalizado Mapbox */
+.gps-marker-marker {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    cursor: pointer;
+}
+
+/* Notificaciones */
+.gps-notificacion {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    animation: gps-slideUp 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+@keyframes gps-slideUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.gps-notificacion.oculto {
+    display: none;
+}
+
+.gps-notificacion.info {
+    background: #3b9ddd;
+    color: white;
+}
+
+.gps-notificacion.exito {
+    background: #2f9e44;
+    color: white;
+}
+
+.gps-notificacion.error {
+    background: #e03131;
+    color: white;
+}
+
+.mapboxgl-ctrl-group {
+    margin-top: 10px !important;
+}
+
+.mapboxgl-ctrl-group button {
+    width: 30px !important;
+    height: 30px !important;
+}
+
+@media (max-width: 768px) {
+    #gps-panel {
+        width: 220px;
+        font-size: 13px;
+    }
+    .gps-panel-header h2 {
+        font-size: 15px;
+    }
+}
+
+/* Split layout farmacias: tabla + mapa */
+.farmacias-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    min-height: 520px;
+}
+
+.farmacias-split .split-left {
+    min-width: 0;
+}
+
+.farmacias-split .split-right {
+    min-width: 0;
+}
+
+.farmacias-split .split-right .card {
+    display: flex;
+    flex-direction: column;
+}
+
+.farmacias-split .card-body {
+    overflow: visible;
+}
+
+#mapa-farmacias-global {
+    border-radius: 0 0 var(--radius) var(--radius);
+}
+
+@media (max-width: 1200px) {
+    .farmacias-split {
+        grid-template-columns: 1fr;
+    }
+    #mapa-farmacias-global {
+        min-height: 350px;
+    }
+}
 
 /* ===== OPERATIVE REDESIGN ===== */
 .ops-hero {
@@ -1546,10 +1843,6 @@ textarea.form-control {
         grid-template-columns: 1fr;
     }
 
-    .ops-split {
-        grid-template-columns: 1fr;
-    }
-
     .route-map {
         min-height: 360px;
     }
@@ -1578,6 +1871,50 @@ textarea.form-control {
 }
 
 /* ─────────── Pedidos summary boxes ─────────── */
+.pedidos-summary-boxes {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.pedidos-summary-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 12px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.pedidos-summary-box .summary-count {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.pedidos-summary-box .summary-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.pedidos-summary-box .summary-empty {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    opacity: 0.7;
+}
+
+.summary-pendiente .summary-count { color: #f59e0b; }
+.summary-preparacion .summary-count { color: #3b82f6; }
+.summary-en_ruta .summary-count { color: #8b5cf6; }
+.summary-parcial .summary-count { color: #f97316; }
+.summary-entregado .summary-count { color: #10b981; }
+
+/* ─────────── Pedidos view toggle ─────────── */
 .pedidos-view-toggle {
     display: flex;
     background: var(--card-bg);
@@ -1633,271 +1970,8 @@ textarea.form-control {
     background: #eff6ff !important;
 }
 
-/* ─────────── Historial Module ─────────── */
-
-.historial-tabs {
-    display: flex;
-    gap: 0;
-    margin-bottom: 16px;
-    background: var(--card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    overflow: hidden;
-}
-
-.historial-tab {
-    flex: 1;
-    padding: 10px 16px;
-    border: none;
-    background: transparent;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all .2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.historial-tab:hover {
-    background: var(--bg);
-    color: var(--text);
-}
-
-.historial-tab.active {
-    background: var(--primary);
-    color: #fff;
-}
-
-.historial-tab i {
-    font-size: 14px;
-}
-
-/* Drawer lateral */
-.historial-drawer {
-    position: fixed;
-    top: 0;
-    right: -480px;
-    width: 480px;
-    max-width: 100vw;
-    height: 100vh;
-    background: var(--card);
-    box-shadow: -4px 0 24px rgba(0,0,0,0.12);
-    z-index: 1001;
-    transition: right .3s ease;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.historial-drawer.open {
-    right: 0;
-}
-
-.historial-drawer.wide {
-    width: 90vw;
-    max-width: 1200px;
-}
-
-.historial-drawer.wide .historial-drawer-body {
-    display: flex;
-    gap: 20px;
-}
-
-.historial-drawer-pedido-info {
-    flex: 1;
-    min-width: 0;
-    overflow-y: auto;
-}
-
-.historial-drawer-map-col {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.historial-drawer-map-col #historial-pedido-mapa {
-    height: 400px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    flex-shrink: 0;
-}
-
-.historial-drawer-map-col .historial-pedido-stops {
-    max-height: 300px;
-    overflow-y: auto;
-    font-size: 13px;
-}
-
-@media (max-width: 900px) {
-    .historial-drawer.wide {
-        width: 100vw;
-    }
-    .historial-drawer.wide .historial-drawer-body {
-        flex-direction: column;
-    }
-    .historial-drawer-map-col #historial-pedido-mapa {
-        height: 250px;
-    }
-}
-
-.historial-drawer-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-}
-
-.historial-drawer-header h3 {
-    margin: 0;
-    font-size: 16px;
-}
-
-.historial-drawer-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px 20px;
-}
-
-.historial-drawer-body .info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 16px;
-    margin-bottom: 16px;
-}
-
-.historial-drawer-body .info-grid > div {
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.historial-section {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-}
-
-.historial-section h4 {
-    margin: 0 0 8px;
-    font-size: 14px;
-    color: var(--text);
-}
-
-.drawer-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-    z-index: 1000;
-}
-
-.drawer-overlay.active {
-    display: block;
-}
-
-/* Clickable table rows */
-.clickable-row {
-    cursor: pointer;
-    transition: background .15s;
-}
-
-.clickable-row:hover {
-    background: #f1f5f9;
-}
-
-/* Historial Rutas layout */
-.historial-rutas-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    align-items: start;
-}
-
 @media (max-width: 1100px) {
-    .historial-rutas-layout {
-        grid-template-columns: 1fr;
+    .pedidos-summary-boxes {
+        grid-template-columns: repeat(3, 1fr);
     }
-}
-
-
-
-/* ===== HISTORIAL TIMELINE ===== */
-.timeline {
-    position: relative;
-    padding-left: 24px;
-}
-
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: 8px;
-    top: 4px;
-    bottom: 4px;
-    width: 2px;
-    background: var(--border);
-    border-radius: 1px;
-}
-
-.timeline-item {
-    position: relative;
-    padding: 6px 0 6px 16px;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-}
-
-.timeline-marker {
-    position: absolute;
-    left: -18px;
-    top: 10px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    border: 2px solid;
-    background: var(--card-bg);
-    z-index: 1;
-}
-
-.timeline-marker.success { border-color: #10b981; }
-.timeline-marker.info { border-color: #3b82f6; }
-.timeline-marker.warning { border-color: #f59e0b; }
-.timeline-marker.danger { border-color: #ef4444; }
-
-.timeline-content {
-    flex: 1;
-}
-
-.timeline-content strong {
-    display: block;
-    font-size: 13px;
-    color: var(--text);
-}
-
-.timeline-content span {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-/* ─────────── Farmacias split layout ─────────── */
-.ops-split {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
-}
-
-.ops-split-left {
-    min-width: 0;
-}
-
-.ops-split-right {
-    min-width: 0;
-    position: sticky;
-    top: 20px;
 }

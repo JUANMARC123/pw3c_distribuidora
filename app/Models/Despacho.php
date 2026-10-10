@@ -18,12 +18,14 @@ class Despacho extends Model
         'fecha_hora_despacho',
         'estado_despacho',
         'monto_recibido',
+        'metodo_pago',
     ];
 
     protected $casts = [
         'fecha_hora_despacho' => 'datetime',
         'estado_despacho' => 'string',
         'monto_recibido' => 'decimal:2',
+        'metodo_pago' => 'string',
     ];
 
     public function pedido()
@@ -39,10 +41,5 @@ class Despacho extends Model
     public function evidencias()
     {
         return $this->hasMany(EvidenciaEntrega::class, 'id_despacho');
-    }
-
-    public function incidencias()
-    {
-        return $this->hasMany(Incidencia::class, 'id_despacho');
     }
 }

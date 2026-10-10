@@ -24,6 +24,9 @@ class DetallePedido extends Model
     ];
 
     protected $casts = [
+        'cantidad_solicitada' => 'integer',
+        'cantidad_entregada' => 'integer',
+        'cantidad_rechazada' => 'integer',
         'precio_unitario' => 'decimal:2',
         'subtotal' => 'decimal:2',
     ];

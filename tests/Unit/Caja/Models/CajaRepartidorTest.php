@@ -17,15 +17,14 @@ it('table name', function () {
 
     it('fillable', function () {
         $fillable = (new CajaRepartidor())->getFillable();
-        $this->assertContains('id_hoja_ruta', $fillable);
         $this->assertContains('id_repartidor', $fillable);
         $this->assertContains('monto_inicial', $fillable);
         $this->assertContains('estado_caja', $fillable);
     });
 
-    it('belongs to hoja ruta', function () {
-        $relation = (new CajaRepartidor())->hojaRuta();
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relation);
+    it('has many hojas ruta', function () {
+        $relation = (new CajaRepartidor())->hojasRuta();
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $relation);
     });
 
     it('belongs to repartidor', function () {

@@ -7,9 +7,7 @@ use App\Models\Pedido;
 use App\Models\Despacho;
 use App\Models\Repartidor;
 use App\Models\Vehiculo;
-use App\Models\Incidencia;
 use App\Models\Farmacia;
-use App\Models\Producto;
 use App\Models\HojaRuta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,14 +19,13 @@ class ReporteController extends ApiController
         return $this->jsonResponse([
             'total_pedidos' => Pedido::count(),
             'pedidos_pendientes' => Pedido::where('estado', 'pendiente')->count(),
-            'pedidos_aprobados' => Pedido::where('estado', 'aprobado')->count(),
+
             'pedidos_entregados' => Pedido::where('estado', 'entregado')->count(),
             'pedidos_cancelados' => Pedido::where('estado', 'cancelado')->count(),
             'total_despachos' => Despacho::count(),
             'despachos_pendientes' => Despacho::where('estado_despacho', 'pendiente')->count(),
             'despachos_entregados' => Despacho::where('estado_despacho', 'entregado')->count(),
             'total_farmacias' => Farmacia::count(),
-            'total_productos' => Producto::count(),
             'total_repartidores' => Repartidor::count(),
             'repartidores_activos' => Repartidor::where('estado', 'activo')->count(),
             'repartidores_en_ruta' => Repartidor::where('estado', 'en_ruta')->count(),
@@ -89,12 +86,4 @@ class ReporteController extends ApiController
         return $this->jsonResponse($data);
     }
 
-    public function incidenciasPorTipo()
-    {
-        $data = Incidencia::select('tipo_incidencia as tipo', DB::raw('count(*) as total'))
-            ->groupBy('tipo_incidencia')
-            ->get();
-
-        return $this->jsonResponse($data);
-    }
 }

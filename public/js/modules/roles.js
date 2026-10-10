@@ -1,4 +1,4 @@
-let rolesTable, editingId = null, allPermisos = [];
+let rolesTable, editingId = null, allPermisos = [], groupedPermisos = {};
 
 document.addEventListener('DOMContentLoaded', async function () {
     if (!checkAuth()) return;

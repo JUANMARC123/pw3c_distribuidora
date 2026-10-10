@@ -30,7 +30,7 @@ class FirebaseSyncService
                     'direccion' => $pedido->farmacia->direccion,
                     'latitud' => (float) $pedido->farmacia->latitud,
                     'longitud' => (float) $pedido->farmacia->longitud,
-                    'radio_geocerca' => (float) ($pedido->farmacia->geocerca ?? 50),
+                    'radio_geocerca' => (float) ($pedido->farmacia->geocerca ?? 20),
                     'estado' => 'pendiente',
                 ];
             })->sortBy('orden_visita')->values()->toArray();

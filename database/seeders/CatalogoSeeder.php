@@ -15,13 +15,12 @@ class CatalogoSeeder extends Seeder
             'Usuarios' => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'asignar-roles'],
             'Roles' => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'asignar-permisos'],
             'Farmacias' => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'gestionar-contactos'],
-            'Productos' => ['acceder', 'listar', 'crear', 'editar', 'eliminar'],
             'Pedidos' => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado'],
             'Repartidores' => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado'],
             'Vehículos' => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado'],
             'Rutas' => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'gestionar-paradas'],
             'Control Rutas' => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'registrar-llegada'],
-            'Despachos' => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado', 'gestionar-incidencias', 'gestionar-evidencias'],
+            'Despachos' => ['acceder', 'listar', 'crear', 'editar', 'eliminar', 'cambiar-estado', 'gestionar-evidencias'],
             'Reportes' => ['acceder', 'listar'],
             'Caja Diaria' => ['acceder', 'listar', 'crear', 'editar', 'cerrar'],
             'Documentos' => ['acceder'],
@@ -40,7 +39,6 @@ class CatalogoSeeder extends Seeder
         $supervisor->givePermissionTo(Permission::whereIn('name', [
             'Dashboard-acceder',
             'Farmacias-acceder', 'Farmacias-listar', 'Farmacias-crear', 'Farmacias-editar',
-            'Productos-acceder', 'Productos-listar', 'Productos-crear', 'Productos-editar',
             'Pedidos-acceder', 'Pedidos-listar', 'Pedidos-crear', 'Pedidos-editar', 'Pedidos-cambiar-estado',
             'Repartidores-acceder', 'Repartidores-listar',
             'Vehículos-acceder', 'Vehículos-listar',
@@ -55,7 +53,6 @@ class CatalogoSeeder extends Seeder
         $operador->givePermissionTo(Permission::whereIn('name', [
             'Dashboard-acceder',
             'Farmacias-acceder', 'Farmacias-listar',
-            'Productos-acceder', 'Productos-listar',
             'Pedidos-acceder', 'Pedidos-listar', 'Pedidos-crear', 'Pedidos-cambiar-estado',
             'Repartidores-acceder', 'Repartidores-listar',
             'Vehículos-acceder', 'Vehículos-listar',
@@ -68,7 +65,7 @@ class CatalogoSeeder extends Seeder
         $repartidorRole = Role::findOrCreate('Repartidor', 'web');
         $repartidorRole->givePermissionTo(Permission::whereIn('name', [
             'Dashboard-acceder',
-            'Despachos-acceder', 'Despachos-listar', 'Despachos-cambiar-estado', 'Despachos-gestionar-incidencias', 'Despachos-gestionar-evidencias',
+            'Despachos-acceder', 'Despachos-listar', 'Despachos-cambiar-estado', 'Despachos-gestionar-evidencias',
             'Control Rutas-acceder', 'Control Rutas-listar', 'Control Rutas-registrar-llegada',
         ])->get());
     }
