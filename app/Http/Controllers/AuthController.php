@@ -30,6 +30,9 @@ class AuthController extends ApiController
 
         $repartidor = Repartidor::where('id_usuario', $user->id_usuario)->first();
 
+        $user->load('roles');
+        $permisos = $user->getAllPermissions()->pluck('name');
+
         return $this->jsonResponse([
             'token' => $token,
             'usuario' => [
@@ -42,6 +45,7 @@ class AuthController extends ApiController
                 'firebase_uid' => $repartidor->firebase_uid,
                 'estado' => $repartidor->estado,
             ] : null,
+            'permisos' => $permisos,
         ], 'Inicio de sesión exitoso.');
     }
 
