@@ -551,31 +551,7 @@ function filterRutasTable() {
 async function showRutaMapa(idx) {
     const items = buildRutasList();
     const item = items[idx];
-    
-    // Validate item and its data
-    if (!item) {
-        console.error('[historial] showRutaMapa: item not found for index', idx);
-        return;
-    }
-    
-    if (item._tipo !== 'control') {
-        console.warn('[historial] showRutaMapa: item is not a control type', item._tipo);
-        const paradasContainer = document.getElementById('historial-ruta-paradas');
-        if (paradasContainer) {
-            paradasContainer.innerHTML = '<p class="text-muted">Solo las rutas de control tienen mapa de paradas.</p>';
-        }
-        return;
-    }
-    
-    const controlId = item._data?.id_control_ruta;
-    if (!controlId) {
-        console.error('[historial] showRutaMapa: controlId not found in item._data', item._data);
-        const paradasContainer = document.getElementById('historial-ruta-paradas');
-        if (paradasContainer) {
-            paradasContainer.innerHTML = '<p class="text-muted">Error: ID de control de ruta no encontrado.</p>';
-        }
-        return;
-    }
+    if (!item) return;
 
     const panel = document.getElementById('historial-ruta-mapa-panel');
     const label = document.getElementById('historial-ruta-selected');
@@ -584,7 +560,11 @@ async function showRutaMapa(idx) {
 
     const paradasContainer = document.getElementById('historial-ruta-paradas');
     if (paradasContainer) {
-        paradasContainer.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando paradas...</div>';
+        if (item._tipo === 'control') {
+            paradasContainer.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando paradas...</div>';
+        } else {
+            paradasContainer.innerHTML = '<p class="text-muted">Sin datos de ruta para este despacho.</p>';
+        }
     }
 
     const mapContainer = document.getElementById('historial-ruta-mapa');
@@ -604,7 +584,9 @@ async function showRutaMapa(idx) {
 
     setTimeout(() => historialMapa.invalidateSize(), 200);
 
-    await loadRutaParadasMapa(controlId);
+    if (item._tipo === 'control') {
+        await loadRutaParadasMapa(item._data.id_control_ruta);
+    }
 }
 
 async function loadRutaParadasMapa(controlId) {
