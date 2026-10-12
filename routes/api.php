@@ -15,6 +15,8 @@ use App\Http\Controllers\Despacho\DespachoController;
 use App\Http\Controllers\Despacho\EvidenciaController;
 use App\Http\Controllers\Caja\CajaController;
 use App\Http\Controllers\Reportes\ReporteController;
+use App\Http\Controllers\CatalogoController;
+use App\Http\Controllers\ProductoController;
 
 // ─── Rutas públicas ─────────────────────────────────────────────────
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -173,6 +175,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('permission:Control Rutas-registrar-llegada');
     Route::post('/hojas-ruta/{id}/entrega-completada', [HojaRutaController::class, 'marcarEntregaCompletada'])
         ->middleware('permission:Despachos-cambiar-estado');
+    Route::get('/catalogos/estados-pedido', [CatalogoController::class, 'estadosPedido']);
+    Route::get('/productos', [ProductoController::class, 'index']);
     Route::post('/hojas-ruta/{id}/entrega-fallida', [HojaRutaController::class, 'marcarEntregaFallida'])
         ->middleware('permission:Despachos-cambiar-estado');
     Route::post('/hojas-ruta/{id}/regreso-almacen', [HojaRutaController::class, 'regresoAlmacen'])
@@ -268,3 +272,6 @@ Route::prefix('mobile')->name('mobile.')->middleware('json.forcing')->group(func
     Route::post('caja/{firebaseUid}/gasto', [\App\Http\Controllers\Mobile\CajaController::class, 'registrarGasto']);
     Route::post('caja/{firebaseUid}/cerrar', [\App\Http\Controllers\Mobile\CajaController::class, 'cerrar']);
 });
+        R o u t e : : g e t ( " / c a t a l o g o s / e s t a d o s - p e d i d o " ,   [ C a t a l o g o C o n t r o l l e r : : c l a s s ,   " e s t a d o s P e d i d o " ] ) ;  
+         R o u t e : : g e t ( " / p r o d u c t o s " ,   [ P r o d u c t o C o n t r o l l e r : : c l a s s ,   " i n d e x " ] ) ;  
+ 
