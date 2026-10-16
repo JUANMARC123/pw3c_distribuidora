@@ -47,6 +47,11 @@ class RepartidorController extends ApiController
             'ci' => 'required|string|max:20|unique:repartidores,ci',
             'categoria_licencia' => 'required|in:A,B,C',
             'firebase_uid' => 'nullable|string|max:255|unique:repartidores,firebase_uid',
+        ], [
+            'id_usuario.unique' => 'Ese usuario ya tiene un repartidor asignado.',
+            'id_usuario.exists' => 'El usuario seleccionado no existe.',
+            'ci.unique' => 'Ese CI ya está registrado en otro repartidor.',
+            'firebase_uid.unique' => 'Ese usuario de Firebase ya está vinculado a otro repartidor.',
         ]);
 
         $validated['estado'] = 'activo';
@@ -90,6 +95,9 @@ class RepartidorController extends ApiController
             'categoria_licencia' => 'sometimes|in:A,B,C',
             'estado' => 'sometimes|in:activo,inactivo,en_ruta',
             'firebase_uid' => "nullable|string|max:255|unique:repartidores,firebase_uid,{$id},id_repartidor",
+        ], [
+            'ci.unique' => 'Ese CI ya está registrado en otro repartidor.',
+            'firebase_uid.unique' => 'Ese usuario de Firebase ya está vinculado a otro repartidor.',
         ]);
 
         DB::beginTransaction();

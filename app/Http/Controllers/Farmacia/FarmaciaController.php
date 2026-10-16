@@ -10,7 +10,7 @@ class FarmaciaController extends ApiController
 {
     public function index(Request $request)
     {
-        $query = Farmacia::withCount('contactos');
+        $query = Farmacia::with('contactos')->withCount('contactos');
 
         if ($search = $request->search) {
             $query->where(function ($q) use ($search) {
@@ -27,8 +27,8 @@ class FarmaciaController extends ApiController
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
             'direccion' => 'required|string',
-            'latitud' => 'required|numeric',
-            'longitud' => 'required|numeric',
+            'latitud' => 'nullable|numeric',
+            'longitud' => 'nullable|numeric',
             'geocerca' => 'nullable|numeric|min:0',
         ]);
 

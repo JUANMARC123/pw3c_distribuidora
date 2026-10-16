@@ -26,7 +26,20 @@ class UsuarioController extends ApiController
             $query->where('estado', $request->estado);
         }
 
-        return $this->safePaginate($query->orderBy('id_usuario', 'desc'), $request);
+        $query->orderBy('id_usuario', 'desc');
+
+        $perPage = $request->per_page ?? 15;
+
+        if ($perPage == -1 || $perPage === '-1') {
+            $usuarios = $query->get()->map(fn ($u) => $this->formatearUsuario($u));
+
+            return $this->jsonResponse($usuarios);
+        }
+
+        $paginator = $query->paginate((int) $perPage);
+        $paginator->through(fn ($u) => $this->formatearUsuario($u));
+
+        return $this->paginatedResponse($paginator);
     }
 
     public function store(Request $request)
@@ -38,7 +51,12 @@ class UsuarioController extends ApiController
             'password' => 'required|string|min:6',
             'telefono' => 'nullable|string|max:20',
             'estado' => 'sometimes|in:activo,bloqueado',
+            'roles' => 'sometimes|array',
+            'roles.*' => 'integer|exists:roles,id',
         ]);
+
+        $roles = $validated['roles'] ?? null;
+        unset($validated['roles']);
 
         $validated['password_hash'] = Hash::make($validated['password']);
         unset($validated['password']);
@@ -46,21 +64,21 @@ class UsuarioController extends ApiController
 
         $usuario = Usuario::create($validated);
 
-        if ($request->filled('roles')) {
-            $usuario->syncRoles($request->roles);
+        if (!empty($roles)) {
+            $usuario->syncRoles($roles);
         } else {
             $usuario->assignRole('Operador');
         }
 
         $usuario->load('roles');
 
-        return $this->jsonResponse($usuario, 'Usuario creado exitosamente.', 201);
+        return $this->jsonResponse($this->formatearUsuario($usuario), 'Usuario creado exitosamente.', 201);
     }
 
     public function show($id)
     {
         $usuario = Usuario::with('roles', 'repartidor')->findOrFail($id);
-        return $this->jsonResponse($usuario);
+        return $this->jsonResponse($this->formatearUsuario($usuario));
     }
 
     public function update(Request $request, $id)
@@ -73,6 +91,8 @@ class UsuarioController extends ApiController
             'email' => "sometimes|email|max:180|unique:usuarios,email,{$id},id_usuario",
             'telefono' => 'nullable|string|max:20',
             'estado' => 'sometimes|in:activo,bloqueado',
+            'roles' => 'sometimes|array',
+            'roles.*' => 'integer|exists:roles,id',
         ];
 
         if ($request->filled('password')) {
@@ -81,6 +101,9 @@ class UsuarioController extends ApiController
 
         $validated = $request->validate($rules);
 
+        $roles = $validated['roles'] ?? null;
+        unset($validated['roles']);
+
         if ($request->filled('password')) {
             $validated['password_hash'] = Hash::make($validated['password']);
             unset($validated['password']);
@@ -88,13 +111,13 @@ class UsuarioController extends ApiController
 
         $usuario->update($validated);
 
-        if ($request->filled('roles')) {
-            $usuario->syncRoles($request->roles);
+        if ($roles !== null) {
+            $usuario->syncRoles($roles);
         }
 
         $usuario->load('roles');
 
-        return $this->jsonResponse($usuario, 'Usuario actualizado exitosamente.');
+        return $this->jsonResponse($this->formatearUsuario($usuario), 'Usuario actualizado exitosamente.');
     }
 
     public function destroy($id)
@@ -113,5 +136,20 @@ class UsuarioController extends ApiController
         $usuario = Usuario::findOrFail($id);
         $usuario->update(['estado' => 'bloqueado']);
         return $this->jsonResponse($usuario, 'Usuario bloqueado exitosamente.');
+    }
+
+    /**
+     * Serializa un usuario normalizando sus roles de Spatie a la forma que
+     * consume el front-end ({ id_rol, nombre }) en lugar de { id, name }.
+     */
+    private function formatearUsuario(Usuario $usuario): array
+    {
+        $data = $usuario->toArray();
+        $data['roles'] = $usuario->roles
+            ->map(fn ($rol) => ['id_rol' => $rol->id, 'nombre' => $rol->name])
+            ->values()
+            ->all();
+
+        return $data;
     }
 }

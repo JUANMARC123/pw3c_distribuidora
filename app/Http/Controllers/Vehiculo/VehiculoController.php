@@ -33,6 +33,7 @@ class VehiculoController extends ApiController
             'placa' => 'required|string|max:20|unique:vehiculos,placa',
             'marca' => 'required|string|max:100',
             'modelo' => 'required|string|max:100',
+            'capacidad_kg' => 'nullable|integer|min:0',
             'estado' => 'sometimes|in:disponible,taller,en_ruta',
         ]);
 
@@ -57,6 +58,7 @@ class VehiculoController extends ApiController
             'placa' => "sometimes|string|max:20|unique:vehiculos,placa,{$id},id_vehiculo",
             'marca' => 'sometimes|string|max:100',
             'modelo' => 'sometimes|string|max:100',
+            'capacidad_kg' => 'nullable|integer|min:0',
             'estado' => 'sometimes|in:disponible,taller,en_ruta',
         ]);
 

@@ -56,7 +56,6 @@ class DemoDataSeeder extends Seeder
             'ci' => '12345678',
             'categoria_licencia' => 'B',
             'estado' => 'activo',
-            'firebase_uid' => 'repartidor-demo-001',
         ]);
     }
 }

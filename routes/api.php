@@ -7,6 +7,7 @@ use App\Http\Controllers\Seguridad\RolesController;
 use App\Http\Controllers\Farmacia\FarmaciaController;
 use App\Http\Controllers\Farmacia\ContactoFarmaciaController;
 use App\Http\Controllers\Pedido\PedidoController;
+use App\Http\Controllers\Pedido\DetallePedidoController;
 use App\Http\Controllers\Repartidor\RepartidorController;
 use App\Http\Controllers\Repartidor\RepartidorVehiculoController;
 use App\Http\Controllers\Vehiculo\VehiculoController;
@@ -15,8 +16,8 @@ use App\Http\Controllers\Despacho\DespachoController;
 use App\Http\Controllers\Despacho\EvidenciaController;
 use App\Http\Controllers\Caja\CajaController;
 use App\Http\Controllers\Reportes\ReporteController;
-use App\Http\Controllers\CatalogoController;
-use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\Catalogo\CatalogoController;
+use App\Http\Controllers\Producto\ProductoController;
 
 // ─── Rutas públicas ─────────────────────────────────────────────────
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -62,6 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('permission:Roles-asignar-permisos');
     Route::post('/roles/{id}/permisos', [RolesController::class, 'asignarPermisos'])
         ->middleware('permission:Roles-asignar-permisos');
+    // Catálogo completo (sin rol). Necesario para asignar permisos al crear un rol.
+    Route::get('/permisos', [RolesController::class, 'permisosCatalogo'])
+        ->middleware('permission:Roles-crear|Roles-asignar-permisos');
 
     // ═══════════════════════════════════════════════════════════════
     // FARMACIAS
@@ -111,6 +115,52 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('permission:Pedidos-editar');
     Route::delete('/pedidos/{pedido}', [PedidoController::class, 'destroy'])
         ->middleware('permission:Pedidos-eliminar');
+
+    // Lineas de detalle del pedido (usadas por saveDetalle al guardar)
+    Route::get('/pedidos/{pedido}/detalles', [DetallePedidoController::class, 'index'])
+        ->middleware('permission:Pedidos-listar');
+    Route::post('/pedidos/{pedido}/detalles', [DetallePedidoController::class, 'store'])
+        ->middleware('permission:Pedidos-crear');
+    Route::put('/pedidos/{pedido}/detalles/{detalle}', [DetallePedidoController::class, 'update'])
+        ->middleware('permission:Pedidos-editar');
+    Route::delete('/pedidos/{pedido}/detalles/{detalle}', [DetallePedidoController::class, 'destroy'])
+        ->middleware('permission:Pedidos-editar');
+
+    // ═══════════════════════════════════════════════════════════════
+    // CATALOGOS
+    // ═══════════════════════════════════════════════════════════════
+    // Derivados del esquema actual (ya no existen tablas estados_*). Los consume
+    // sobre todo el módulo de pedidos, así que Pedidos-listar también autoriza.
+    Route::get('/catalogos/estados-pedido', [CatalogoController::class, 'estadosPedido'])
+        ->middleware('permission:Productos-listar|Pedidos-listar');
+    Route::get('/catalogos/estados-repartidor', [CatalogoController::class, 'estadosRepartidor'])
+        ->middleware('permission:Repartidores-listar');
+    Route::get('/catalogos/licencias', [CatalogoController::class, 'licencias'])
+        ->middleware('permission:Repartidores-listar');
+    Route::get('/catalogos/estados-vehiculo', [CatalogoController::class, 'estadosVehiculo'])
+        ->middleware('permission:Vehículos-listar');
+    Route::get('/catalogos/estados-usuario', [CatalogoController::class, 'estadosUsuario'])
+        ->middleware('permission:Usuarios-listar');
+    Route::get('/catalogos/marcas', [CatalogoController::class, 'marcas'])
+        ->middleware('permission:Vehículos-listar');
+    Route::get('/catalogos/modelos', [CatalogoController::class, 'modelos'])
+        ->middleware('permission:Vehículos-listar');
+    Route::get('/catalogos/cargos', [CatalogoController::class, 'cargos'])
+        ->middleware('permission:Farmacias-listar');
+
+    // ═══════════════════════════════════════════════════════════════
+    // PRODUCTOS
+    // ═══════════════════════════════════════════════════════════════
+    Route::get('/productos', [ProductoController::class, 'index'])
+        ->middleware('permission:Productos-listar|Pedidos-listar');
+    Route::post('/productos', [ProductoController::class, 'store'])
+        ->middleware('permission:Productos-crear');
+    Route::get('/productos/{producto}', [ProductoController::class, 'show'])
+        ->middleware('permission:Productos-listar|Pedidos-listar');
+    Route::put('/productos/{producto}', [ProductoController::class, 'update'])
+        ->middleware('permission:Productos-editar');
+    Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])
+        ->middleware('permission:Productos-eliminar');
 
     // ═══════════════════════════════════════════════════════════════
     // REPARTIDORES
@@ -175,8 +225,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('permission:Control Rutas-registrar-llegada');
     Route::post('/hojas-ruta/{id}/entrega-completada', [HojaRutaController::class, 'marcarEntregaCompletada'])
         ->middleware('permission:Despachos-cambiar-estado');
-    Route::get('/catalogos/estados-pedido', [CatalogoController::class, 'estadosPedido']);
-    Route::get('/productos', [ProductoController::class, 'index']);
     Route::post('/hojas-ruta/{id}/entrega-fallida', [HojaRutaController::class, 'marcarEntregaFallida'])
         ->middleware('permission:Despachos-cambiar-estado');
     Route::post('/hojas-ruta/{id}/regreso-almacen', [HojaRutaController::class, 'regresoAlmacen'])
@@ -272,6 +320,3 @@ Route::prefix('mobile')->name('mobile.')->middleware('json.forcing')->group(func
     Route::post('caja/{firebaseUid}/gasto', [\App\Http\Controllers\Mobile\CajaController::class, 'registrarGasto']);
     Route::post('caja/{firebaseUid}/cerrar', [\App\Http\Controllers\Mobile\CajaController::class, 'cerrar']);
 });
-        R o u t e : : g e t ( " / c a t a l o g o s / e s t a d o s - p e d i d o " ,   [ C a t a l o g o C o n t r o l l e r : : c l a s s ,   " e s t a d o s P e d i d o " ] ) ;  
-         R o u t e : : g e t ( " / p r o d u c t o s " ,   [ P r o d u c t o C o n t r o l l e r : : c l a s s ,   " i n d e x " ] ) ;  
- 

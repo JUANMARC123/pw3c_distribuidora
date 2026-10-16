@@ -16,10 +16,12 @@ class Producto extends Model
         'nombre',
         'precio_unitario',
         'unidad_medida',
+        'estado',
     ];
 
     protected $casts = [
         'precio_unitario' => 'decimal:2',
+        'estado' => 'boolean',
     ];
 
     public function detalles()

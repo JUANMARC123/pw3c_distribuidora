@@ -27,13 +27,20 @@ class RolesController extends ApiController
     {
         $validated = $request->validate([
             'nombre' => 'required|string|max:255|unique:roles,name',
+            'permisos' => 'sometimes|array',
+            'permisos.*' => 'integer|exists:permissions,id',
         ]);
 
         $role = Role::create(['name' => $validated['nombre'], 'guard_name' => 'web']);
 
+        if (!empty($validated['permisos'])) {
+            $role->syncPermissions($validated['permisos']);
+        }
+
         return $this->jsonResponse([
             'id_rol' => $role->id,
             'nombre' => $role->name,
+            'permisos_count' => $role->permissions()->count(),
         ], 'Rol creado exitosamente.', 201);
     }
 
@@ -84,21 +91,37 @@ class RolesController extends ApiController
     public function permisos($id)
     {
         $role = Role::findOrFail($id);
-        $assignedIds = $role->permissions->pluck('id');
 
-        $allPermissions = Permission::orderBy('name')->get()->map(function ($perm) {
+        return $this->jsonResponse([
+            'asignados' => $role->permissions->pluck('id'),
+            'permisos' => $this->catalogoPermisos(),
+        ]);
+    }
+
+    /**
+     * Catálogo completo de permisos, independiente de un rol.
+     * Se usa para poder asignar permisos al crear un rol nuevo.
+     */
+    public function permisosCatalogo()
+    {
+        return $this->jsonResponse([
+            'asignados' => [],
+            'permisos' => $this->catalogoPermisos(),
+        ]);
+    }
+
+    /** Permisos agrupables por módulo, en la forma que consume el front-end. */
+    private function catalogoPermisos()
+    {
+        return Permission::orderBy('name')->get()->map(function ($perm) {
             $parts = explode('-', $perm->name, 2);
+
             return [
                 'id_permiso' => $perm->id,
                 'modulo' => ['nombre' => $parts[0] ?? 'General'],
                 'accion' => ['nombre' => $parts[1] ?? $perm->name],
             ];
         });
-
-        return $this->jsonResponse([
-            'asignados' => $assignedIds,
-            'permisos' => $allPermissions,
-        ]);
     }
 
     public function asignarPermisos(Request $request, $id)

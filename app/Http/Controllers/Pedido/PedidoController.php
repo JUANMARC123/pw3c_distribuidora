@@ -63,6 +63,7 @@ class PedidoController extends ApiController
         $pedido = Pedido::with([
             'farmacia',
             'usuario',
+            'detalles.producto',
             'despacho.hojaRutaDetalle.hojaRuta',
         ])->findOrFail($id);
 
@@ -76,12 +77,26 @@ class PedidoController extends ApiController
         $validated = $request->validate([
             'id_farmacia' => 'sometimes|integer|exists:farmacias,id_farmacia',
             'observaciones' => 'nullable|string',
-            'estado' => 'sometimes|in:pendiente,en_ruta,entregado,cancelado',
+            'estado' => 'sometimes|nullable',
+            'id_estado_pedido' => 'sometimes|nullable|integer',
             'subtotal' => 'nullable|numeric|min:0',
             'descuento' => 'nullable|numeric|min:0',
             'total' => 'nullable|numeric|min:0',
             'archivo_pedido' => 'nullable|string',
         ]);
+
+        // El front envía id_estado_pedido; el ENUM de la BD espera la clave de texto.
+        if ($request->has('estado') || $request->has('id_estado_pedido')) {
+            $estado = Pedido::resolverEstado($request->input('estado'), $request->input('id_estado_pedido'));
+
+            if ($estado === null) {
+                return $this->errorResponse('Estado inválido.', 422);
+            }
+
+            $validated['estado'] = $estado;
+        }
+
+        unset($validated['id_estado_pedido']);
 
         $pedido->update($validated);
 
@@ -104,12 +119,22 @@ class PedidoController extends ApiController
         $pedido = Pedido::findOrFail($id);
 
         $validated = $request->validate([
-            'estado' => 'required|in:pendiente,en_ruta,entregado,cancelado',
+            'estado'           => 'required_without:id_estado_pedido|nullable',
+            'id_estado_pedido' => 'required_without:estado|nullable|integer',
         ]);
 
-        $pedido->update(['estado' => $validated['estado']]);
+        $estado = Pedido::resolverEstado(
+            $request->input('estado'),
+            $request->input('id_estado_pedido')
+        );
 
-        return $this->jsonResponse($pedido, 'Estado del pedido actualizado.');
+        if ($estado === null) {
+            return $this->errorResponse('Estado inválido. Usa una clave de pedidos.estado o un id_estado_pedido del catálogo.', 422);
+        }
+
+        $pedido->update(['estado' => $estado]);
+
+        return $this->jsonResponse($pedido->load('farmacia', 'usuario'), 'Estado del pedido actualizado.');
     }
 
     public function subirArchivo(Request $request, $id)

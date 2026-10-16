@@ -3,6 +3,7 @@
 /public/hot
 /public/storage
 /storage/*.key
+/storage/app/firebase/*.json
 /storage/framework/sessions/
 /storage/framework/cache/
 /storage/framework/views/

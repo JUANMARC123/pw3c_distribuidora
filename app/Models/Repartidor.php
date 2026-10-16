@@ -9,6 +9,23 @@ class Repartidor extends Model
 {
     use HasFactory;
 
+    /**
+     * Único origen de verdad del estado y la licencia.
+     * Ver migración 2026_07_10_150004_create_repartidores_table.php
+     * Añadir valores nuevos AL FINAL para no renumerar los ids derivados.
+     */
+    public const ESTADOS = [
+        'activo'   => 'Activo',
+        'inactivo' => 'Inactivo',
+        'en_ruta'  => 'En ruta',
+    ];
+
+    public const LICENCIAS = [
+        'A' => 'Categoría A',
+        'B' => 'Categoría B',
+        'C' => 'Categoría C',
+    ];
+
     protected $table = 'repartidores';
     protected $primaryKey = 'id_repartidor';
 
@@ -50,5 +67,36 @@ class Repartidor extends Model
     public function cajas()
     {
         return $this->hasMany(CajaRepartidor::class, 'id_repartidor');
+    }
+
+    /** Catálogo de estados en la forma que consume el front-end. */
+    public static function estadosCatalogo(): array
+    {
+        $catalogo = [];
+        foreach (array_keys(self::ESTADOS) as $i => $clave) {
+            $catalogo[] = [
+                'id_estado_repartidor' => $i + 1,
+                'clave'                => $clave,
+                'nombre_estado'        => self::ESTADOS[$clave],
+            ];
+        }
+
+        return $catalogo;
+    }
+
+    /** Catálogo de licencias en la forma que consume el front-end. */
+    public static function licenciasCatalogo(): array
+    {
+        $catalogo = [];
+        foreach (array_keys(self::LICENCIAS) as $i => $clave) {
+            $catalogo[] = [
+                'id_licencia' => $i + 1,
+                'clave'       => $clave,
+                'categoria'   => $clave,
+                'nombre'      => self::LICENCIAS[$clave],
+            ];
+        }
+
+        return $catalogo;
     }
 }

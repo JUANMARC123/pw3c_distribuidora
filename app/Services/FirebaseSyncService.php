@@ -11,9 +11,26 @@ class FirebaseSyncService
 {
     protected string $databaseUrl;
 
-    public function __construct()
+    protected FirebaseAuthService $firebaseAuth;
+
+    public function __construct(FirebaseAuthService $firebaseAuth)
     {
         $this->databaseUrl = config('firebase.database_url');
+        $this->firebaseAuth = $firebaseAuth;
+    }
+
+    /**
+     * Construye la URL REST de la RTDB para un nodo, anexando el access_token
+     * de admin cuando hay credenciales de cuenta de servicio configuradas.
+     * Con el token, las escrituras bypasean las reglas de seguridad.
+     */
+    protected function url(string $path): string
+    {
+        $url = rtrim($this->databaseUrl, '/') . '/' . ltrim($path, '/') . '.json';
+
+        $token = $this->firebaseAuth->accessToken();
+
+        return $token ? $url . '?access_token=' . urlencode($token) : $url;
     }
 
     public function iniciarViaje(HojaRuta $hojaRuta): void
@@ -53,7 +70,7 @@ class FirebaseSyncService
             ];
 
             $response = Http::timeout(10)->put(
-                "{$this->databaseUrl}/viajes_activos/{$firebaseUid}.json",
+                $this->url("viajes_activos/{$firebaseUid}"),
                 $payload
             );
 
@@ -86,7 +103,7 @@ class FirebaseSyncService
             }
 
             $response = Http::timeout(10)->delete(
-                "{$this->databaseUrl}/viajes_activos/{$firebaseUid}.json"
+                $this->url("viajes_activos/{$firebaseUid}")
             );
 
             if ($response->failed()) {
@@ -107,7 +124,7 @@ class FirebaseSyncService
         try {
             // Get current viaje data to find the farmacia index
             $response = Http::timeout(10)->get(
-                "{$this->databaseUrl}/viajes_activos/{$firebaseUid}.json"
+                $this->url("viajes_activos/{$firebaseUid}")
             );
 
             if ($response->failed() || !$response->json()) {
@@ -120,7 +137,7 @@ class FirebaseSyncService
             foreach ($farmacias as $index => $farmacia) {
                 if (($farmacia['id_detalle_hoja_ruta'] ?? '') === (string) $idDetalleHojaRuta) {
                     Http::timeout(10)->patch(
-                        "{$this->databaseUrl}/viajes_activos/{$firebaseUid}/farmacias/{$index}.json",
+                        $this->url("viajes_activos/{$firebaseUid}/farmacias/{$index}"),
                         ['estado' => $estado]
                     );
                     break;

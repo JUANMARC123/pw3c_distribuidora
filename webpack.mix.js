@@ -11,9 +11,6 @@ const mix = require('laravel-mix');
  |
  | Environment variables prefixed with MIX_ are automatically available
  | in the frontend as process.env.MIX_VAR_NAME at build time.
- | 
- | For Mapbox token: add MAPBOX_TOKEN to .env and MIX_MAPBOX_TOKEN="${MAPBOX_TOKEN}"
- | Then in JS: window.MAPBOX_TOKEN = process.env.MIX_MAPBOX_TOKEN || '';
  */
 
 mix.js('resources/js/app.js', 'public/js')
@@ -24,7 +21,6 @@ mix.js('resources/js/app.js', 'public/js')
         // Ensure process.env is available for MIX_ variables
         plugins: [
             new (require('webpack')).DefinePlugin({
-                'process.env.MIX_MAPBOX_TOKEN': JSON.stringify(process.env.MIX_MAPBOX_TOKEN || ''),
                 'process.env.MIX_FIREBASE_API_KEY': JSON.stringify(process.env.MIX_FIREBASE_API_KEY || ''),
                 'process.env.MIX_FIREBASE_DATABASE_URL': JSON.stringify(process.env.MIX_FIREBASE_DATABASE_URL || ''),
             })
