@@ -32,6 +32,21 @@ async function loadRutasActivas() {
         rutasActivas = [];
     }
 
+    // /logistica/rutas-activas solo devuelve el resumen de cada ruta. Las paradas
+    // reales (detalles + despachos) viven en /hojas-ruta/{id}, así que se adjuntan
+    // aquí para que el resto de la vista siga usando getRutaParadas(r).
+    await Promise.all(rutasActivas.map(async r => {
+        const id = r.id_hoja_ruta || r.id;
+        if (!id) { r.despachos = []; return; }
+        try {
+            const det = await apiFetch(`/hojas-ruta/${id}`);
+            const hoja = det?.data || det;
+            r.despachos = mapDetallesToParadas(hoja);
+        } catch (e) {
+            r.despachos = [];
+        }
+    }));
+
     renderTrackingSummary();
     renderTrackingList();
 
@@ -76,7 +91,7 @@ function renderTrackingList() {
         const completadas = getRutaCompletadas(r);
         const isActive = trackingActiveId === id;
         const horaSalida = r.hora_salida ? r.hora_salida.substring(0, 5) : '';
-        const estado = trackSafe(r.estado?.nombre_estado || r.estado || 'En curso');
+        const estado = trackSafe(estadoRutaNombre(r));
         return `
             <article class="tracking-card ${isActive ? 'active' : ''}" onclick="selectTrackingRuta(${id})" data-ruta-id="${id}">
                 <div class="tracking-card-head">
@@ -157,7 +172,7 @@ function renderTrackingDetail(ruta) {
                 <p>' + trackSafe(getRepartidorNameTracking(ruta.repartidor || {})) + '</p>\
                 <p class="tracking-hora-salida"><i class="fas fa-clock"></i> Salida: <strong>' + horaSalida + '</strong></p>\
             </div>\
-            ' + getStatusBadge(ruta.estado?.nombre_estado || ruta.estado || 'En curso') + '\
+            ' + getStatusBadge(estadoRutaNombre(ruta)) + '\
         </div>\
         <div class="route-progress-large">\
             <div class="route-progress-bar"><span style="width:' + getRutaProgreso(ruta) + '%"></span></div>\
@@ -199,11 +214,11 @@ function renderTrackingStop(stop, idx, ruta, isCompletada) {
             <button class="btn btn-sm btn-outline" onclick="openStopModal(' + idx + ')"><i class="fas fa-clipboard-list"></i></button>\
         ';
     } else {
-        actionsHtml = '\
+        actionsHtml = hasPermission('Control Rutas', 'registrar-llegada') ? '\
             <button class="btn btn-sm btn-success btn-llegar" onclick="registrarLlegada(' + getRutaId(ruta) + ', ' + idx + ')">\
                 <i class="fas fa-truck"></i> Llegar\
             </button>\
-        ';
+        ' : '<span class="badge badge-info">Pendiente</span>';
     }
 
     var cls = estaCompletado ? ' tracking-stop-completed' : '';
@@ -228,12 +243,12 @@ async function registrarLlegada(rutaId, stopIdx) {
     if (!ruta) return;
     const paradas = getRutaParadas(ruta);
     const stop = paradas[stopIdx];
-    if (!stop || !stop.id_parada) return;
+    if (!stop || !stop.id_detalle) return;
 
     try {
-        await apiFetch(`/logistica/rutas-activas/${rutaId}/registrar-llegada-parada`, {
+        await apiFetch(`/hojas-ruta/${rutaId}/registrar-llegada`, {
             method: 'POST',
-            body: { id_parada: stop.id_parada },
+            body: { id_detalle: stop.id_detalle },
         });
         stop.hora_llegada = new Date().toTimeString().substring(0, 8);
         renderTrackingDetail(ruta);
@@ -280,26 +295,20 @@ function openStopModal(stopIdx) {
 
             ${!estaCompletado ? `
             <div class="stop-modal-section">
-                <h4><i class="fas fa-exclamation-triangle"></i> Incidencias</h4>
-                <div id="stop-incidencias-list" class="stop-modal-subsection">
-                    <div class="loading-sm"><div class="spinner"></div></div>
-                </div>
-                <button class="btn btn-sm btn-outline" onclick="agregarIncidencia()"><i class="fas fa-plus"></i> Agregar incidencia</button>
-            </div>
-
-            <div class="stop-modal-section">
                 <h4><i class="fas fa-camera"></i> Evidencias</h4>
                 <div id="stop-evidencias-list" class="stop-modal-subsection">
-                    <div class="loading-sm"><div class="spinner"></div></div>
+                    ${hasPermission('Despachos', 'gestionar-evidencias') ? '<div class="loading-sm"><div class="spinner"></div></div>' : '<p class="text-muted">Sin acceso a evidencias.</p>'}
                 </div>
-                <button class="btn btn-sm btn-outline" onclick="agregarEvidencia()"><i class="fas fa-plus"></i> Subir evidencia</button>
+                ${hasPermission('Despachos', 'gestionar-evidencias') ? '<button class="btn btn-sm btn-outline" onclick="agregarEvidencia()"><i class="fas fa-plus"></i> Subir evidencia</button>' : ''}
             </div>
 
+            ${hasPermission('Despachos', 'cambiar-estado') ? `
             <div class="stop-modal-actions">
                 <button class="btn btn-success" onclick="marcarEntregado()"><i class="fas fa-check"></i> Entregado</button>
                 <button class="btn btn-danger" onclick="marcarFallido()"><i class="fas fa-times"></i> Fallido</button>
                 <button class="btn btn-warning" onclick="marcarDevolucion()"><i class="fas fa-undo"></i> Devolucion</button>
             </div>
+            ` : ''}
             ` : `
             <div class="stop-modal-section">
                 <p class="text-muted">Esta parada ya fue completada.</p>
@@ -311,8 +320,7 @@ function openStopModal(stopIdx) {
     overlay.classList.add('active');
     modal.classList.add('active');
 
-    if (!estaCompletado) {
-        loadStopIncidencias();
+    if (!estaCompletado && hasPermission('Despachos', 'gestionar-evidencias')) {
         loadStopEvidencias();
     }
 }
@@ -342,78 +350,6 @@ function createStopModalElements() {
     return overlay;
 }
 
-// ─── Incidencias en la parada ───
-
-async function loadStopIncidencias() {
-    const container = document.getElementById('stop-incidencias-list');
-    if (!container || !currentStop) return;
-    const idDespacho = currentStop.id_despacho;
-    if (!idDespacho) { container.innerHTML = '<p class="text-muted">Sin incidencias.</p>'; return; }
-
-    try {
-        const d = await apiFetch(`/despachos/${idDespacho}/incidencias`);
-        const data = Array.isArray(d) ? d : (d.data || []);
-        if (!data.length) {
-            container.innerHTML = '<p class="text-muted">Sin incidencias registradas.</p>';
-        } else {
-            container.innerHTML = data.map(inc => `
-                <div class="incidencia-item">
-                    <span class="badge badge-warning">${trackSafe(inc.tipo?.nombre_tipo || inc.nombre_tipo || '—')}</span>
-                    <span>${trackSafe(inc.descripcion || '')}</span>
-                </div>
-            `).join('');
-        }
-    } catch (e) {
-        container.innerHTML = '<p class="text-muted">Error al cargar incidencias.</p>';
-    }
-}
-
-async function agregarIncidencia() {
-    if (!currentStop) return;
-
-    const { value: formData } = await Swal.fire({
-        title: 'Nueva Incidencia',
-        html: `
-            <div class="form-group">
-                <label>Tipo de incidencia</label>
-                <select id="swal-tipo-inc" class="form-control">
-                    <option value="1">Producto dañado</option>
-                    <option value="2">Retraso</option>
-                    <option value="3">Dirección incorrecta</option>
-                    <option value="4">Cliente ausente</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Descripción</label>
-                <textarea id="swal-desc-inc" class="form-control" rows="3" placeholder="Describa la incidencia..."></textarea>
-            </div>
-        `,
-        focusConfirm: false,
-        showCancelButton: true,
-        confirmButtonText: 'Guardar',
-        cancelButtonText: 'Cancelar',
-        preConfirm: () => {
-            const tipo = parseInt(document.getElementById('swal-tipo-inc').value);
-            const descripcion = document.getElementById('swal-desc-inc').value.trim();
-            if (!descripcion) { Swal.showValidationMessage('La descripción es obligatoria'); return false; }
-            return { id_tipo_incidencia: tipo, descripcion };
-        }
-    });
-
-    if (!formData) return;
-
-    try {
-        await apiFetch(`/despachos/${currentStop.id_despacho}/incidencias`, {
-            method: 'POST',
-            body: formData,
-        });
-        Swal.fire('Registrada', 'Incidencia registrada correctamente', 'success');
-        loadStopIncidencias();
-    } catch (e) {
-        Swal.fire('Error', e.message || 'Error al registrar incidencia', 'error');
-    }
-}
-
 // ─── Evidencias en la parada ───
 
 async function loadStopEvidencias() {
@@ -434,7 +370,7 @@ async function loadStopEvidencias() {
                     : null;
                 return `
                     <div class="evidencia-item">
-                        <span class="badge badge-info">${trackSafe(ev.tipoEvidencia?.nombre_tipo || ev.tipo?.nombre_tipo || ev.nombre_tipo || '—')}</span>
+                        <span class="badge badge-info">${trackSafe(tipoEvidenciaLabel(ev.tipo_evidencia))}</span>
                         ${url ? `<a href="${url}" target="_blank" class="btn btn-sm btn-outline"><i class="fas fa-eye"></i> Ver</a>` : '<span class="text-muted">Sin archivo</span>'}
                     </div>
                 `;
@@ -454,9 +390,7 @@ async function agregarEvidencia() {
             <div class="form-group">
                 <label>Tipo de evidencia</label>
                 <select id="swal-tipo-ev" class="form-control">
-                    <option value="1">Foto</option>
-                    <option value="2">Firma</option>
-                    <option value="3">PDF</option>
+                    ${TIPOS_EVIDENCIA.map(t => `<option value="${t.clave}">${t.nombre_tipo}</option>`).join('')}
                 </select>
             </div>
             <div class="form-group">
@@ -469,11 +403,11 @@ async function agregarEvidencia() {
         confirmButtonText: 'Subir',
         cancelButtonText: 'Cancelar',
         preConfirm: () => {
-            const tipo = parseInt(document.getElementById('swal-tipo-ev').value);
+            const tipo = document.getElementById('swal-tipo-ev').value;
             const archivo = document.getElementById('swal-archivo-ev').files[0];
             if (!archivo) { Swal.showValidationMessage('Seleccione un archivo'); return false; }
             const fd = new FormData();
-            fd.append('id_tipo_evidencia', tipo);
+            fd.append('tipo_evidencia', tipo);
             fd.append('archivo', archivo);
             return fd;
         }
@@ -500,16 +434,16 @@ async function marcarEntregado() {
     const rutaId = getRutaId(currentRutaForStop);
     const idDespacho = currentStop.id_despacho;
     const idPedido = currentStop.id_pedido || currentStop.pedido_id;
-    const idParada = currentStop.id_parada;
+    const idDetalle = currentStop.id_detalle;
 
-    if (!idParada || !idDespacho || !idPedido) {
+    if (!idDetalle || !idDespacho || !idPedido) {
         return Swal.fire('Error', 'Faltan datos de la parada', 'error');
     }
 
     try {
-        await apiFetch(`/logistica/rutas-activas/${rutaId}/entrega-completada`, {
+        await apiFetch(`/hojas-ruta/${rutaId}/entrega-completada`, {
             method: 'POST',
-            body: { id_parada: idParada, id_despacho: idDespacho, id_pedido: idPedido },
+            body: { id_detalle: idDetalle, id_despacho: idDespacho, id_pedido: idPedido },
         });
         Swal.fire('Completada', 'Entrega marcada como completada', 'success');
         closeStopModal();
@@ -524,9 +458,9 @@ async function marcarFallido() {
     const rutaId = getRutaId(currentRutaForStop);
     const idDespacho = currentStop.id_despacho;
     const idPedido = currentStop.id_pedido || currentStop.pedido_id;
-    const idParada = currentStop.id_parada;
+    const idDetalle = currentStop.id_detalle;
 
-    if (!idParada || !idDespacho || !idPedido) {
+    if (!idDetalle || !idDespacho || !idPedido) {
         return Swal.fire('Error', 'Faltan datos de la parada', 'error');
     }
 
@@ -541,9 +475,9 @@ async function marcarFallido() {
     });
 
     try {
-        await apiFetch(`/logistica/rutas-activas/${rutaId}/entrega-fallida`, {
+        await apiFetch(`/hojas-ruta/${rutaId}/entrega-fallida`, {
             method: 'POST',
-            body: { id_parada: idParada, id_despacho: idDespacho, id_pedido: idPedido, motivo: motivo || '' },
+            body: { id_detalle: idDetalle, id_despacho: idDespacho, id_pedido: idPedido, motivo: motivo || '' },
         });
         Swal.fire('Registrada', 'Entrega marcada como fallida', 'success');
         closeStopModal();
@@ -558,9 +492,9 @@ async function marcarDevolucion() {
     const rutaId = getRutaId(currentRutaForStop);
     const idDespacho = currentStop.id_despacho;
     const idPedido = currentStop.id_pedido || currentStop.pedido_id;
-    const idParada = currentStop.id_parada;
+    const idDetalle = currentStop.id_detalle;
 
-    if (!idParada || !idDespacho || !idPedido) {
+    if (!idDetalle || !idDespacho || !idPedido) {
         return Swal.fire('Error', 'Faltan datos de la parada', 'error');
     }
 
@@ -577,9 +511,9 @@ async function marcarDevolucion() {
     if (!r.isConfirmed) return;
 
     try {
-        await apiFetch(`/logistica/rutas-activas/${rutaId}/devolucion`, {
+        await apiFetch(`/hojas-ruta/${rutaId}/entrega-fallida`, {
             method: 'POST',
-            body: { id_parada: idParada, id_despacho: idDespacho, id_pedido: idPedido },
+            body: { id_detalle: idDetalle, id_despacho: idDespacho, id_pedido: idPedido, motivo: 'Devolución' },
         });
         Swal.fire('Registrada', 'Devolución registrada correctamente', 'success');
         closeStopModal();
@@ -625,41 +559,17 @@ function checkProximityToStops(ruta, repartidorCoords) {
 }
 
 async function autoRegistrarLlegada(rutaId, stopIdx, stop) {
-    if (!stop.id_parada) return;
-    var idDespacho = stop.id_despacho;
-    var idPedido = stop.id_pedido || stop.pedido_id;
-    if (!idDespacho || !idPedido) return;
+    if (!stop.id_detalle) return;
 
     try {
-        var resp = await apiFetch('/logistica/rutas-activas/' + rutaId + '/auto-completar-parada', {
+        await apiFetch('/hojas-ruta/' + rutaId + '/registrar-llegada', {
             method: 'POST',
-            body: { id_parada: stop.id_parada, id_despacho: idDespacho, id_pedido: idPedido },
+            body: { id_detalle: stop.id_detalle },
         });
+        stop.hora_llegada = new Date().toTimeString().substring(0, 5);
         var ruta = rutasActivas.find(function (r) { return getRutaId(r) === rutaId; });
-        if (!ruta) return;
-
-        if (resp.ruta_finalizada) {
-            var idx = rutasActivas.indexOf(ruta);
-            if (idx > -1) rutasActivas.splice(idx, 1);
-            renderTrackingList();
-            if (trackingActiveId === rutaId) {
-                trackingActiveId = rutasActivas.length > 0 ? getRutaId(rutasActivas[0]) : null;
-                renderTrackingDetail(rutasActivas[0] || null);
-                if (rutasActivas.length > 0) selectTrackingRuta(trackingActiveId);
-            }
-            Swal.fire({
-                title: 'Ruta completada',
-                text: 'El repartidor regreso al almacen.',
-                icon: 'success',
-                timer: 3000,
-                showConfirmButton: false,
-            });
-        } else {
-            stop.hora_llegada = new Date().toTimeString().substring(0, 5);
-            stop.estado = 'Entregado completo';
-            if (getRutaId(ruta) === trackingActiveId) {
-                renderTrackingDetail(ruta);
-            }
+        if (ruta && getRutaId(ruta) === trackingActiveId) {
+            renderTrackingDetail(ruta);
         }
     } catch (e) {
         console.warn('Auto-registro de llegada fallo:', e);
@@ -988,7 +898,42 @@ function listenFirebaseTracking() {
 }
 
 function getRutaId(r) {
-    return parseInt(r?.id_control_ruta || r?.control_ruta_id || r?.id_ruta || r?.id || 0);
+    return parseInt(r?.id_hoja_ruta || r?.id_control_ruta || r?.control_ruta_id || r?.id_ruta || r?.id || 0);
+}
+
+/**
+ * El resumen de /logistica/rutas-activas no incluye las paradas. Cada parada real
+ * es un detalle de la hoja de ruta (id_detalle) con su despacho asociado.
+ */
+function mapDetallesToParadas(hoja) {
+    const detalles = hoja?.detalles || [];
+    return detalles.map(det => {
+        const despacho = (det.despachos || [])[0] || null;
+        const farmacia = det.pedido?.farmacia || null;
+        const raw = despacho ? despacho.estado_despacho : 'pendiente';
+        const estado = raw === 'entregado' ? 'Entregado' : (raw === 'incidencia' ? 'Fallido' : 'Pendiente');
+        return {
+            id_detalle: det.id_detalle,
+            id_parada: det.id_detalle,
+            id_despacho: despacho ? despacho.id_despacho : null,
+            id_pedido: det.id_pedido || det.pedido?.id_pedido,
+            hora_llegada: det.hora_llegada,
+            estado: estado,
+            farmacia: farmacia?.nombre || null,
+            latitud: farmacia?.latitud ?? null,
+            longitud: farmacia?.longitud ?? null,
+            orden_visita: det.orden_visita,
+        };
+    });
+}
+
+/**
+ * El estado de la ruta viaja como `estado_ruta` (planificado/en_progreso/...).
+ */
+function estadoRutaNombre(r) {
+    if (!r) return 'En curso';
+    if (r.estado_ruta) return estadoRutaLabel(r.estado_ruta);
+    return r.estado?.nombre_estado || r.estado || 'En curso';
 }
 
 function getRutaParadas(r) {

@@ -182,6 +182,7 @@ function getStatusBadge(status) {
         'en ruta': 'badge-info',
         'fallido': 'badge-danger',
         'cancelado': 'badge-danger',
+        'incidencia': 'badge-danger',
         'operativo': 'badge-success',
         'mantenimiento': 'badge-warning',
         'disponible': 'badge-success',
@@ -218,6 +219,49 @@ function estadoLabel(estado) {
     if (catalogado) return catalogado.nombre_estado;
 
     return clave.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+}
+
+/**
+ * Catálogos fijos del backend actual.
+ *
+ * El backend ya no expone /catalogos/estados-despacho ni /catalogos/tipos-*.
+ * `despachos.estado_despacho`, `evidencias_entrega.tipo_evidencia` y
+ * `hojas_ruta.estado_ruta` son ENUMs de texto en la base de datos, así que se
+ * declaran una sola vez aquí para que el front no llame a endpoints inexistentes.
+ * El `id` solo se usa para construir los <select>.
+ */
+const ESTADOS_DESPACHO = [
+    { id: 1, clave: 'pendiente', nombre_estado: 'Pendiente' },
+    { id: 2, clave: 'entregado', nombre_estado: 'Entregado' },
+    { id: 3, clave: 'incidencia', nombre_estado: 'Incidencia' },
+];
+
+const TIPOS_EVIDENCIA = [
+    { id: 1, clave: 'foto', nombre_tipo: 'Foto' },
+    { id: 2, clave: 'firma', nombre_tipo: 'Firma' },
+    { id: 3, clave: 'sello', nombre_tipo: 'Sello' },
+];
+
+const ESTADOS_RUTA = [
+    { clave: 'planificado', nombre_estado: 'Planificado' },
+    { clave: 'en_progreso', nombre_estado: 'En progreso' },
+    { clave: 'completado', nombre_estado: 'Completado' },
+    { clave: 'cancelado', nombre_estado: 'Cancelado' },
+];
+
+function estadoDespachoLabel(clave) {
+    const item = ESTADOS_DESPACHO.find(e => e.clave === String(clave || '').toLowerCase());
+    return item ? item.nombre_estado : (clave || '—');
+}
+
+function tipoEvidenciaLabel(clave) {
+    const item = TIPOS_EVIDENCIA.find(t => t.clave === String(clave || '').toLowerCase());
+    return item ? item.nombre_tipo : (clave || '—');
+}
+
+function estadoRutaLabel(clave) {
+    const item = ESTADOS_RUTA.find(e => e.clave === String(clave || '').toLowerCase());
+    return item ? item.nombre_estado : (clave || '—');
 }
 
 function formatDate(dateStr) {

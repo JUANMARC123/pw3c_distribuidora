@@ -636,36 +636,30 @@ function initFirebasePlanificador() {
 
 async function mostrarHistorialRepartidor(repartidorId) {
     try {
-        const [despachos, controles] = await Promise.all([
+        const [despachos, hojas] = await Promise.all([
             apiFetch('/despachos?per_page=-1').catch(() => []),
-            apiFetch('/controles-ruta?per_page=-1').catch(() => []),
+            apiFetch('/hojas-ruta?per_page=-1').catch(() => []),
         ]);
         const despachosArr = Array.isArray(despachos) ? despachos : (despachos.data || []);
-        const controlesArr = Array.isArray(controles) ? controles : (controles.data || []);
+        const hojasArr = Array.isArray(hojas) ? hojas : (hojas.data || []);
 
         const hoy = new Date().toISOString().slice(0, 10);
 
-        const controlesHoy = controlesArr.filter(c => {
-            const repId = c.id_repartidor || c.repartidor?.id_repartidor;
-            const fecha = (c.fecha_salida || c.hora_salida || c.created_at || '').slice(0, 10);
+        const hojasHoy = hojasArr.filter(h => {
+            const repId = h.id_repartidor || h.repartidor?.id_repartidor;
+            const fecha = (h.fecha || h.hora_salida || h.created_at || '').slice(0, 10);
             return String(repId) === String(repartidorId) && fecha === hoy;
         });
 
-        const controlIds = controlesHoy.map(c => c.id_control_ruta);
         const despachosHoy = despachosArr.filter(d => {
-            const repId = d.id_repartidor || d.repartidor?.id_repartidor;
-            const fecha = (d.fecha_despacho || d.created_at || '').slice(0, 10);
+            const repId = d.hojaRutaDetalle?.hojaRuta?.repartidor?.id_repartidor || d.id_repartidor || d.repartidor?.id_repartidor;
+            const fecha = (d.fecha_hora_despacho || d.created_at || '').slice(0, 10);
             return String(repId) === String(repartidorId) && fecha === hoy;
         });
 
-        const entregados = despachosHoy.filter(d => {
-            const est = (d.estado?.nombre_estado || d.estado || '').toLowerCase();
-            return est.includes('entreg');
-        }).length;
+        const entregados = despachosHoy.filter(d => String(d.estado_despacho || '').toLowerCase().includes('entreg')).length;
 
-        const incidencias = despachosHoy.reduce((s, d) => {
-            return s + (d.incidencias_count ?? d.incidencias?.length ?? 0);
-        }, 0);
+        const incidencias = despachosHoy.filter(d => String(d.estado_despacho || '').toLowerCase() === 'incidencia').length;
 
         const rep = repartidoresData.find(r => String(getRepartidorId(r)) === String(repartidorId));
         const nombre = rep ? getRepartidorName(rep) : 'Repartidor';
@@ -691,12 +685,12 @@ async function mostrarHistorialRepartidor(repartidorId) {
                         <div style="font-size:12px;color:#64748b;">Incidencias</div>
                     </div>
                 </div>
-                ${controlesHoy.length ? `
+                ${hojasHoy.length ? `
                     <div style="text-align:left;border-top:1px solid var(--border);padding-top:12px;">
                         <strong style="font-size:13px;">Rutas de hoy:</strong>
-                        ${controlesHoy.map(c => `
+                        ${hojasHoy.map(h => `
                             <div style="font-size:12px;padding:4px 0;color:var(--text-muted);">
-                                Control #${c.id_control_ruta} &middot; ${c.ruta?.nombre_ruta || 'Sin ruta'}
+                                Ruta #${h.id_hoja_ruta} &middot; ${estadoRutaLabel(h.estado_ruta)}
                             </div>
                         `).join('')}
                     </div>

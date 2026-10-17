@@ -38,7 +38,7 @@ function renderInicioSkeleton() {
             </div>
         </section>
         <section class="ops-metrics-grid" id="inicio-metricas">
-            ${['Pedidos', 'Entregas', 'Farmacias', 'Repartidores', 'Vehículos', 'Problemas'].map(label => `
+            ${['Pedidos', 'Entregas', 'Farmacias', 'Repartidores', 'Vehículos', 'Pendientes'].map(label => `
                 <div class="ops-metric">
                     <div class="label">${label}</div>
                     <div class="value"><span class="stat-skeleton"></span></div>
@@ -83,7 +83,7 @@ function renderMetricas(resumen, rutas, caja) {
         { label: 'Farmacias', value: resumen.total_farmacias ?? resumen.farmacias ?? 0, hint: 'Clientes' },
         { label: 'Repartidores', value: resumen.total_repartidores ?? resumen.repartidores ?? 0, hint: 'Personal' },
         { label: 'Vehículos', value: resumen.total_vehiculos ?? resumen.vehiculos ?? 0, hint: 'Flota' },
-        { label: 'Problemas', value: resumen.total_incidencias ?? resumen.incidencias ?? 0, hint: 'Incidencias' },
+        { label: 'Pendientes', value: resumen.despachos_pendientes ?? 0, hint: 'Despachos por entregar' },
     ];
 
     document.getElementById('inicio-metricas').innerHTML = metrics.map(m => `
@@ -96,12 +96,12 @@ function renderMetricas(resumen, rutas, caja) {
 }
 
 function renderAlertas(resumen, rutas, caja) {
-    const incidencias = resumen.total_incidencias ?? resumen.incidencias ?? 0;
+    const pendientes = resumen.despachos_pendientes ?? 0;
     const rutasActivas = rutas.length;
     const cajasAbiertas = caja?.cajas_abiertas ?? 0;
     const alertas = [
         { icon: 'fa-route', text: `${rutasActivas} rutas activas`, cls: rutasActivas ? 'badge-info' : 'badge-secondary' },
-        { icon: 'fa-exclamation-triangle', text: `${incidencias} problemas registrados`, cls: incidencias ? 'badge-danger' : 'badge-success' },
+        { icon: 'fa-box', text: `${pendientes} despachos pendientes`, cls: pendientes ? 'badge-warning' : 'badge-success' },
         { icon: 'fa-cash-register', text: `${cajasAbiertas} cajas abiertas`, cls: cajasAbiertas ? 'badge-warning' : 'badge-secondary' },
     ];
     document.getElementById('inicio-alertas').innerHTML = alertas.map(a => `
@@ -127,7 +127,7 @@ function renderRutas(rutas) {
                 <div class="order-card-header">
                     <div>
                         <div class="order-id">${rep.nombre || 'Repartidor'}</div>
-                        <h4>${r.ruta?.nombre_ruta || r.nombre_ruta || 'Ruta activa'}</h4>
+                        <h4>Ruta #${r.id_hoja_ruta || '—'} · ${estadoRutaLabel(r.estado_ruta)}</h4>
                     </div>
                     <span class="badge badge-info">${progreso}%</span>
                 </div>
