@@ -1,0 +1,14 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app/
+    level: 5
+    checkGenericClassInNonGenericObjectType: false
+    checkMissingIterableValueType: false
+    excludePaths:
+        - app/Providers/*
+
+    scanFiles:
+        - vendor/larastan/larastan/stubs/Sanctum.stub

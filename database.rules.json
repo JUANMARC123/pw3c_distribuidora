@@ -1,0 +1,27 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "usuarios": {
+      ".read": true,
+      "$uid": {
+        "info": {
+          ".write": "newData.exists() ? newData.child('id').val() === $uid : true",
+          ".validate": "newData.hasChildren(['id','nombre'])"
+        },
+        "ubicacion": {
+          ".write": true,
+          ".validate": "newData.hasChildren(['latitud','longitud']) && newData.child('latitud').isNumber() && newData.child('longitud').isNumber() && newData.child('latitud').val() >= -90 && newData.child('latitud').val() <= 90 && newData.child('longitud').val() >= -180 && newData.child('longitud').val() <= 180"
+        }
+      }
+    },
+
+    "viajes_activos": {
+      "$uid": {
+        ".read": true,
+        ".write": false
+      }
+    }
+  }
+}
